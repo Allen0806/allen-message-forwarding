@@ -10,4 +10,14 @@
 	<artifactId>allen-message-forwarding-client</artifactId>
 	<name>allen-message-forwarding-client</name>
 	<description>Allen Message Forwarding Client</description>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+		</dependency>
+	</dependencies>
 </project>

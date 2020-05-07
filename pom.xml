@@ -18,4 +18,14 @@
 		<module>allen-message-forwarding-server</module>
 		<module>allen-message-forwarding-task</module>
 	</modules>
+	<properties>
+		<allen.tools.version>1.0.0-SNAPSHOT</allen.tools.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.allen</groupId>
+			<artifactId>allen-tools</artifactId>
+			<version>${allen.tools.version}</version>
+		</dependency>
+	</dependencies>
 </project>
