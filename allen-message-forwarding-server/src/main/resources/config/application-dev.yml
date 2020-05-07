@@ -1,0 +1,121 @@
+# 服务器端口号
+server:
+  port: 8080
+  servlet:
+    # 配置项目名称（默认为 /），如果配置了项目名称，那么在访问路径中要加上配置的路径
+    context-path: /
+    session:
+      # 服务器session最大超时时间(分钟)
+      timeout: 30m
+  # tomcat配置
+  tomcat:
+    # tomcat字符集
+    uri-encoding: UTF-8
+    # tomcat最大连接数
+    max-connections: 2000
+    accept-count: 5000
+    # tomcat最大线程数
+    max-threads: 1000
+    # 最大连接超时时间
+    connection-timeout: 100
+    accesslog:
+      # 启用访问日志
+      enabled: true
+      # 访问日志的格式模式
+      pattern: common
+      # 是否缓冲输出，使其仅定期刷新
+      buffered: true
+      # 创建日志文件的目录。可以绝对或相对于Tomcat基础目录
+      directory: D:/Develop/Logs/allen-user
+      # 要放在日志文件名中的日期格式
+      file-date-format: .yyyy-MM-dd
+      # 日志文件名前缀
+      prefix: access_log
+       # 日志文件名后缀
+      suffix: .log
+      # 是否延迟在文件名中包含日期戳，直到旋转时间
+      rename-on-rotate: false
+      # 设置请求的IP地址，主机名，协议和端口的请求属性
+      request-attributes-enabled: false
+      # 是否启用访问日志轮换
+      rotate: true
+
+spring:
+  application:
+    name: allen-user
+  http:
+    encoding:
+      charset: UTF-8
+  main:
+    banner-mode: "off"
+  datasource:
+    # 使用druid连接池
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/mydev?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&allowMultiQueries=true
+     # 配置基本属性
+    username: mydev
+    password: Mydev@1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # druid相关配置
+    druid:
+      # 配置初始化大小/最小/最大
+      initial-size: 5
+      min-idle: 5
+      max-active: 30
+      # 获取连接等待超时时间
+      max-wait: 60000
+      # 间隔多久进行一次检测，检测需要关闭的空闲连接
+      time-between-eviction-runs-millis: 60000
+      # 一个连接在池中最小生存的时间
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 'x'
+      # 是否在连接空闲一段时间后检测其可用性
+      test-while-idle: true
+      # 是否在获得连接后检测其可用性
+      test-on-borrow: false
+      # 是否在连接放回连接池后检测其可用性
+      test-on-return: false
+      # 打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+      pool-prepared-statements: false
+      max-pool-prepared-statement-per-connection-size: 20
+      # 监控统计过滤器stat，拦截防注入过滤器wall
+      filters: stat,wall
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+#      filter: 
+#        wall:
+#          enabled: true
+#          db-type: mysql
+#          config:
+#            # 是否允许同时执行多条语句
+#            multi-statement-allow: true
+      web-stat-filter:
+        enabled: true
+        url-pattern: "/*"
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+        session-stat-enable: true
+      stat-view-servlet:
+         # 是否启用StatViewServlet默认值true
+        enabled: true
+        # 访问路径为/druid时，跳转到StatViewServlet
+        url-pattern: "/druid/*"
+        # 是否能够重置数据
+        reset-enable: false
+        # 需要账号密码才能访问控制台，默认为root
+        login-username: druid
+        login-password: druid
+        # IP白名单
+        allow: 127.0.0.1
+        # IP黑名单（共同存在时，deny优先于allow）
+        deny: 
+
+#配置Mybatis
+mybatis:
+  # 路径都使用双星，不使用单星
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  type-aliases-package: com.allen.**.data
+  type-handlers-package: com.allen.**.typehandler
+  configuration:
+    # 开启驼峰命名转换，如：Table(create_time) -> Entity(createTime)。不需要我们关心怎么进行字段匹配，mybatis会自动识别`大写字母与下划线`
+    map-underscore-to-camel-case: true
+      
