@@ -10,4 +10,18 @@
 	<artifactId>allen-message-forwarding-task</artifactId>
 	<name>allen-message-forwarding-task</name>
 	<description>Allen Message Forwarding Task</description>
+	<properties>
+		<allen-message-forwarding.version>1.0.0-SNAPSHOT</allen-message-forwarding.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.allen</groupId>
+			<artifactId>allen-message-forwarding-service</artifactId>
+			<version>${allen-message-forwarding.version}</version>
+		</dependency>
+	</dependencies>
 </project>

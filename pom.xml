@@ -19,13 +19,13 @@
 		<module>allen-message-forwarding-task</module>
 	</modules>
 	<properties>
-		<allen.tools.version>1.0.0-SNAPSHOT</allen.tools.version>
+		<allen-tools.version>1.0.0-SNAPSHOT</allen-tools.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>com.allen</groupId>
 			<artifactId>allen-tools</artifactId>
-			<version>${allen.tools.version}</version>
+			<version>${allen-tools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

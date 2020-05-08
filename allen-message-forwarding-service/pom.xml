@@ -10,4 +10,30 @@
 	<artifactId>allen-message-forwarding-service</artifactId>
 	<name>allen-message-forwarding-service</name>
 	<description>Allen Message Forwarding Service</description>
+	<properties>
+		<allen-message-forwarding.version>1.0.0-SNAPSHOT</allen-message-forwarding.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.allen</groupId>
+			<artifactId>allen-message-forwarding-client</artifactId>
+			<version>${allen-message-forwarding.version}</version>
+		</dependency>
+	</dependencies>
 </project>
