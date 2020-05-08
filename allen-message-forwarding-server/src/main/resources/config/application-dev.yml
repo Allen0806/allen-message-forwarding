@@ -42,7 +42,7 @@ server:
 
 spring:
   application:
-    name: allen-user
+    name: allen-message-forwarding-server
   http:
     encoding:
       charset: UTF-8

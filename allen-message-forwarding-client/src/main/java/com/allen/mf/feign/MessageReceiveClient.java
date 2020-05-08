@@ -14,7 +14,7 @@ import com.allen.tool.result.BaseResult;
  * @author Allen
  * @date 2020年4月20日
  */
-@FeignClient(name = "allen-message-forwarding", path = "/mf", fallback = MessageReceiveFallback.class)
+@FeignClient(name = "allen-message-forwarding-server", path = "/mf", fallback = MessageReceiveFallback.class)
 public interface MessageReceiveClient {
 
 	/**
@@ -24,6 +24,6 @@ public interface MessageReceiveClient {
 	 * @return 响应对象
 	 */
 	@PostMapping(value = "/process/message/receive", headers = { "Content-Type=application/json" })
-	public BaseResult<Object> receive(@RequestBody MessageDTO request);
+	public BaseResult<Object> receive(@RequestBody MessageDTO messageDTO);
 
 }

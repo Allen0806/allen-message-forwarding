@@ -16,7 +16,7 @@ import com.allen.tool.result.BaseResult;
 public class MessageReceiveFallback implements MessageReceiveClient {
 
 	@Override
-	public BaseResult<Object> receive(MessageDTO request) {
+	public BaseResult<Object> receive(MessageDTO messageDTO) {
 		return new BaseResult<Object>(BaseResult.STATUS_SYSTEM_FAILURE, "请求失败");
 	}
 

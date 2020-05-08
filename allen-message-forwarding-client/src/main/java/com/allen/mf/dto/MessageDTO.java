@@ -24,13 +24,13 @@ public class MessageDTO implements java.io.Serializable {
 	/**
 	 * 消息流水号，固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复
 	 */
-	@ApiModelProperty(value = "消息流水号", dataType = "String", required = true)
+	@ApiModelProperty(name = "消息流水号", value = "固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复", dataType = "String", required = true)
 	private String messageNo;
 
 	/**
 	 * 业务线ID，最长20位
 	 */
-	@ApiModelProperty(value = "业务线ID", dataType = "String", required = true)
+	@ApiModelProperty(name = "业务线ID", value = "最长20位", dataType = "String", required = true)
 	private String businessLineId;
 
 	/**
@@ -42,25 +42,25 @@ public class MessageDTO implements java.io.Serializable {
 	/**
 	 * 消息ID，即消息配置信息里的消息ID，固定6位
 	 */
-	@ApiModelProperty(value = "消息ID", dataType = "Integer", required = true)
+	@ApiModelProperty(name = "消息ID", value = "消息配置信息里的消息ID，固定6位", dataType = "Integer", required = true)
 	private Integer messageId;
 
 	/**
 	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
 	 */
-	@ApiModelProperty(value = "消息关键字", dataType = "String", required = true)
+	@ApiModelProperty(name = "消息关键字", value = "方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位", dataType = "String", required = true)
 	private String messageKeyword;
 
 	/**
 	 * 通过Http接口转发消息时，设置到http header里的参数，比如接口编号等
 	 */
-	@ApiModelProperty(value = "Http Header 参数", dataType = "Map<String, String>", required = false)
+	@ApiModelProperty(name = "Http Header 参数", value = "通过Http接口转发消息时，设置到http header里的参数，比如接口编号等", dataType = "Map<String, String>", required = false)
 	private Map<String, String> httpHeaders;
 
 	/**
 	 * 要转发的消息内容
 	 */
-	@ApiModelProperty(value = "消息内容", dataType = "String", required = true)
+	@ApiModelProperty(name = "消息内容", dataType = "String", required = true)
 	private String messageContent;
 
 	public String getMessageNo() {
