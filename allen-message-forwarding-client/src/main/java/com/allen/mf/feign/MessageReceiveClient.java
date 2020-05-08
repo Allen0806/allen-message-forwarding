@@ -14,7 +14,7 @@ import com.allen.tool.result.BaseResult;
  * @author Allen
  * @date 2020年4月20日
  */
-@FeignClient(name = "allen-message-forwarding-service", path = "/mmf", fallback = MessageReceiveFallback.class)
+@FeignClient(name = "allen-message-forwarding", path = "/mf", fallback = MessageReceiveFallback.class)
 public interface MessageReceiveClient {
 
 	/**
