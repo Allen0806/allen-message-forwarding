@@ -26,7 +26,7 @@ server:
       # 是否缓冲输出，使其仅定期刷新
       buffered: true
       # 创建日志文件的目录。可以绝对或相对于Tomcat基础目录
-      directory: D:/Develop/Logs/allen-user
+      directory: /Users/allen/Develop/logs/${spring.application.name}
       # 要放在日志文件名中的日期格式
       file-date-format: .yyyy-MM-dd
       # 日志文件名前缀

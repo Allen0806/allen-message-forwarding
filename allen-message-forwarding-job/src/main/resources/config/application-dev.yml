@@ -1,6 +1,6 @@
 # 服务器端口号
 server:
-  port: 8080
+  port: 8081
   servlet:
     # 配置项目名称（默认为 /），如果配置了项目名称，那么在访问路径中要加上配置的路径
     context-path: /
@@ -26,7 +26,7 @@ server:
       # 是否缓冲输出，使其仅定期刷新
       buffered: true
       # 创建日志文件的目录。可以绝对或相对于Tomcat基础目录
-      directory: D:/Develop/Logs/allen-user
+      directory: /Users/allen/Develop/logs/${spring.application.name}
       # 要放在日志文件名中的日期格式
       file-date-format: .yyyy-MM-dd
       # 日志文件名前缀
@@ -42,7 +42,7 @@ server:
 
 spring:
   application:
-    name: allen-user
+    name: allen-message-forwarding-job
   http:
     encoding:
       charset: UTF-8
