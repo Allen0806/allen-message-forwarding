@@ -108,7 +108,47 @@ spring:
         allow: 127.0.0.1
         # IP黑名单（共同存在时，deny优先于allow）
         deny: 
-
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true
+eureka:
+  instance:
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
+    hostname: ${spring.cloud.client.ip-address}
+    lease-expiration-duration-in-seconds: 15 # 服务过期时间 （服务提供方）
+    lease-renewal-interval-in-seconds: 3 #服务刷新时间配置，每隔这个时间会主动心跳一次 (服务提供方）
+  client:
+    registry-fetch-interval-seconds: 3 #拉服务列表时间间隔 （客户端）
+    register-with-eureka: true  #注册到eureka server
+    service-url:
+      defaultZone: http://admin:123@10.3.1.92:9000/eureka/
+feign:
+  hystrix:
+    enabled: true
+  okhttp:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
+  client:
+    config:
+      default: 
+        retryer: feign.Retryer.Default
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 6000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream,health,info
 #配置Mybatis
 mybatis:
   # 路径都使用双星，不使用单星
