@@ -7,9 +7,9 @@
 		<artifactId>allen-message-forwarding</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>allen-message-forwarding-task</artifactId>
-	<name>allen-message-forwarding-task</name>
-	<description>Allen Message Forwarding Task</description>
+	<artifactId>allen-message-forwarding-job</artifactId>
+	<name>allen-message-forwarding-job</name>
+	<description>Allen Message Forwarding Job</description>
 	<properties>
 		<allen-message-forwarding.version>1.0.0-SNAPSHOT</allen-message-forwarding.version>
 	</properties>

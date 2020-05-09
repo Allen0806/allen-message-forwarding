@@ -2,6 +2,11 @@ package com.allen.mf.dto;
 
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.Range;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -25,30 +30,40 @@ public class MessageDTO implements java.io.Serializable {
 	 * 消息流水号，固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复
 	 */
 	@ApiModelProperty(name = "消息流水号", value = "固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复", dataType = "String", required = true)
+	@NotNull(message = "消息流水号不能为空")
+	@Size(min = 32, max = 32, message = "消息流水号固定32位")
 	private String messageNo;
 
 	/**
 	 * 业务线ID，最长20位
 	 */
 	@ApiModelProperty(name = "业务线ID", value = "最长20位", dataType = "String", required = true)
+	@NotNull(message = "业务线ID不能为空")
+	@Size(max = 20, message = "业务线ID最长20位")
 	private String businessLineId;
 
 	/**
 	 * 来源系统ID，固定4位
 	 */
 	@ApiModelProperty(value = "来源系统ID", dataType = "Integer", required = true)
+	@NotNull(message = "来源系统ID不能为空")
+	@Range(min = 1000, max = 9999, message = "来源系统ID取值范围为1000~9999")
 	private Integer sourceSystemId;
 
 	/**
 	 * 消息ID，即消息配置信息里的消息ID，固定6位
 	 */
 	@ApiModelProperty(name = "消息ID", value = "消息配置信息里的消息ID，固定6位", dataType = "Integer", required = true)
+	@NotNull(message = "消息ID不能为空")
+	@Range(min = 100000, max = 999999, message = "消息ID取值范围为100000~999999")
 	private Integer messageId;
 
 	/**
 	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
 	 */
 	@ApiModelProperty(name = "消息关键字", value = "方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位", dataType = "String", required = true)
+	@NotNull(message = "消息关键字不能为空")
+	@Size(max = 32, message = "消息关键字最长32位")
 	private String messageKeyword;
 
 	/**
@@ -61,6 +76,7 @@ public class MessageDTO implements java.io.Serializable {
 	 * 要转发的消息内容
 	 */
 	@ApiModelProperty(name = "消息内容", dataType = "String", required = true)
+	@NotNull(message = "消息内容不能为空")
 	private String messageContent;
 
 	public String getMessageNo() {

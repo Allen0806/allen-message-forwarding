@@ -18,8 +18,8 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan(basePackages = "com.allen")
 @MapperScan(basePackages = "com.allen.**.dao")
-@EnableEurekaClient
-@EnableDiscoveryClient
+@EnableEurekaClient // 仅适用于Eureka注册中心
+//@EnableDiscoveryClient 适用于其他注册中心
 public class MessageForwardingApplication {
 
 	public static void main(String[] args) {

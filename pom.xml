@@ -16,7 +16,7 @@
 		<module>allen-message-forwarding-client</module>
 		<module>allen-message-forwarding-service</module>
 		<module>allen-message-forwarding-server</module>
-		<module>allen-message-forwarding-task</module>
+		<module>allen-message-forwarding-job</module>
 	</modules>
 	<properties>
 		<allen-tools.version>1.0.0-SNAPSHOT</allen-tools.version>
