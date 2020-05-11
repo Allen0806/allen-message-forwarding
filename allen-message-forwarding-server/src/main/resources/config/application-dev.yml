@@ -25,12 +25,13 @@ server:
       pattern: common
       # 是否缓冲输出，使其仅定期刷新
       buffered: true
-      # 创建日志文件的目录。可以绝对或相对于Tomcat基础目录
-      directory: /Users/allen/Develop/logs/${spring.application.name}
+      # 创建日志文件的目录。可以绝对或相对于Tomcat基础目录（整体一定是绝对路径，windows要加盘符）
+      directory: D:/Users/allen/Develop/logs/${spring.application.name}
+      # directory: /Users/allen/Develop/logs/${spring.application.name}
+       # 日志文件名前缀
+      prefix: ${spring.application.name}-access-
       # 要放在日志文件名中的日期格式
-      file-date-format: .yyyy-MM-dd
-      # 日志文件名前缀
-      prefix: access_log
+      file-date-format: yyyy-MM-dd
        # 日志文件名后缀
       suffix: .log
       # 是否延迟在文件名中包含日期戳，直到旋转时间
@@ -122,7 +123,7 @@ eureka:
     registry-fetch-interval-seconds: 3 #拉服务列表时间间隔 （客户端）
     register-with-eureka: true  #注册到eureka server
     service-url:
-      defaultZone: http://admin:123@10.3.1.92:9000/eureka/
+      defaultZone: http://allen:allen1234@${eureka.instance.hostname}:8701/eureka/
 feign:
   hystrix:
     enabled: true
@@ -149,6 +150,7 @@ management:
     web:
       exposure:
         include: hystrix.stream,health,info
+        
 #配置Mybatis
 mybatis:
   # 路径都使用双星，不使用单星
