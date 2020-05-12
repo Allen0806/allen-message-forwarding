@@ -26,8 +26,8 @@ server:
       # 是否缓冲输出，使其仅定期刷新
       buffered: true
       # 创建日志文件的目录。可以绝对或相对于Tomcat基础目录（整体一定是绝对路径，windows要加盘符）
-      directory: D:/Users/allen/Develop/logs/${spring.application.name}
-      # directory: /Users/allen/Develop/logs/${spring.application.name}
+      #directory: D:/Users/allen/Develop/logs/${spring.application.name}
+      directory: /Users/allen/Develop/logs/${spring.application.name}
        # 日志文件名前缀
       prefix: ${spring.application.name}-access-
       # 要放在日志文件名中的日期格式
@@ -109,10 +109,7 @@ spring:
         allow: 127.0.0.1
         # IP黑名单（共同存在时，deny优先于allow）
         deny: 
-  cloud:
-    loadbalancer:
-      retry:
-        enabled: true
+
 eureka:
   instance:
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
@@ -135,34 +132,7 @@ eureka:
     fetch-registry: true
     # 表示客户端需要注册的 Eureka Server 的地址。
     service-url:
-      defaultZone: http://allen:allen1234@localhost:8701/eureka/
-      
-feign:
-  hystrix:
-    enabled: true
-  okhttp:
-    enabled: true
-  compression:
-    request:
-      enabled: true
-    response:
-      enabled: true
-  client:
-    config:
-      default: 
-        retryer: feign.Retryer.Default
-hystrix:
-  command:
-    default:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 6000
-management:
-  endpoints:
-    web:
-      exposure:
-        include: hystrix.stream,health,info
+      defaultZone: http://allen:allen1234@${spring.cloud.client.ip-address}:8701/eureka/
         
 #配置Mybatis
 mybatis:

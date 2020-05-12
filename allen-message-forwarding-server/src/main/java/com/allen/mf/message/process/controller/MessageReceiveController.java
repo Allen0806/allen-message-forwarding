@@ -28,6 +28,9 @@ public class MessageReceiveController {
 	 */
 	@PostMapping(value = "/process/message/receive")
 	public BaseResult<Object> receive(@RequestBody MessageDTO messageDTO) {
+		BaseResult<Object> baseResult = new BaseResult<>();
+		baseResult.setStatus(BaseResult.STATUS_HANDLE_SUCCESS);
+		baseResult.setMessage("请求成功");
 		return null;
 	}
 }
