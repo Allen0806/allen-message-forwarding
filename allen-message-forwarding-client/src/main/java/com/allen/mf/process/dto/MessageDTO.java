@@ -1,4 +1,4 @@
-package com.allen.mf.dto;
+package com.allen.mf.process.dto;
 
 import java.util.Map;
 

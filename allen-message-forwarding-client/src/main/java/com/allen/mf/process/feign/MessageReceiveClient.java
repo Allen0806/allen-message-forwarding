@@ -1,15 +1,15 @@
-package com.allen.mf.feign;
+package com.allen.mf.process.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.allen.mf.dto.MessageDTO;
-import com.allen.mf.fallback.MessageReceiveFallback;
+import com.allen.mf.process.dto.MessageDTO;
+import com.allen.mf.process.fallback.MessageReceiveFallback;
 import com.allen.tool.result.BaseResult;
 
 /**
- * 
+ * 消息接收 Feign Client，供外部系统集成使用
  * 
  * @author Allen
  * @date 2020年4月20日
@@ -18,10 +18,10 @@ import com.allen.tool.result.BaseResult;
 public interface MessageReceiveClient {
 
 	/**
-	 * 新增操作.
+	 * 消息接收Feign Client接口
 	 * 
-	 * @param request 请求对象
-	 * @return 响应对象
+	 * @param messageDTO 消息对象
+	 * @return 接收结果
 	 */
 	@PostMapping(value = "/process/message/receive", headers = { "Content-Type=application/json" })
 	public BaseResult<Object> receive(@RequestBody MessageDTO messageDTO);

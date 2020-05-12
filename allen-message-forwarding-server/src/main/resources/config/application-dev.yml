@@ -117,13 +117,26 @@ eureka:
   instance:
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
     hostname: ${spring.cloud.client.ip-address}
-    lease-expiration-duration-in-seconds: 15 # 服务过期时间 （服务提供方）
-    lease-renewal-interval-in-seconds: 3 #服务刷新时间配置，每隔这个时间会主动心跳一次 (服务提供方）
+    # true：实例以 IP 的形式注册；false：实例以机器 HOSTNAME 形式注册
+    prefer-ip-address: true
+    # 表示 Eureka Server 在接收到上一个心跳之后等待下一个心跳的秒数（默认 90 秒），
+    # 若不能在指定时间内收到心跳，则移除此实例，并禁止此实例的流量。
+    # 需要设置为至少高于 lease-renewal-interval-in-seconds 的值，不然会被误移除了。
+    lease-expiration-duration-in-seconds: 30
+    # 表示 Eureka Client 向 Eureka Server 发送心跳的频率（默认 30 秒），
+    # 如果在 lease-expiration-duration-in-seconds 指定的时间内未收到心跳，则移除该实例。
+    lease-renewal-interval-in-seconds: 10
   client:
-    registry-fetch-interval-seconds: 3 #拉服务列表时间间隔 （客户端）
-    register-with-eureka: true  #注册到eureka server
+    # Eureka Client 刷新本地缓存时间，默认30秒
+    registry-fetch-interval-seconds: 5
+    # 表示是否将自己注册到Eureka Server，默认为true。
+    register-with-eureka: true 
+    # 表示是否从Eureka Server获取注册信息，默认为true。
+    fetch-registry: true
+    # 表示客户端需要注册的 Eureka Server 的地址。
     service-url:
-      defaultZone: http://allen:allen1234@${eureka.instance.hostname}:8701/eureka/
+      defaultZone: http://allen:allen1234@localhost:8701/eureka/
+      
 feign:
   hystrix:
     enabled: true
