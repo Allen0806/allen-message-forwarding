@@ -1,9 +1,9 @@
-package com.allen.mf.process.fallback;
+package com.allen.mf.message.process.fallback;
 
 import org.springframework.stereotype.Component;
 
-import com.allen.mf.process.dto.MessageDTO;
-import com.allen.mf.process.feign.MessageReceiveClient;
+import com.allen.mf.message.process.dto.MessageDTO;
+import com.allen.mf.message.process.feign.MessageReceiveClient;
 import com.allen.tool.result.BaseResult;
 
 /**

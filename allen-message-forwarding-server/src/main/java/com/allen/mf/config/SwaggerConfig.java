@@ -1,4 +1,4 @@
-package com.allen.mf;
+package com.allen.mf.config;
 
 import java.util.Collections;
 
