@@ -118,7 +118,7 @@
             <AppenderRef ref="DruidSqlLog"/>
         </Logger>
         
-		<Root level="DEBUG" includeLocation="true">
+		<Root level="INFO" includeLocation="true">
 			<AppenderRef ref="DebugLog" />
 			<AppenderRef ref="InfoLog" />
 			<AppenderRef ref="WarnLog" />

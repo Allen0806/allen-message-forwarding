@@ -31,6 +31,6 @@ public class MessageReceiveController {
 		BaseResult<Object> baseResult = new BaseResult<>();
 		baseResult.setStatus(BaseResult.STATUS_HANDLE_SUCCESS);
 		baseResult.setMessage("请求成功");
-		return null;
+		return baseResult;
 	}
 }
