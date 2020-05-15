@@ -21,9 +21,9 @@ import com.allen.tool.result.BaseResult;
 public class MessageReceiveController {
 
 	/**
-	 * 新增操作.
+	 * 接收消息
 	 * 
-	 * @param request 请求对象
+	 * @param messageDTO 消息对象
 	 * @return 响应对象
 	 */
 	@PostMapping(value = "/process/message/receive")
