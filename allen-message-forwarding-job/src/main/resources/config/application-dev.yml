@@ -6,7 +6,7 @@ server:
     context-path: /
     session:
       # 服务器session最大超时时间(分钟)
-      timeout: 30m
+      timeout: 30m    encoding:      charset: UTF-8
   # tomcat配置
   tomcat:
     # tomcat字符集
@@ -15,8 +15,6 @@ server:
     max-connections: 2000
     accept-count: 5000
     # tomcat最大线程数
-    max-threads: 1000
-    # 最大连接超时时间
     connection-timeout: 100
     accesslog:
       # 启用访问日志
@@ -38,14 +36,11 @@ server:
       # 设置请求的IP地址，主机名，协议和端口的请求属性
       request-attributes-enabled: false
       # 是否启用访问日志轮换
-      rotate: true
+      rotate: true    threads:      max: 1000
 
 spring:
   application:
     name: allen-message-forwarding-job
-  http:
-    encoding:
-      charset: UTF-8
   main:
     banner-mode: "off"
   datasource:
