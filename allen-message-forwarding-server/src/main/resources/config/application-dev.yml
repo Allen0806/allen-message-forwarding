@@ -13,6 +13,7 @@ server:
     uri-encoding: UTF-8
     # tomcat最大连接数
     max-connections: 2000
+    # accept队列长度
     accept-count: 5000
     # 最大连接超时时间
     connection-timeout: 100
