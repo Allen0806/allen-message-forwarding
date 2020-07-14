@@ -33,7 +33,7 @@ public class SwaggerConfig {
 
 	private ApiInfo apiInfo() {
 		return new ApiInfo("消息转发系统接口文档", "网站：https://message.allenworks.cn，欢迎大家访问。", "API V1.0.0", "Terms of service",
-				new Contact("消息转发系统", "https://message.allenworks.cn", "allen0903@163.com"), "Apache",
+				new Contact("消息转发系统", "https://message.allenworks.cn", "chase_dream_luo@163.com"), "Apache",
 				"http://www.apache.org/", Collections.emptyList());
 	}
 }

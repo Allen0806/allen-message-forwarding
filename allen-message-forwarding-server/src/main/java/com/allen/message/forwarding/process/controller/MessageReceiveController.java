@@ -17,7 +17,7 @@ import com.allen.tool.result.BaseResult;
  *
  */
 @RestController
-@RequestMapping(path = "/mf")
+@RequestMapping(path = "/message/forwarding")
 public class MessageReceiveController {
 
 	/**
@@ -26,7 +26,7 @@ public class MessageReceiveController {
 	 * @param messageDTO 消息对象
 	 * @return 响应对象
 	 */
-	@PostMapping(value = "/process/message/receive")
+	@PostMapping(value = "/process/receive")
 	public BaseResult<Object> receive(@RequestBody MessageDTO messageDTO) {
 		BaseResult<Object> baseResult = new BaseResult<>();
 		baseResult.setStatus(BaseResult.STATUS_HANDLE_SUCCESS);
