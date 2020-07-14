@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.allen.message.forwarding.process.dto.MessageDTO;
+import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.tool.result.BaseResult;
 
 /**

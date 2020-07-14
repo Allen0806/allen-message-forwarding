@@ -4,8 +4,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.allen.message.forwarding.process.dto.MessageDTO;
 import com.allen.message.forwarding.process.fallback.MessageReceiveFallback;
+import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.tool.result.BaseResult;
 
 /**
