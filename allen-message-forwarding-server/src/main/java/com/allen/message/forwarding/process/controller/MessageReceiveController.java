@@ -1,11 +1,11 @@
-package com.allen.mf.message.process.controller;
+package com.allen.message.forwarding.process.controller;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.allen.mf.message.process.dto.MessageDTO;
+import com.allen.message.forwarding.process.dto.MessageDTO;
 import com.allen.tool.result.BaseResult;
 
 /**

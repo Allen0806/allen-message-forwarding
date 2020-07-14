@@ -1,4 +1,4 @@
-package com.allen.mf.config;
+package com.allen.message.forwarding.config;
 
 import java.util.Collections;
 

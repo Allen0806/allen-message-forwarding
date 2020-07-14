@@ -1,4 +1,4 @@
-package com.allen.mf;
+package com.allen.message.forwarding;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;

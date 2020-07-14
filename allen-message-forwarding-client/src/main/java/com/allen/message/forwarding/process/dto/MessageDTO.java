@@ -1,4 +1,4 @@
-package com.allen.mf.message.process.dto;
+package com.allen.message.forwarding.process.dto;
 
 import java.util.Map;
 

@@ -1,11 +1,11 @@
-package com.allen.mf.message.process.feign;
+package com.allen.message.forwarding.process.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.allen.mf.message.process.dto.MessageDTO;
-import com.allen.mf.message.process.fallback.MessageReceiveFallback;
+import com.allen.message.forwarding.process.dto.MessageDTO;
+import com.allen.message.forwarding.process.fallback.MessageReceiveFallback;
 import com.allen.tool.result.BaseResult;
 
 /**
