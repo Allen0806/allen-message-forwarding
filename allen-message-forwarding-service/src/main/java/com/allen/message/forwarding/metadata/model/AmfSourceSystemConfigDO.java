@@ -8,8 +8,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Range;
 
-import com.allen.tool.validation.group.Insert;
-import com.allen.tool.validation.group.Update;
+import com.allen.tool.validation.ValidationGroup;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -33,14 +32,14 @@ public class AmfSourceSystemConfigDO implements Serializable {
 	 * 主键ID，修改时不可为空
 	 */
 	@ApiModelProperty(value = "主键ID，修改时不可为空", dataType = "Long", required = true)
-	@NotNull(message = "主键ID不能为空", groups = { Update.class })
+	@NotNull(message = "主键ID不能为空", groups = { ValidationGroup.Update.class })
 	private Long id;
 
 	/**
 	 * 业务线ID，最长20位，新增时不可为空
 	 */
 	@ApiModelProperty(value = "业务线ID，最长20位，新增时不可为空", dataType = "String", required = true)
-	@NotNull(message = "业务线ID不能为空", groups = { Insert.class })
+	@NotNull(message = "业务线ID不能为空", groups = { ValidationGroup.Insert.class })
 	@Size(max = 20, message = "业务线ID最长20位")
 	private String businessLineId;
 
@@ -48,7 +47,7 @@ public class AmfSourceSystemConfigDO implements Serializable {
 	 * 业务线名称，最长30位，新增时不可为空
 	 */
 	@ApiModelProperty(value = "业务线名称，最长30位，新增时不可为空", dataType = "String", required = true)
-	@NotNull(message = "业务线名称不能为空", groups = { Insert.class })
+	@NotNull(message = "业务线名称不能为空", groups = { ValidationGroup.Insert.class })
 	@Size(max = 30, message = "业务线名称最长30位")
 	private String businessLineName;
 
@@ -56,7 +55,7 @@ public class AmfSourceSystemConfigDO implements Serializable {
 	 * 来源系统ID，固定4位，新增时不可为空
 	 */
 	@ApiModelProperty(value = "来源系统ID，固定4位，新增时不可为空", dataType = "Integer", required = true)
-	@NotNull(message = "来源系统ID不能为空", groups = { Insert.class })
+	@NotNull(message = "来源系统ID不能为空", groups = { ValidationGroup.Insert.class })
 	@Range(min = 1000, max = 9999, message = "来源系统ID取值范围为1000~9999")
 	private Integer sourceSystemId;
 
@@ -64,7 +63,7 @@ public class AmfSourceSystemConfigDO implements Serializable {
 	 * 来源系统名称，最长30位，新增时不可为空
 	 */
 	@ApiModelProperty(value = "来源系统名称，最长30位，新增时不可为空", dataType = "String", required = true)
-	@NotNull(message = "来源系统名称不能为空", groups = { Insert.class })
+	@NotNull(message = "来源系统名称不能为空", groups = { ValidationGroup.Insert.class })
 	@Size(max = 30, message = "来源系统名称最长30位")
 	private String sourceSystemName;
 
@@ -79,7 +78,7 @@ public class AmfSourceSystemConfigDO implements Serializable {
 	 * 创建人ID，最长20位，新增时不可为空，不可修改
 	 */
 	@ApiModelProperty(value = "创建人ID，最长20位，新增时不可为空，不可修改", dataType = "String", required = true)
-	@NotNull(message = "创建人ID不能为空", groups = { Insert.class })
+	@NotNull(message = "创建人ID不能为空", groups = { ValidationGroup.Insert.class })
 	@Size(max = 20, message = "创建人ID最长20位")
 	private String createdBy;
 
@@ -93,7 +92,7 @@ public class AmfSourceSystemConfigDO implements Serializable {
 	 * 最后修改人ID，最长20位，修改时不可为空
 	 */
 	@ApiModelProperty(value = "最后修改人ID，最长20位，修改时不可为空", dataType = "String", required = true)
-	@NotNull(message = "最后修改人ID不能为空", groups = { Update.class })
+	@NotNull(message = "最后修改人ID不能为空", groups = { ValidationGroup.Update.class })
 	@Size(max = 20, message = "最后修改人ID最长20位")
 	private String updatedBy;
 

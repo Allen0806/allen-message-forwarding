@@ -9,8 +9,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Range;
 
-import com.allen.tool.validation.group.Insert;
-import com.allen.tool.validation.group.Update;
+import com.allen.tool.validation.ValidationGroup;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -34,21 +33,21 @@ public class AmfMessageForwardingConfigDO implements Serializable {
 	 * 主键ID，修改时不可为空
 	 */
 	@ApiModelProperty(value = "主键ID，修改时不可为空", dataType = "Long", required = true)
-	@NotNull(message = "主键ID不能为空", groups = { Update.class })
+	@NotNull(message = "主键ID不能为空", groups = { ValidationGroup.Update.class })
 	private Long id;
 
 	/**
 	 * 消息配置主键ID，新增时不可为空
 	 */
 	@ApiModelProperty(value = "消息配置主键ID，新增时不可为空", dataType = "Long", required = true)
-	@NotNull(message = "消息配置主键ID不能为空", groups = { Insert.class })
+	@NotNull(message = "消息配置主键ID不能为空", groups = { ValidationGroup.Insert.class })
 	private String messageConfigId;
 
 	/**
 	 * 目标系统名称，最长30位，新增时不可为空
 	 */
 	@ApiModelProperty(value = "目标系统名称，最长30位，新增时不可为空", dataType = "String", required = true)
-	@NotNull(message = "目标系统名称不能为空", groups = { Insert.class })
+	@NotNull(message = "目标系统名称不能为空", groups = { ValidationGroup.Insert.class })
 	@Size(max = 30, message = "目标系统名称最长30位")
 	private String targetSystem;
 
@@ -56,7 +55,7 @@ public class AmfMessageForwardingConfigDO implements Serializable {
 	 * 转发到目标系统的方式，固定2位长度：01-Http，02-Kafka，03-RocketMQ，新增时不能为空
 	 */
 	@ApiModelProperty(value = "转发到目标系统的方式，固定2位长度：01-Http，02-Kafka，03-RocketMQ，新增时不能为空", dataType = "String", required = true)
-	@NotNull(message = "转发到目标系统的方式不能为空", groups = { Insert.class })
+	@NotNull(message = "转发到目标系统的方式不能为空", groups = { ValidationGroup.Insert.class })
 	@Pattern(regexp = "^01|02|03$", message = "转发到目标系统的方式不为01、02或03之一")
 	private String forwardingWay;
 
@@ -64,7 +63,7 @@ public class AmfMessageForwardingConfigDO implements Serializable {
 	 * 目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔），新增时不可为空
 	 */
 	@ApiModelProperty(value = "目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔），新增时不可为空", dataType = "String", required = true)
-	@NotNull(message = "目标地址不能为空", groups = { Insert.class })
+	@NotNull(message = "目标地址不能为空", groups = { ValidationGroup.Insert.class })
 	@Size(max = 200, message = "目标地址最长200位")
 	private String targetAddress;
 
@@ -86,7 +85,7 @@ public class AmfMessageForwardingConfigDO implements Serializable {
 	 * 创建人ID，最长20位，新增时不可为空，不可修改
 	 */
 	@ApiModelProperty(value = "创建人ID，最长20位，新增时不可为空，不可修改", dataType = "String", required = true)
-	@NotNull(message = "创建人ID不能为空", groups = { Insert.class })
+	@NotNull(message = "创建人ID不能为空", groups = { ValidationGroup.Insert.class })
 	@Size(max = 20, message = "创建人ID最长20位")
 	private String createdBy;
 
@@ -100,7 +99,7 @@ public class AmfMessageForwardingConfigDO implements Serializable {
 	 * 最后修改人ID，最长20位，修改时不可为空
 	 */
 	@ApiModelProperty(value = "最后修改人ID，最长20位，修改时不可为空", dataType = "String", required = true)
-	@NotNull(message = "最后修改人ID不能为空", groups = { Update.class })
+	@NotNull(message = "最后修改人ID不能为空", groups = { ValidationGroup.Update.class })
 	@Size(max = 20, message = "最后修改人ID最长20位")
 	private String updatedBy;
 
