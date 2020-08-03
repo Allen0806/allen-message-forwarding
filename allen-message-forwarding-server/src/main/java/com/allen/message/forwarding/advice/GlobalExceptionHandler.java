@@ -38,19 +38,14 @@ public class GlobalExceptionHandler {
 	 * @return 异常转换结果
 	 */
 	@ExceptionHandler(ConstraintViolationException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
 	public BaseResult<List<String>> handleConstraintViolationException(ConstraintViolationException e) {
-		BaseResult<List<String>> validateResult = new BaseResult<List<String>>();
 		List<String> errorMessages = new ArrayList<String>();
 		for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
 			errorMessages.add(violation.getMessage());
 		}
-		validateResult.setStatus(BaseResult.STATUS_VALIDATION_FAILURE);
-		validateResult.setMessage("参数校验失败");
-		validateResult.setData(errorMessages);
 		LOGGER.error("参数校验失败，失败信息：" + errorMessages, e);
-		return validateResult;
+		return BaseResult.paramError(errorMessages);
 	}
 
 	/**
@@ -60,19 +55,14 @@ public class GlobalExceptionHandler {
 	 * @return 异常转换结果
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
 	public BaseResult<List<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-		BaseResult<List<String>> validateResult = new BaseResult<List<String>>();
 		List<String> errorMessages = new ArrayList<String>();
 		for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
-			errorMessages.add(fieldError.getDefaultMessage());
+			errorMessages.add(fieldError.getField() + "-" + fieldError.getDefaultMessage());
 		}
-		validateResult.setStatus(BaseResult.STATUS_VALIDATION_FAILURE);
-		validateResult.setMessage("参数校验失败");
-		validateResult.setData(errorMessages);
 		LOGGER.error("参数校验失败，失败信息：" + errorMessages, e);
-		return validateResult;
+		return BaseResult.paramError(errorMessages);
 	}
 
 	/**
@@ -84,11 +74,8 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(CustomBusinessException.class)
 	@ResponseBody
 	public BaseResult<Object> handleCustomBusinessException(CustomBusinessException e) {
-		LOGGER.error("发生业务异常，异常编码：{}，异常信息：{}", e.getStatus(), e.getMessage(), e);
-		BaseResult<Object> validateResult = new BaseResult<Object>();
-		validateResult.setStatus(e.getStatus());
-		validateResult.setMessage(e.getMessage());
-		return validateResult;
+		LOGGER.error("发生业务异常，异常编码：{}，异常信息：{}", e.getStatusCode(), e.getMessage(), e);
+		return new BaseResult<Object>(e.getStatusCode(), e.getMessage());
 	}
 
 }

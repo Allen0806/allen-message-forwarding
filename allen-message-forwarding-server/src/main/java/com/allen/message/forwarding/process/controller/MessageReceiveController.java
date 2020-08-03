@@ -31,15 +31,9 @@ public class MessageReceiveController {
 	 */
 	@PostMapping(value = "/process/receive")
 	public BaseResult<Object> receive(@RequestBody @Valid MessageDTO messageDTO, BindingResult bindingResult) {
-		BaseResult<Object> baseResult = new BaseResult<>();
-		if (bindingResult.hasErrors()){
-			baseResult.setStatus(BaseResult.STATUS_SYSTEM_FAILURE);
-			baseResult.setMessage("数据校验未通过");
-			baseResult.setData(bindingResult.getAllErrors());
-            return baseResult;
-        }
-		baseResult.setStatus(BaseResult.STATUS_HANDLE_SUCCESS);
-		baseResult.setMessage("请求成功");
-		return baseResult;
+		if (bindingResult.hasErrors()) {
+			return BaseResult.paramError(bindingResult.getAllErrors());
+		}
+		return BaseResult.success();
 	}
 }

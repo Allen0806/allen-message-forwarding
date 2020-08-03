@@ -54,8 +54,7 @@ public class AmfSourceSystemConfigDO implements Serializable {
 	/**
 	 * 来源系统ID，固定4位，新增时不可为空
 	 */
-	@ApiModelProperty(value = "来源系统ID，固定4位，新增时不可为空", dataType = "Integer", required = true)
-	@NotNull(message = "来源系统ID不能为空", groups = { ValidationGroup.Insert.class })
+	@ApiModelProperty(value = "来源系统ID，固定4位，新增时不可为空", dataType = "Integer", required = false)
 	@Range(min = 1000, max = 9999, message = "来源系统ID取值范围为1000~9999")
 	private Integer sourceSystemId;
 

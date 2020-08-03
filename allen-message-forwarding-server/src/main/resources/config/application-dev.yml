@@ -16,7 +16,7 @@ server:
     # accept队列长度
     accept-count: 5000
     # 最大连接超时时间
-    connection-timeout: 100
+    connection-timeout: 5000
     accesslog:
       # 启用访问日志
       enabled: true
@@ -105,7 +105,14 @@ server:
         allow: 127.0.0.1
         # IP黑名单（共同存在时，deny优先于allow）
         deny: 
-
+  redis:    host: localhost
+    port: 6379
+    database: 0
+    timeout: 1000ms
+    lettuce:      pool:        min-idle: 5
+        max-idle: 10
+        max-active: 8
+        max-wait: 5000ms
 eureka:
   instance:
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
@@ -134,7 +141,7 @@ eureka:
 mybatis:
   # 路径都使用双星，不使用单星
   mapper-locations: classpath*:mapper/**/*Mapper.xml
-  type-aliases-package: com.allen.**.data
+  type-aliases-package: com.allen.**.model
   type-handlers-package: com.allen.**.typehandler
   configuration:
     # 开启驼峰命名转换，如：Table(create_time) -> Entity(createTime)。不需要我们关心怎么进行字段匹配，mybatis会自动识别`大写字母与下划线`
