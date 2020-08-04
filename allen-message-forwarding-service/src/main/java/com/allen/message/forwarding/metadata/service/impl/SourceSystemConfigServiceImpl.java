@@ -6,6 +6,8 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,11 @@ import com.allen.tool.validation.ValidationGroup;
 public class SourceSystemConfigServiceImpl implements SourceSystemConfigService {
 
 	/**
+	 * 日志纪录器
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(SourceSystemConfigServiceImpl.class);
+
+	/**
 	 * 消息来源系统配置信息DAO层接口实例
 	 */
 	@Autowired
@@ -52,6 +59,8 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 		sourceSystemConfigDO.setCreateTime(LocalDateTime.now());
 		sourceSystemConfigDO.setUpdateTime(LocalDateTime.now());
 		sourceSystemConfigDAO.save(sourceSystemConfigDO);
+		LOGGER.info("保存消息来源系统配置信息成功，业务线名称：{}，来源系统名称：{}", sourceSystemConfigDO.getBusinessLineName(),
+				sourceSystemConfigDO.getSourceSystemName());
 	}
 
 	@Validated(ValidationGroup.Update.class)
@@ -72,6 +81,8 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 		sourceSystemConfigDAO.update(sourceSystemConfigDONew);
 		// TODO 更新消息信息的业务线名称及来源系统名称
 
+		LOGGER.info("更新消息来源系统配置信息成功，业务线名称：{}，来源系统名称：{}", sourceSystemConfigDO.getBusinessLineName(),
+				sourceSystemConfigDO.getSourceSystemName());
 	}
 
 	@Transactional
@@ -84,6 +95,7 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 		sourceSystemConfigDO.setUpdatedBy(updatedBy);
 		sourceSystemConfigDO.setUpdateTime(LocalDateTime.now());
 		sourceSystemConfigDAO.update(sourceSystemConfigDO);
+		LOGGER.info("删除消息来源系统配置信息成功，ID：{}，修改人：{}", id, updatedBy);
 
 	}
 
