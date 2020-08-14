@@ -107,7 +107,7 @@ public class SourceSystemConfigController {
 	 * @param pageSize       每页行数
 	 * @return 分页查询结果
 	 */
-	@PostMapping("/meta/sourcesytemconfig/listByBusinessLineId4Paging/{businessLineId}/{pageNo}/{pageSize}")
+	@PostMapping("/meta/sourcesytemconfig/listbybusinesslineid4paging/{businessLineId}/{pageNo}/{pageSize}")
 	public BaseResult<List<AmfSourceSystemConfigDO>> listByBusinessLineId4Paging(
 			@NotNull(message = "业务线ID不能为空") @PathVariable("businessLineId") String businessLineId,
 			@NotNull(message = "当前页数不能为空") @PathVariable("pageNo") int pageNo,
