@@ -3,15 +3,11 @@ package com.allen.message.forwarding.metadata.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import com.allen.message.forwarding.metadata.dao.SourceSystemConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
@@ -20,7 +16,6 @@ import com.allen.message.forwarding.tool.IdGenerator;
 import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.result.StatusCode;
 import com.allen.tool.string.StringUtil;
-import com.allen.tool.validation.ValidationGroup;
 
 /**
  * 消息来源系统配置信息管理Service层接口实现类
@@ -30,7 +25,6 @@ import com.allen.tool.validation.ValidationGroup;
  * @since 1.0.0
  */
 @Service
-@Validated
 public class SourceSystemConfigServiceImpl implements SourceSystemConfigService {
 
 	/**
@@ -50,10 +44,9 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	@Autowired
 	private IdGenerator idGenerator;
 
-	@Validated(ValidationGroup.Insert.class)
 	@Transactional
 	@Override
-	public void save(@Valid AmfSourceSystemConfigDO sourceSystemConfigDO) {
+	public void save(AmfSourceSystemConfigDO sourceSystemConfigDO) {
 		sourceSystemConfigDO.setSourceSystemId(idGenerator.generateSourceSystemId());
 		sourceSystemConfigDO.setDeleted(0);
 		sourceSystemConfigDO.setCreateTime(LocalDateTime.now());
@@ -63,10 +56,9 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 				sourceSystemConfigDO.getSourceSystemName());
 	}
 
-	@Validated(ValidationGroup.Update.class)
 	@Transactional
 	@Override
-	public void update(@Valid AmfSourceSystemConfigDO sourceSystemConfigDO) {
+	public void update(AmfSourceSystemConfigDO sourceSystemConfigDO) {
 		String businessLineName = sourceSystemConfigDO.getBusinessLineName();
 		String sourceSystemName = sourceSystemConfigDO.getSourceSystemName();
 		if (StringUtil.isBlank(businessLineName) && StringUtil.isBlank(sourceSystemName)) {
@@ -87,7 +79,7 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 
 	@Transactional
 	@Override
-	public void remove(@NotNull(message = "主键ID不能为空") Long id, @NotNull(message = "修改人ID不能为空") String updatedBy) {
+	public void remove(Long id, String updatedBy) {
 		// TODO 查询该消息来源系统是否有关联的有效的消息配置信息，如果有则不允许更新
 		AmfSourceSystemConfigDO sourceSystemConfigDO = new AmfSourceSystemConfigDO();
 		sourceSystemConfigDO.setId(id);
@@ -100,20 +92,18 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	}
 
 	@Override
-	public AmfSourceSystemConfigDO get(@NotNull(message = "主键ID不能为空") Long id) {
+	public AmfSourceSystemConfigDO get(Long id) {
 		return sourceSystemConfigDAO.get(id);
 	}
 
 	@Override
-	public int count(@NotNull(message = "业务线ID不能为空") String businessLineId) {
+	public int count(String businessLineId) {
 		return sourceSystemConfigDAO.count(businessLineId);
 	}
 
 	@Override
-	public List<AmfSourceSystemConfigDO> listByBusinessLineId4Paging(
-			@NotNull(message = "业务线ID不能为空") String businessLineId, @NotNull(message = "当前页数不能为空") int pageNo,
-			@NotNull(message = "每页行数不能为空") int pageSize) {
-		int startNo = pageNo * pageSize;
+	public List<AmfSourceSystemConfigDO> listByBusinessLineId4Paging(String businessLineId, int pageNo, int pageSize) {
+		int startNo = (pageNo - 1) * pageSize;
 		return sourceSystemConfigDAO.listByBusinessLineId4Paging(businessLineId, startNo, pageSize);
 	}
 

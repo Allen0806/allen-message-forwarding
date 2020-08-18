@@ -1,23 +1,33 @@
 package com.allen.message.forwarding.metadata.service;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
+
 /**
- *
+ * 消息来源系统服务层单元测试类
+ * 
  * @author Allen
  * @date 2020-8-14
  * @since 1.0.0
  *
  */
-@SpringBootTest //(classes = {AacApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class SourceSystemConfigServiceTest {
+@SpringBootTest // (classes = {AacApplication.class}, webEnvironment =
+				// SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class SourceSystemConfigServiceTest {
+
+	@Autowired
+	private SourceSystemConfigService sourceSystemConfigService;
 
 	/**
 	 * @throws java.lang.Exception
@@ -48,51 +58,71 @@ class SourceSystemConfigServiceTest {
 	}
 
 	/**
-	 * Test method for {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#save(com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO)}.
+	 * Test method for
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#save(com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO)}.
 	 */
 	@Test
 	final void testSave() {
-		fail("Not yet implemented"); // TODO
+		AmfSourceSystemConfigDO sourceSystemConfigDO = new AmfSourceSystemConfigDO();
+		sourceSystemConfigDO.setBusinessLineId("message");
+		sourceSystemConfigDO.setBusinessLineName("消息系统");
+		sourceSystemConfigDO.setSourceSystemName("子系统2");
+		sourceSystemConfigDO.setCreatedBy("admin");
+		sourceSystemConfigDO.setUpdatedBy("admin");
+
+		sourceSystemConfigService.save(sourceSystemConfigDO);
 	}
 
 	/**
-	 * Test method for {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#update(com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO)}.
+	 * Test method for
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#update(com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO)}.
 	 */
 	@Test
 	final void testUpdate() {
-		fail("Not yet implemented"); // TODO
+		AmfSourceSystemConfigDO sourceSystemConfigDO = new AmfSourceSystemConfigDO();
+		sourceSystemConfigDO.setId(1L);
+		sourceSystemConfigDO.setSourceSystemName("客户系统");
+		sourceSystemConfigDO.setUpdatedBy("allen");
+		sourceSystemConfigService.update(sourceSystemConfigDO);
 	}
 
 	/**
-	 * Test method for {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#remove(java.lang.Long, java.lang.String)}.
+	 * Test method for
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#remove(java.lang.Long, java.lang.String)}.
 	 */
 	@Test
 	final void testRemove() {
-		fail("Not yet implemented"); // TODO
+		sourceSystemConfigService.remove(1L, "admin");
 	}
 
 	/**
-	 * Test method for {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#get(java.lang.Long)}.
+	 * Test method for
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#get(java.lang.Long)}.
 	 */
 	@Test
 	final void testGet() {
-		fail("Not yet implemented"); // TODO
+		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigService.get(1L);
+		assertEquals("信贷系统", sourceSystemConfigDO.getBusinessLineName());
 	}
 
 	/**
-	 * Test method for {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#count(java.lang.String)}.
+	 * Test method for
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#count(java.lang.String)}.
 	 */
 	@Test
 	final void testCount() {
-		fail("Not yet implemented"); // TODO
+		int count = sourceSystemConfigService.count("credit");
+		assertEquals(1, count);
 	}
 
 	/**
-	 * Test method for {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#listByBusinessLineId4Paging(java.lang.String, int, int)}.
+	 * Test method for
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#listByBusinessLineId4Paging(java.lang.String, int, int)}.
 	 */
 	@Test
 	final void testListByBusinessLineId4Paging() {
-		fail("Not yet implemented"); // TODO
+		List<AmfSourceSystemConfigDO> list = sourceSystemConfigService.listByBusinessLineId4Paging("credit", 1, 10);
+		assertEquals(1, list.size());
 	}
 
 }

@@ -19,8 +19,8 @@
 			<if test="businessLineName!=null">
 				`business_line_name`,
 			</if>
-			<if test="souceSystemId!=null">
-				`souce_system_id`,
+			<if test="sourceSystemId!=null">
+				`source_system_id`,
 			</if>
 			<if test="sourceSystemName!=null">
 				`source_system_name`,
@@ -54,8 +54,8 @@
 			<if test="businessLineName!=null">
 				#{businessLineName},
 			</if>
-			<if test="souceSystemId!=null">
-				#{souceSystemId},
+			<if test="sourceSystemId!=null">
+				#{sourceSystemId},
 			</if>
 			<if test="sourceSystemName!=null">
 				#{sourceSystemName},
@@ -90,8 +90,8 @@
             <if test="businessLineName != null and businessLineName!=''">
                 `business_line_name` = #{businessLineName},
             </if>
-            <if test="souceSystemId != null">
-                `souce_system_id` = #{souceSystemId},
+            <if test="sourceSystemId != null">
+                `source_system_id` = #{sourceSystemId},
             </if>
             <if test="sourceSystemName != null and sourceSystemName!=''">
                 `source_system_name` = #{sourceSystemName},
@@ -114,7 +114,7 @@
 		id,
 		business_line_id,
 		business_line_name,
-		souce_system_id,
+		source_system_id,
 		source_system_name,
 		is_deleted,
 		created_by,
@@ -127,7 +127,7 @@
         <result property="id" column="id"/>
         <result property="businessLineId" column="business_line_id"/>
         <result property="businessLineName" column="business_line_name"/>
-        <result property="souceSystemId" column="souce_system_id"/>
+        <result property="sourceSystemId" column="source_system_id"/>
         <result property="sourceSystemName" column="source_system_name"/>
         <result property="deleted" column="is_deleted"/>
         <result property="createdBy" column="created_by"/>

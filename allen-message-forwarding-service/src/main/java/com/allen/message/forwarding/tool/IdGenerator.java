@@ -64,8 +64,14 @@ public class IdGenerator {
 	 * @return 下一个ID
 	 */
 	private Integer generateId(String key, int initValue) {
-		RedisAtomicInteger redisAtomicInteger = new RedisAtomicInteger(key, redisTemplate.getConnectionFactory(),
-				initValue);
+		RedisAtomicInteger redisAtomicInteger = null;
+		Object value = redisTemplate.opsForValue().get(key);
+		if (value == null) {
+			redisAtomicInteger = new RedisAtomicInteger(key, redisTemplate.getConnectionFactory(), initValue);
+		} else {
+			redisAtomicInteger = new RedisAtomicInteger(key, redisTemplate.getConnectionFactory());
+		}
+
 		return redisAtomicInteger.getAndIncrement();
 	}
 
