@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -25,8 +26,8 @@ public interface SourceSystemConfigService {
 	 * 
 	 * @param sourceSystemConfigDO 消息来源系统配置信息
 	 */
-	@Validated(ValidationGroup.Insert.class)
-	void save(@Valid AmfSourceSystemConfigDO sourceSystemConfigDO);
+	@Validated({ ValidationGroup.Insert.class, Default.class })
+	void save(@NotNull(message = "消息来源系统配置信息不能为空") @Valid AmfSourceSystemConfigDO sourceSystemConfigDO);
 
 	/**
 	 * 修改消息来源系统配置信息
@@ -34,7 +35,8 @@ public interface SourceSystemConfigService {
 	 * @param sourceSystemConfigDO
 	 */
 	@Validated(ValidationGroup.Update.class)
-	void update(@Valid AmfSourceSystemConfigDO sourceSystemConfigDO);
+	void update(@NotNull(message = "消息来源系统配置信息不能为空", groups = {
+			ValidationGroup.Update.class }) @Valid AmfSourceSystemConfigDO sourceSystemConfigDO);
 
 	/**
 	 * 根据主键ID删除消息来源系统配置信息，逻辑删除。如果有对应的消息配置，则不允许删除

@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.allen.message.forwarding.metadata.dao.SourceSystemConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
 import com.allen.message.forwarding.metadata.service.SourceSystemConfigService;
-import com.allen.message.forwarding.tool.IdGenerator;
 import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.result.StatusCode;
 import com.allen.tool.string.StringUtil;
@@ -41,13 +40,10 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	/**
 	 * ID生成器
 	 */
-	@Autowired
-	private IdGenerator idGenerator;
 
 	@Transactional
 	@Override
 	public void save(AmfSourceSystemConfigDO sourceSystemConfigDO) {
-		sourceSystemConfigDO.setSourceSystemId(idGenerator.generateSourceSystemId());
 		sourceSystemConfigDO.setDeleted(0);
 		sourceSystemConfigDO.setCreateTime(LocalDateTime.now());
 		sourceSystemConfigDO.setUpdateTime(LocalDateTime.now());
@@ -64,10 +60,15 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 		if (StringUtil.isBlank(businessLineName) && StringUtil.isBlank(sourceSystemName)) {
 			throw new CustomBusinessException(StatusCode.PARAM_ERROR.getCode(), "更新消息来源系统信息时业务线名称与来源系统名称不能同时为空");
 		}
+		// 只允许修改业务线名称及来源系统名称
 		AmfSourceSystemConfigDO sourceSystemConfigDONew = new AmfSourceSystemConfigDO();
 		sourceSystemConfigDONew.setId(sourceSystemConfigDO.getId());
-		sourceSystemConfigDONew.setBusinessLineName(businessLineName);
-		sourceSystemConfigDONew.setSourceSystemName(sourceSystemName);
+		if (StringUtil.isNotBlank(businessLineName)) {
+			sourceSystemConfigDONew.setBusinessLineName(businessLineName);
+		}
+		if (StringUtil.isNotBlank(sourceSystemName)) {
+			sourceSystemConfigDONew.setSourceSystemName(sourceSystemName);
+		}
 		sourceSystemConfigDONew.setUpdatedBy(sourceSystemConfigDO.getUpdatedBy());
 		sourceSystemConfigDONew.setUpdateTime(LocalDateTime.now());
 		sourceSystemConfigDAO.update(sourceSystemConfigDONew);

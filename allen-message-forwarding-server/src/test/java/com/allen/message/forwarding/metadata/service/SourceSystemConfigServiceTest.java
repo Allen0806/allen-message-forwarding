@@ -22,8 +22,7 @@ import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
  * @since 1.0.0
  *
  */
-@SpringBootTest // (classes = {AacApplication.class}, webEnvironment =
-				// SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 public class SourceSystemConfigServiceTest {
 
 	@Autowired
@@ -64,7 +63,7 @@ public class SourceSystemConfigServiceTest {
 	@Test
 	final void testSave() {
 		AmfSourceSystemConfigDO sourceSystemConfigDO = new AmfSourceSystemConfigDO();
-		sourceSystemConfigDO.setBusinessLineId("message");
+		sourceSystemConfigDO.setBusinessLineId("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 		sourceSystemConfigDO.setBusinessLineName("消息系统");
 		sourceSystemConfigDO.setSourceSystemName("子系统2");
 		sourceSystemConfigDO.setCreatedBy("admin");
@@ -77,7 +76,7 @@ public class SourceSystemConfigServiceTest {
 	 * Test method for
 	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#update(com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO)}.
 	 */
-	@Test
+//	@Test
 	final void testUpdate() {
 		AmfSourceSystemConfigDO sourceSystemConfigDO = new AmfSourceSystemConfigDO();
 		sourceSystemConfigDO.setId(1L);
@@ -90,7 +89,7 @@ public class SourceSystemConfigServiceTest {
 	 * Test method for
 	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#remove(java.lang.Long, java.lang.String)}.
 	 */
-	@Test
+//	@Test
 	final void testRemove() {
 		sourceSystemConfigService.remove(1L, "admin");
 	}
@@ -99,7 +98,7 @@ public class SourceSystemConfigServiceTest {
 	 * Test method for
 	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#get(java.lang.Long)}.
 	 */
-	@Test
+//	@Test
 	final void testGet() {
 		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigService.get(1L);
 		assertEquals("信贷系统", sourceSystemConfigDO.getBusinessLineName());
@@ -109,7 +108,7 @@ public class SourceSystemConfigServiceTest {
 	 * Test method for
 	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#count(java.lang.String)}.
 	 */
-	@Test
+//	@Test
 	final void testCount() {
 		int count = sourceSystemConfigService.count("credit");
 		assertEquals(1, count);
@@ -119,7 +118,7 @@ public class SourceSystemConfigServiceTest {
 	 * Test method for
 	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#listByBusinessLineId4Paging(java.lang.String, int, int)}.
 	 */
-	@Test
+//	@Test
 	final void testListByBusinessLineId4Paging() {
 		List<AmfSourceSystemConfigDO> list = sourceSystemConfigService.listByBusinessLineId4Paging("credit", 1, 10);
 		assertEquals(1, list.size());

@@ -19,9 +19,7 @@
 			<if test="businessLineName!=null">
 				`business_line_name`,
 			</if>
-			<if test="sourceSystemId!=null">
 				`source_system_id`,
-			</if>
 			<if test="sourceSystemName!=null">
 				`source_system_name`,
 			</if>
@@ -42,8 +40,7 @@
 			</if>
 		</trim>
 		)
-		values
-		(
+		select 
 		<trim suffixOverrides=",">
 			<if test="id!=null">
 				#{id},
@@ -54,9 +51,8 @@
 			<if test="businessLineName!=null">
 				#{businessLineName},
 			</if>
-			<if test="sourceSystemId!=null">
-				#{sourceSystemId},
-			</if>
+				<!-- 插入时最大值累加，保证唯一性 -->
+				max(source_system_id) + 1,
 			<if test="sourceSystemName!=null">
 				#{sourceSystemName},
 			</if>
@@ -76,7 +72,7 @@
 				#{updateTime},
 			</if>
 		</trim>
-		)
+		from amf_source_system_config
 	</insert>
     
 	<!-- 根据主键ID更新 -->
@@ -141,12 +137,14 @@
         <include refid="sourceSystemConfigColumns"></include>
         from  `amf_source_system_config`
         where `id` = #{id}
+        and   `is_deleted` = 0
     </select>
 
 	<select id="count" parameterType="string" resultType="int">
 		select count(*)
-		from `amf_source_system_config`
+		from  `amf_source_system_config`
 		where `business_line_id` = #{businessLineId}
+		and   `is_deleted` = 0
 	</select>
 	
 	<!-- 分页查询 -->
@@ -155,6 +153,7 @@
         <include refid="sourceSystemConfigColumns"></include>
         from  `amf_source_system_config`
         where `business_line_id` = #{businessLineId}
+        and   `is_deleted` = 0
         limit #{startNo}, #{pageSize}
 	</select>
 </mapper>
