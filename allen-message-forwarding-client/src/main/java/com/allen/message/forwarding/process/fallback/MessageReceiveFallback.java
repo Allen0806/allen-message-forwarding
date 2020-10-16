@@ -8,7 +8,7 @@ import com.allen.tool.result.BaseResult;
 import com.allen.tool.result.StatusCode;
 
 /**
- * 
+ * Hystrix限流处理类
  * 
  * @author Allen
  * @date 2020年4月20日
