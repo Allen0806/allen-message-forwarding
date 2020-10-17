@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
+import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDTO;
 import com.allen.message.forwarding.metadata.service.SourceSystemConfigService;
 import com.allen.tool.result.BaseResult;
 import com.allen.tool.validation.ValidationGroup;
@@ -42,8 +42,8 @@ public class SourceSystemConfigController {
 	 */
 	@PostMapping("/meta/sourcesytemconfig/save")
 	public BaseResult<Object> save(
-			@Validated({ ValidationGroup.Insert.class }) @RequestBody AmfSourceSystemConfigDO sourceSystemConfigDO) {
-		sourceSystemConfigService.save(sourceSystemConfigDO);
+			@Validated({ ValidationGroup.Insert.class }) @RequestBody AmfSourceSystemConfigDTO sourceSystemConfigDTO) {
+		sourceSystemConfigService.save(sourceSystemConfigDTO);
 		return BaseResult.success();
 	}
 
@@ -55,8 +55,8 @@ public class SourceSystemConfigController {
 	 */
 	@PostMapping("/meta/sourcesytemconfig/update")
 	public BaseResult<Object> update(
-			@Validated({ ValidationGroup.Update.class }) @RequestBody AmfSourceSystemConfigDO sourceSystemConfigDO) {
-		sourceSystemConfigService.update(sourceSystemConfigDO);
+			@Validated({ ValidationGroup.Update.class }) @RequestBody AmfSourceSystemConfigDTO sourceSystemConfigDTO) {
+		sourceSystemConfigService.update(sourceSystemConfigDTO);
 		return BaseResult.success();
 	}
 
@@ -81,8 +81,8 @@ public class SourceSystemConfigController {
 	 * @return 消息来源系统配置信息
 	 */
 	@PostMapping("/meta/sourcesytemconfig/get/{id}")
-	public BaseResult<AmfSourceSystemConfigDO> get(@NotNull(message = "主键ID不能为空") @PathVariable("id") Long id) {
-		AmfSourceSystemConfigDO sourceSystemConfig = sourceSystemConfigService.get(id);
+	public BaseResult<AmfSourceSystemConfigDTO> get(@NotNull(message = "主键ID不能为空") @PathVariable("id") Long id) {
+		AmfSourceSystemConfigDTO sourceSystemConfig = sourceSystemConfigService.get(id);
 		return BaseResult.success(sourceSystemConfig);
 	}
 
@@ -107,13 +107,13 @@ public class SourceSystemConfigController {
 	 * @param pageSize       每页行数
 	 * @return 分页查询结果
 	 */
-	@PostMapping("/meta/sourcesytemconfig/listbybusinesslineid4paging/{businessLineConfigId}/{pageNo}/{pageSize}")
-	public BaseResult<List<AmfSourceSystemConfigDO>> listByBusinessLineId4Paging(
+	@PostMapping("/meta/sourcesytemconfig/list4paging/{businessLineConfigId}/{pageNo}/{pageSize}")
+	public BaseResult<List<AmfSourceSystemConfigDTO>> listByBusinessLineId4Paging(
 			@NotNull(message = "业务线ID不能为空") @PathVariable("businessLineConfigId") Long businessLineConfigId,
 			@NotNull(message = "当前页数不能为空") @PathVariable("pageNo") int pageNo,
 			@NotNull(message = "每页行数不能为空") @PathVariable("pageSize") int pageSize) {
-		List<AmfSourceSystemConfigDO> sourceSystemConfigs = sourceSystemConfigService
-				.listByBusinessLineId4Paging(businessLineConfigId, pageNo, pageSize);
+		List<AmfSourceSystemConfigDTO> sourceSystemConfigs = sourceSystemConfigService.list4Paging(businessLineConfigId,
+				pageNo, pageSize);
 		return BaseResult.success(sourceSystemConfigs);
 	}
 }
