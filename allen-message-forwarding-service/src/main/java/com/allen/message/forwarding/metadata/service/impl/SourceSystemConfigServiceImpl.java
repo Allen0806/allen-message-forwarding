@@ -98,14 +98,15 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	}
 
 	@Override
-	public int count(String businessLineId) {
-		return sourceSystemConfigDAO.count(businessLineId);
+	public int count(Long businessLineConfigId) {
+		return sourceSystemConfigDAO.count(businessLineConfigId);
 	}
 
 	@Override
-	public List<AmfSourceSystemConfigDO> listByBusinessLineId4Paging(String businessLineId, int pageNo, int pageSize) {
+	public List<AmfSourceSystemConfigDO> listByBusinessLineId4Paging(Long businessLineConfigId, int pageNo,
+			int pageSize) {
 		int startNo = (pageNo - 1) * pageSize;
-		return sourceSystemConfigDAO.listByBusinessLineId4Paging(businessLineId, startNo, pageSize);
+		return sourceSystemConfigDAO.list4Paging(businessLineConfigId, startNo, pageSize);
 	}
 
 }

@@ -106,21 +106,21 @@ public class SourceSystemConfigServiceTest {
 
 	/**
 	 * Test method for
-	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#count(java.lang.String)}.
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#count(java.lang.Long)}.
 	 */
 //	@Test
 	final void testCount() {
-		int count = sourceSystemConfigService.count("credit");
+		int count = sourceSystemConfigService.count(1L);
 		assertEquals(1, count);
 	}
 
 	/**
 	 * Test method for
-	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#listByBusinessLineId4Paging(java.lang.String, int, int)}.
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#listByBusinessLineId4Paging(java.lang.Long, int, int)}.
 	 */
 //	@Test
 	final void testListByBusinessLineId4Paging() {
-		List<AmfSourceSystemConfigDO> list = sourceSystemConfigService.listByBusinessLineId4Paging("credit", 1, 10);
+		List<AmfSourceSystemConfigDO> list = sourceSystemConfigService.listByBusinessLineId4Paging(1L, 1, 10);
 		assertEquals(1, list.size());
 	}
 

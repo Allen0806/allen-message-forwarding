@@ -92,10 +92,10 @@ public class SourceSystemConfigController {
 	 * @param businessLineId 业务线ID
 	 * @return 消息来源系统配置信息数量
 	 */
-	@PostMapping("/meta/sourcesytemconfig/count/{businessLineId}")
+	@PostMapping("/meta/sourcesytemconfig/count/{businessLineConfigId}")
 	public BaseResult<Integer> count(
-			@NotNull(message = "业务线ID不能为空") @PathVariable("businessLineId") String businessLineId) {
-		Integer count = sourceSystemConfigService.count(businessLineId);
+			@NotNull(message = "业务线ID不能为空") @PathVariable("businessLineConfigId") Long businessLineConfigId) {
+		Integer count = sourceSystemConfigService.count(businessLineConfigId);
 		return BaseResult.success(count);
 	}
 
@@ -107,13 +107,13 @@ public class SourceSystemConfigController {
 	 * @param pageSize       每页行数
 	 * @return 分页查询结果
 	 */
-	@PostMapping("/meta/sourcesytemconfig/listbybusinesslineid4paging/{businessLineId}/{pageNo}/{pageSize}")
+	@PostMapping("/meta/sourcesytemconfig/listbybusinesslineid4paging/{businessLineConfigId}/{pageNo}/{pageSize}")
 	public BaseResult<List<AmfSourceSystemConfigDO>> listByBusinessLineId4Paging(
-			@NotNull(message = "业务线ID不能为空") @PathVariable("businessLineId") String businessLineId,
+			@NotNull(message = "业务线ID不能为空") @PathVariable("businessLineConfigId") Long businessLineConfigId,
 			@NotNull(message = "当前页数不能为空") @PathVariable("pageNo") int pageNo,
 			@NotNull(message = "每页行数不能为空") @PathVariable("pageSize") int pageSize) {
 		List<AmfSourceSystemConfigDO> sourceSystemConfigs = sourceSystemConfigService
-				.listByBusinessLineId4Paging(businessLineId, pageNo, pageSize);
+				.listByBusinessLineId4Paging(businessLineConfigId, pageNo, pageSize);
 		return BaseResult.success(sourceSystemConfigs);
 	}
 }

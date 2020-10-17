@@ -44,7 +44,7 @@ public interface SourceSystemConfigService {
 	 * @param id        主键ID
 	 * @param updatedBy 修改人ID
 	 */
-	void remove(@NotNull(message = "主键ID不能为空") Long id, @NotNull(message = "修改人ID不能为空") String updatedBy);
+	void remove(@NotNull(message = "消息来源系统配置信息主键ID不能为空") Long id, @NotNull(message = "修改人ID不能为空") String updatedBy);
 
 	/**
 	 * 根据主键ID获取消息来源系统配置信息
@@ -52,24 +52,25 @@ public interface SourceSystemConfigService {
 	 * @param id 主键ID
 	 * @return 消息来源系统配置信息
 	 */
-	AmfSourceSystemConfigDO get(@NotNull(message = "主键ID不能为空") Long id);
+	AmfSourceSystemConfigDO get(@NotNull(message = "消息来源系统配置信息主键ID不能为空") Long id);
 
 	/**
-	 * 根据业务线ID统计消息来源系统配置信息数量
+	 * 根据业务线主键统计未删除的消息来源系统配置信息数量
 	 * 
-	 * @param businessLineId 业务线ID
+	 * @param businessLineConfigId 所属业务线主键
 	 * @return 消息来源系统配置信息数量
 	 */
-	int count(@NotNull(message = "业务线ID不能为空") String businessLineId);
+	int count(@NotNull(message = "消息来源系统配置信息业务线主键不能为空") Long businessLineConfigId);
 
 	/**
-	 * 根据业务线ID分页查询消息来源系统配置信息
+	 * 根据业务线ID分页查询未删除的消息来源系统配置信息
 	 * 
-	 * @param businessLineId 业务线ID
-	 * @param pageNo         当前页数
-	 * @param pageSize       每页行数
+	 * @param businessLineConfigId 业务线主键
+	 * @param pageNo               当前页数
+	 * @param pageSize             每页行数
 	 * @return 分页查询结果
 	 */
-	List<AmfSourceSystemConfigDO> listByBusinessLineId4Paging(@NotNull(message = "业务线ID不能为空") String businessLineId,
+	List<AmfSourceSystemConfigDO> listByBusinessLineId4Paging(
+			@NotNull(message = "消息来源系统配置信息业务线主键不能为空") Long businessLineConfigId,
 			@NotNull(message = "当前页数不能为空") int pageNo, @NotNull(message = "每页行数不能为空") int pageSize);
 }

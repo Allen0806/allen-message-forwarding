@@ -6,27 +6,25 @@ import java.time.LocalDateTime;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.Range;
-
 import com.allen.tool.validation.ValidationGroup;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * 消息来源系统配置信息类，用来存取消息来源系统配置信息
+ * 消息所属业务线配置信息DTO类，用来存取消息所属业务线配置信息
  *
  * @author Allen
  * @date Jul 14, 2020
  * @since 1.0.0
  */
-@ApiModel("消息来源系统配置信息")
-public class AmfSourceSystemConfigDO implements Serializable {
+@ApiModel("消息所属业务配置信息")
+public class AmfBusinessLineConfigDTO implements Serializable {
 
 	/**
 	 * 序列化版本号
 	 */
-	private static final long serialVersionUID = 1421855185252976800L;
+	private static final long serialVersionUID = -3505063851603049868L;
 
 	/**
 	 * 主键ID，修改时不可为空
@@ -44,34 +42,12 @@ public class AmfSourceSystemConfigDO implements Serializable {
 	private String businessLineId;
 
 	/**
-	 * 业务线名称，最长30位，新增时不可为空
+	 * 业务线名称，最长30位，新增及修改时不可为空
 	 */
-	@ApiModelProperty(value = "业务线名称，最长30位，新增时不可为空", dataType = "String", required = true)
-	@NotNull(message = "业务线名称不能为空", groups = { ValidationGroup.Insert.class })
+	@ApiModelProperty(value = "业务线名称，最长30位，新增及修改时不可为空", dataType = "String", required = true)
+	@NotNull(message = "业务线名称不能为空", groups = { ValidationGroup.Insert.class, ValidationGroup.Update.class })
 	@Size(max = 30, message = "业务线名称最长30位")
 	private String businessLineName;
-
-	/**
-	 * 来源系统ID，固定4位，由系统分配，默认值为数据库中的最大值加1，不可修改
-	 */
-	@ApiModelProperty(value = "来源系统ID，固定4位", dataType = "Integer", required = false)
-	@Range(min = 1000, max = 9999, message = "来源系统ID取值范围为1000~9999")
-	private Integer sourceSystemId;
-
-	/**
-	 * 来源系统名称，最长30位，新增时不可为空
-	 */
-	@ApiModelProperty(value = "来源系统名称，最长30位，新增时不可为空", dataType = "String", required = true)
-	@NotNull(message = "来源系统名称不能为空", groups = { ValidationGroup.Insert.class })
-	@Size(max = 30, message = "来源系统名称最长30位")
-	private String sourceSystemName;
-
-	/**
-	 * 是否删除标记：0-否，1-是，默认为0
-	 */
-	@ApiModelProperty(value = "是否删除标记：0-否，1-是，默认为0", dataType = "Integer", required = false)
-	@Range(min = 0, max = 1, message = "是否删除标记取值只能是0或1")
-	private Integer deleted;
 
 	/**
 	 * 创建人ID，最长20位，新增时不可为空，不可修改
@@ -125,30 +101,6 @@ public class AmfSourceSystemConfigDO implements Serializable {
 		this.businessLineName = businessLineName;
 	}
 
-	public Integer getSourceSystemId() {
-		return sourceSystemId;
-	}
-
-	public void setSourceSystemId(Integer sourceSystemId) {
-		this.sourceSystemId = sourceSystemId;
-	}
-
-	public String getSourceSystemName() {
-		return sourceSystemName;
-	}
-
-	public void setSourceSystemName(String sourceSystemName) {
-		this.sourceSystemName = sourceSystemName;
-	}
-
-	public Integer getDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(Integer deleted) {
-		this.deleted = deleted;
-	}
-
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -184,11 +136,9 @@ public class AmfSourceSystemConfigDO implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
-		sbuilder.append("AmfSourceSystemConfigDO[").append("id=").append(id).append(", businessLineId=")
-				.append(businessLineId).append(", businessLineName=").append(businessLineName)
-				.append(", sourceSystemId=").append(sourceSystemId).append(", sourceSystemName=")
-				.append(sourceSystemName).append(", deleted=").append(deleted).append(", createdBy=").append(createdBy)
-				.append(", createTime=").append(createTime).append(", updatedBy=").append(updatedBy)
+		sbuilder.append("AmfBusinessLineConfigDO[").append("id=").append(id).append(", businessLineId=")
+				.append(businessLineId).append(", businessLineName=").append(businessLineName).append(", createdBy=")
+				.append(createdBy).append(", createTime=").append(createTime).append(", updatedBy=").append(updatedBy)
 				.append(", updateTime=").append(updateTime).append("]");
 		return sbuilder.toString();
 	}

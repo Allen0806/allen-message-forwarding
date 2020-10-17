@@ -34,15 +34,7 @@ public interface SourceSystemConfigDAO {
 	int update(AmfSourceSystemConfigDO sourceSystemConfigDO);
 
 	/**
-	 * 根据主键ID删除消息来源系统配置信息，逻辑删除
-	 * 
-	 * @param id 主键ID
-	 * @return 删除数量
-	 */
-	int remove(Long id);
-
-	/**
-	 * 根据主键ID获取消息来源系统配置信息
+	 * 根据主键ID获取未删除的消息来源系统配置信息
 	 * 
 	 * @param id 主键ID
 	 * @return 消息来源系统配置信息
@@ -50,21 +42,21 @@ public interface SourceSystemConfigDAO {
 	AmfSourceSystemConfigDO get(Long id);
 
 	/**
-	 * 根据业务线ID统计消息来源系统配置信息数量
+	 * 根据业务线主键统计未删除的消息来源系统配置信息数量
 	 * 
-	 * @param businessLineId 业务线ID
+	 * @param businessLineConfigId 业务线主键
 	 * @return 消息来源系统配置信息数量
 	 */
-	int count(String businessLineId);
+	int count(Long businessLineConfigId);
 
 	/**
-	 * 根据业务线ID分页查询消息来源系统配置信息
+	 * 根据业务线主键分页查询未删除的消息来源系统配置信息
 	 * 
-	 * @param businessLineId 业务线ID
-	 * @param startNo        起始行号
-	 * @param pageSize       每页行数
+	 * @param businessLineConfigId 业务线主键
+	 * @param startNo              起始行号
+	 * @param pageSize             每页行数
 	 * @return 分页查询结果
 	 */
-	List<AmfSourceSystemConfigDO> listByBusinessLineId4Paging(@Param("businessLineId") String businessLineId,
+	List<AmfSourceSystemConfigDO> list4Paging(@Param("businessLineConfigId") Long businessLineConfigId,
 			@Param("startNo") int startNo, @Param("pageSize") int pageSize);
 }
