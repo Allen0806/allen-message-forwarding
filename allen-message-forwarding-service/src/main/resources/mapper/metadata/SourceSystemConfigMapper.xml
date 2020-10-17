@@ -13,11 +13,8 @@
 			<if test="id!=null">
 				`id`,
 			</if>
-			<if test="businessLineId!=null">
-				`business_line_id`,
-			</if>
-			<if test="businessLineName!=null">
-				`business_line_name`,
+			<if test="businessLineConfigId!=null">
+				`business_line_config_id`,
 			</if>
 				`source_system_id`,
 			<if test="sourceSystemName!=null">
@@ -45,11 +42,8 @@
 			<if test="id!=null">
 				#{id},
 			</if>
-			<if test="businessLineId!=null">
-				#{businessLineId},
-			</if>
-			<if test="businessLineName!=null">
-				#{businessLineName},
+			<if test="businessLineConfigId!=null">
+				#{businessLineConfigId},
 			</if>
 				<!-- 插入时最大值累加，保证唯一性，初始值为1000 -->
 				case when max(source_system_id) > 999 then max(source_system_id) + 1 else 1000 end,
@@ -80,9 +74,6 @@
         update `amf_source_system_config`
         set
         <trim suffixOverrides=",">
-            <if test="businessLineName != null and businessLineName!=''">
-                `business_line_name` = #{businessLineName},
-            </if>
             <if test="sourceSystemName != null and sourceSystemName!=''">
                 `source_system_name` = #{sourceSystemName},
             </if>
@@ -102,8 +93,7 @@
     <!-- 通用查询语句块 -->
 	<sql id="sourceSystemConfigColumns">
 		id,
-		business_line_id,
-		business_line_name,
+		business_line_config_id,
 		source_system_id,
 		source_system_name,
 		is_deleted,
@@ -115,8 +105,7 @@
     
     <resultMap id="sourceSystemConfigResultMap" type="com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO" >
         <result property="id" column="id"/>
-        <result property="businessLineId" column="business_line_id"/>
-        <result property="businessLineName" column="business_line_name"/>
+        <result property="businessLineConfigId" column="business_line_config_id"/>
         <result property="sourceSystemId" column="source_system_id"/>
         <result property="sourceSystemName" column="source_system_name"/>
         <result property="deleted" column="is_deleted"/>
@@ -137,7 +126,7 @@
 	<select id="count" parameterType="string" resultType="int">
 		select count(*)
 		from  `amf_source_system_config`
-		where `business_line_id` = #{businessLineId}
+		where `business_line_config_id` = #{businessLineConfigId}
 		and   `is_deleted` = 0
 	</select>
 	
@@ -146,7 +135,7 @@
         select
         <include refid="sourceSystemConfigColumns"></include>
         from  `amf_source_system_config`
-        where `business_line_id` = #{businessLineId}
+        where `business_line_config_id` = #{businessLineConfigId}
         and   `is_deleted` = 0
         limit #{startNo}, #{pageSize}
 	</select>

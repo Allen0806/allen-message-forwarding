@@ -8,7 +8,7 @@ import javax.validation.groups.Default;
 
 import org.springframework.validation.annotation.Validated;
 
-import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
+import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDTO;
 import com.allen.tool.validation.ValidationGroup;
 
 /**
@@ -24,19 +24,19 @@ public interface SourceSystemConfigService {
 	/**
 	 * 新增消息来源系统配置信息
 	 * 
-	 * @param sourceSystemConfigDO 消息来源系统配置信息
+	 * @param sourceSystemConfigDTO 消息来源系统配置信息
 	 */
 	@Validated({ ValidationGroup.Insert.class, Default.class })
-	void save(@NotNull(message = "消息来源系统配置信息不能为空") @Valid AmfSourceSystemConfigDO sourceSystemConfigDO);
+	void save(@NotNull(message = "消息来源系统配置信息不能为空") @Valid AmfSourceSystemConfigDTO sourceSystemConfigDTO);
 
 	/**
 	 * 修改消息来源系统配置信息
 	 * 
-	 * @param sourceSystemConfigDO
+	 * @param sourceSystemConfigDTO
 	 */
 	@Validated(ValidationGroup.Update.class)
 	void update(@NotNull(message = "消息来源系统配置信息不能为空", groups = {
-			ValidationGroup.Update.class }) @Valid AmfSourceSystemConfigDO sourceSystemConfigDO);
+			ValidationGroup.Update.class }) @Valid AmfSourceSystemConfigDTO sourceSystemConfigDTO);
 
 	/**
 	 * 根据主键ID删除消息来源系统配置信息，逻辑删除。如果有对应的消息配置，则不允许删除
@@ -47,12 +47,12 @@ public interface SourceSystemConfigService {
 	void remove(@NotNull(message = "消息来源系统配置信息主键ID不能为空") Long id, @NotNull(message = "修改人ID不能为空") String updatedBy);
 
 	/**
-	 * 根据主键ID获取消息来源系统配置信息
+	 * 根据主键ID获取未删除的消息来源系统配置信息
 	 * 
 	 * @param id 主键ID
 	 * @return 消息来源系统配置信息
 	 */
-	AmfSourceSystemConfigDO get(@NotNull(message = "消息来源系统配置信息主键ID不能为空") Long id);
+	AmfSourceSystemConfigDTO get(@NotNull(message = "消息来源系统配置信息主键ID不能为空") Long id);
 
 	/**
 	 * 根据业务线主键统计未删除的消息来源系统配置信息数量
@@ -70,7 +70,7 @@ public interface SourceSystemConfigService {
 	 * @param pageSize             每页行数
 	 * @return 分页查询结果
 	 */
-	List<AmfSourceSystemConfigDO> listByBusinessLineId4Paging(
+	List<AmfSourceSystemConfigDTO> list4Paging(
 			@NotNull(message = "消息来源系统配置信息业务线主键不能为空") Long businessLineConfigId,
 			@NotNull(message = "当前页数不能为空") int pageNo, @NotNull(message = "每页行数不能为空") int pageSize);
 }

@@ -38,7 +38,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	private SourceSystemConfigService sourceSystemConfigService;
 
 	/**
-	 * 消息来源系统配置信息DAO层接口实例
+	 * 业务线信息DAO层接口实例
 	 */
 	@Autowired
 	private BusinessLineConfigDAO businessLineConfigDAO;
@@ -63,6 +63,10 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	@Override
 	public void update(AmfBusinessLineConfigDTO businessLineConfigDTO) {
 		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(businessLineConfigDTO.getId());
+		if (businessLineConfigDO == null) {
+			LOGGER.info("未查到对应的业务线信息，业务线主键：{}", businessLineConfigDTO.getId());
+			return;
+		}
 		if (businessLineConfigDO.getBusinessLineName().equals(businessLineConfigDTO.getBusinessLineName())) {
 			LOGGER.info("业务线名称没有变化，不进行消息所属业务线配置信息更新操作，业务线名称：{}", businessLineConfigDTO.getBusinessLineName());
 			return;

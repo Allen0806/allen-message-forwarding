@@ -15,8 +15,7 @@ CREATE TABLE `amf_business_line_config` (
 -- 消息来源系统配置表
 CREATE TABLE `amf_source_system_config` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `business_line_id` varchar(20) NOT NULL COMMENT '业务线ID',
-  `business_line_name` varchar(30) NOT NULL COMMENT '业务线名称',
+  `business_line_config_id` bigint NOT NULL COMMENT '业务线主键ID',
   `source_system_id` int NOT NULL COMMENT '来源系统编号，初始值为1000',
   `source_system_name` varchar(30) NOT NULL COMMENT '来源系统名称',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否删除标记：0-否，1-是',
@@ -26,7 +25,7 @@ CREATE TABLE `amf_source_system_config` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间，默认值为系统当前时间，数据修改时自动更新',
   PRIMARY KEY (`id`),
   UNIQUE KEY `udx_source_system_config` (`source_system_id`) COMMENT '来源系统编号唯一索引',
-  KEY `idx_source_system_config` (`business_line_id`,`source_system_id`) COMMENT '来源系统普通索引'
+  KEY `idx_source_system_config` (`business_line_id`) COMMENT '来源系统普通索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息来源系统配置表';
 
 -- 消息配置表
@@ -34,7 +33,6 @@ CREATE TABLE `amf_message_config` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `business_line_id` varchar(20)  NOT NULL COMMENT '业务线ID',
   `business_line_name` varchar(30)  NOT NULL COMMENT '业务线名称',
-  `source_system_config_id` bigint NOT NULL COMMENT '来源系统配置主键',
   `souce_system_id` int NOT NULL COMMENT '来源系统编号，初始值为1000',
   `source_system_name` varchar(30)  NOT NULL COMMENT '来源系统名称',
   `message_id` int NOT NULL COMMENT '消息ID',
@@ -71,8 +69,6 @@ CREATE TABLE `amf_message_forwarding_config` (
 CREATE TABLE `amf_message` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `message_no` varchar(32) NOT NULL COMMENT '消息流水号',
-  `business_line_id` varchar(20) NOT NULL COMMENT '业务线ID',
-  `source_system_id` int NOT NULL COMMENT '消息来源系统ID',
   `message_id` int NOT NULL COMMENT '消息ID',
   `message_keyword` varchar(32) NOT NULL COMMENT '消息关键字',
   `http_headers` text COMMENT 'http header参数，json格式',
