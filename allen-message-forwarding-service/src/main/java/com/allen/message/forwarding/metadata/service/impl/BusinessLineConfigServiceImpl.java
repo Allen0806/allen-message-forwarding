@@ -175,6 +175,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		businessLineConfigDTO.setCreateTime(businessLineConfigDO.getCreateTime());
 		businessLineConfigDTO.setUpdatedBy(businessLineConfigDO.getUpdatedBy());
 		businessLineConfigDTO.setUpdateTime(businessLineConfigDO.getUpdateTime());
+		
 		return businessLineConfigDTO;
 	}
 
