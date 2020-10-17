@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
+import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDTO;
 
 /**
  * 消息来源系统服务层单元测试类
@@ -62,14 +62,14 @@ public class SourceSystemConfigServiceTest {
 	 */
 	@Test
 	final void testSave() {
-		AmfSourceSystemConfigDO sourceSystemConfigDO = new AmfSourceSystemConfigDO();
-		sourceSystemConfigDO.setBusinessLineId("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-		sourceSystemConfigDO.setBusinessLineName("消息系统");
-		sourceSystemConfigDO.setSourceSystemName("子系统2");
-		sourceSystemConfigDO.setCreatedBy("admin");
-		sourceSystemConfigDO.setUpdatedBy("admin");
+		AmfSourceSystemConfigDTO sourceSystemConfigDTO = new AmfSourceSystemConfigDTO();
+		sourceSystemConfigDTO.setBusinessLineId("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+		sourceSystemConfigDTO.setBusinessLineName("消息系统");
+		sourceSystemConfigDTO.setSourceSystemName("子系统2");
+		sourceSystemConfigDTO.setCreatedBy("admin");
+		sourceSystemConfigDTO.setUpdatedBy("admin");
 
-		sourceSystemConfigService.save(sourceSystemConfigDO);
+		sourceSystemConfigService.save(sourceSystemConfigDTO);
 	}
 
 	/**
@@ -78,11 +78,11 @@ public class SourceSystemConfigServiceTest {
 	 */
 //	@Test
 	final void testUpdate() {
-		AmfSourceSystemConfigDO sourceSystemConfigDO = new AmfSourceSystemConfigDO();
-		sourceSystemConfigDO.setId(1L);
-		sourceSystemConfigDO.setSourceSystemName("客户系统");
-		sourceSystemConfigDO.setUpdatedBy("allen");
-		sourceSystemConfigService.update(sourceSystemConfigDO);
+		AmfSourceSystemConfigDTO sourceSystemConfigDTO = new AmfSourceSystemConfigDTO();
+		sourceSystemConfigDTO.setId(1L);
+		sourceSystemConfigDTO.setSourceSystemName("客户系统");
+		sourceSystemConfigDTO.setUpdatedBy("allen");
+		sourceSystemConfigService.update(sourceSystemConfigDTO);
 	}
 
 	/**
@@ -100,8 +100,8 @@ public class SourceSystemConfigServiceTest {
 	 */
 //	@Test
 	final void testGet() {
-		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigService.get(1L);
-		assertEquals("信贷系统", sourceSystemConfigDO.getBusinessLineName());
+		AmfSourceSystemConfigDTO sourceSystemConfigDTO = sourceSystemConfigService.get(1L);
+		assertEquals("信贷系统", sourceSystemConfigDTO.getBusinessLineName());
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class SourceSystemConfigServiceTest {
 	 */
 //	@Test
 	final void testListByBusinessLineId4Paging() {
-		List<AmfSourceSystemConfigDO> list = sourceSystemConfigService.listByBusinessLineId4Paging(1L, 1, 10);
+		List<AmfSourceSystemConfigDTO> list = sourceSystemConfigService.list4Paging(1L, 1, 10);
 		assertEquals(1, list.size());
 	}
 
