@@ -36,13 +36,6 @@ public class AmfMessageConfigDO implements Serializable {
 	private Long id;
 
 	/**
-	 * 业来源系统配置主键，新增时不可为空
-	 */
-	@ApiModelProperty(value = "业来源系统配置主键，新增时不可为空", dataType = "Long", required = true)
-	@NotNull(message = "业来源系统配置主键不能为空", groups = { ValidationGroup.Insert.class })
-	private Long sourceSystemConfigId;
-
-	/**
 	 * 业务线ID，最长20位
 	 */
 	@ApiModelProperty(value = "业务线ID，最长20位", dataType = "String", required = false)

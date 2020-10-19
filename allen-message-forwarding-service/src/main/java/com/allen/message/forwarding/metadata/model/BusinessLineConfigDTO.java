@@ -6,27 +6,25 @@ import java.time.LocalDateTime;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.Range;
-
 import com.allen.tool.validation.ValidationGroup;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * 消息来源系统配置信息DTO类，用来传输消息来源系统配置信息
+ * 消息所属业务线配置信息DTO类，用来存取消息所属业务线配置信息
  *
  * @author Allen
- * @date 2020年10月17日
+ * @date Jul 14, 2020
  * @since 1.0.0
  */
-@ApiModel("消息来源系统配置信息")
-public class AmfSourceSystemConfigDTO implements Serializable {
+@ApiModel("消息所属业务配置信息")
+public class BusinessLineConfigDTO implements Serializable {
 
 	/**
 	 * 序列化版本号
 	 */
-	private static final long serialVersionUID = -3141863322260139688L;
+	private static final long serialVersionUID = -3505063851603049868L;
 
 	/**
 	 * 主键ID，修改时不可为空
@@ -36,38 +34,20 @@ public class AmfSourceSystemConfigDTO implements Serializable {
 	private Long id;
 
 	/**
-	 * 业务线主键ID，新增时不可为空
+	 * 业务线ID，最长20位，新增时不可为空，不可修改
 	 */
-	@ApiModelProperty(value = "业务线主键ID，新增时不可为空", dataType = "Long", required = true)
-	@NotNull(message = "业务线主键ID不能为空", groups = { ValidationGroup.Insert.class })
-	private Long businessLineConfigId;
-
-	/**
-	 * 业务线ID
-	 */
-	@ApiModelProperty(value = "业务线ID", dataType = "String", required = false)
+	@ApiModelProperty(value = "业务线ID，最长20位，新增时不可为空", dataType = "String", required = true)
+	@NotNull(message = "业务线ID不能为空", groups = { ValidationGroup.Insert.class })
+	@Size(max = 20, message = "业务线ID最长20位")
 	private String businessLineId;
 
 	/**
-	 * 业务线名称
+	 * 业务线名称，最长30位，新增及修改时不可为空
 	 */
-	@ApiModelProperty(value = "业务线名称", dataType = "String", required = false)
+	@ApiModelProperty(value = "业务线名称，最长30位，新增及修改时不可为空", dataType = "String", required = true)
+	@NotNull(message = "业务线名称不能为空", groups = { ValidationGroup.Insert.class, ValidationGroup.Update.class })
+	@Size(max = 30, message = "业务线名称最长30位")
 	private String businessLineName;
-
-	/**
-	 * 来源系统ID，固定4位，由系统分配，默认值为数据库中的最大值加1，不可修改
-	 */
-	@ApiModelProperty(value = "来源系统ID，固定4位", dataType = "Integer", required = false)
-	@Range(min = 1000, max = 9999, message = "来源系统ID取值范围为1000~9999")
-	private Integer sourceSystemId;
-
-	/**
-	 * 来源系统名称，最长30位，不可为空
-	 */
-	@ApiModelProperty(value = "来源系统名称，最长30位，不可为空", dataType = "String", required = true)
-	@NotNull(message = "来源系统名称不能为空")
-	@Size(max = 30, message = "来源系统名称最长30位")
-	private String sourceSystemName;
 
 	/**
 	 * 创建人ID，最长20位，新增时不可为空，不可修改
@@ -105,14 +85,6 @@ public class AmfSourceSystemConfigDTO implements Serializable {
 		this.id = id;
 	}
 
-	public Long getBusinessLineConfigId() {
-		return businessLineConfigId;
-	}
-
-	public void setBusinessLineConfigId(Long businessLineConfigId) {
-		this.businessLineConfigId = businessLineConfigId;
-	}
-
 	public String getBusinessLineId() {
 		return businessLineId;
 	}
@@ -127,22 +99,6 @@ public class AmfSourceSystemConfigDTO implements Serializable {
 
 	public void setBusinessLineName(String businessLineName) {
 		this.businessLineName = businessLineName;
-	}
-
-	public Integer getSourceSystemId() {
-		return sourceSystemId;
-	}
-
-	public void setSourceSystemId(Integer sourceSystemId) {
-		this.sourceSystemId = sourceSystemId;
-	}
-
-	public String getSourceSystemName() {
-		return sourceSystemName;
-	}
-
-	public void setSourceSystemName(String sourceSystemName) {
-		this.sourceSystemName = sourceSystemName;
 	}
 
 	public String getCreatedBy() {
@@ -180,10 +136,8 @@ public class AmfSourceSystemConfigDTO implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
-		sbuilder.append("AmfSourceSystemConfigDO[").append("id=").append(id).append(", businessLineConfigId=")
-				.append(businessLineConfigId).append(", businessLineId=").append(businessLineId)
-				.append(", businessLineName=").append(businessLineName).append(", sourceSystemId=")
-				.append(sourceSystemId).append(", sourceSystemName=").append(sourceSystemName).append(", createdBy=")
+		sbuilder.append("AmfBusinessLineConfigDO[").append("id=").append(id).append(", businessLineId=")
+				.append(businessLineId).append(", businessLineName=").append(businessLineName).append(", createdBy=")
 				.append(createdBy).append(", createTime=").append(createTime).append(", updatedBy=").append(updatedBy)
 				.append(", updateTime=").append(updateTime).append("]");
 		return sbuilder.toString();

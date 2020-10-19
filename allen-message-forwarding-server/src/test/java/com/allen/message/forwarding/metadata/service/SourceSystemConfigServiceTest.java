@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDTO;
+import com.allen.message.forwarding.metadata.model.SourceSystemConfigDTO;
 
 /**
  * 消息来源系统服务层单元测试类
@@ -62,7 +62,7 @@ public class SourceSystemConfigServiceTest {
 	 */
 	@Test
 	final void testSave() {
-		AmfSourceSystemConfigDTO sourceSystemConfigDTO = new AmfSourceSystemConfigDTO();
+		SourceSystemConfigDTO sourceSystemConfigDTO = new SourceSystemConfigDTO();
 		sourceSystemConfigDTO.setBusinessLineId("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 		sourceSystemConfigDTO.setBusinessLineName("消息系统");
 		sourceSystemConfigDTO.setSourceSystemName("子系统2");
@@ -78,7 +78,7 @@ public class SourceSystemConfigServiceTest {
 	 */
 //	@Test
 	final void testUpdate() {
-		AmfSourceSystemConfigDTO sourceSystemConfigDTO = new AmfSourceSystemConfigDTO();
+		SourceSystemConfigDTO sourceSystemConfigDTO = new SourceSystemConfigDTO();
 		sourceSystemConfigDTO.setId(1L);
 		sourceSystemConfigDTO.setSourceSystemName("客户系统");
 		sourceSystemConfigDTO.setUpdatedBy("allen");
@@ -100,7 +100,7 @@ public class SourceSystemConfigServiceTest {
 	 */
 //	@Test
 	final void testGet() {
-		AmfSourceSystemConfigDTO sourceSystemConfigDTO = sourceSystemConfigService.get(1L);
+		SourceSystemConfigDTO sourceSystemConfigDTO = sourceSystemConfigService.get(1L);
 		assertEquals("信贷系统", sourceSystemConfigDTO.getBusinessLineName());
 	}
 
@@ -120,7 +120,7 @@ public class SourceSystemConfigServiceTest {
 	 */
 //	@Test
 	final void testListByBusinessLineId4Paging() {
-		List<AmfSourceSystemConfigDTO> list = sourceSystemConfigService.list4Paging(1L, 1, 10);
+		List<SourceSystemConfigDTO> list = sourceSystemConfigService.list4Paging(1L, 1, 10);
 		assertEquals(1, list.size());
 	}
 
