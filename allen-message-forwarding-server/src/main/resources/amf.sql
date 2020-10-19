@@ -3,7 +3,7 @@ CREATE TABLE `amf_business_line_config` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `business_line_id` varchar(20) NOT NULL COMMENT '业务线ID',
   `business_line_name` varchar(30) NOT NULL COMMENT '业务线名称',
-  `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '是否删除标记：0-否，1-是',
+  `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否删除标记：0-否，1-是',
   `created_by` varchar(20) NOT NULL COMMENT '创建人ID',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间，默认值为系统当前时间',
   `updated_by` varchar(20) NOT NULL COMMENT '最后修改人ID',
@@ -37,7 +37,7 @@ CREATE TABLE `amf_message_config` (
   `source_system_name` varchar(30)  NOT NULL COMMENT '来源系统名称',
   `message_id` int NOT NULL COMMENT '消息ID',
   `message_name` varchar(30)  NOT NULL COMMENT '消息名称',
-  `message_status` tinyint unsigned NOT NULL COMMENT '消息状态：0-停用，1-启用',
+  `message_status` tinyint unsigned NOT NULL DEFAULT 1 COMMENT '消息状态：0-停用，1-启用',
   `callback_url` varchar(200)  DEFAULT NULL COMMENT '消息发送结果回调地址',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否删除标记：0-否，1-是',
   `created_by` varchar(20)  NOT NULL COMMENT '创建人ID',
@@ -45,7 +45,8 @@ CREATE TABLE `amf_message_config` (
   `updated_by` varchar(20)  NOT NULL COMMENT '最后修改人ID',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间，默认值为系统当前时间，数据修改时自动更新',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `udx_message_config` (`message_id`)
+  UNIQUE KEY `udx_message_config` (`message_id`) COMMENT '消息配置唯一索引',
+  KEY `idx_message_config` (`souce_system_id`) COMMENT '消息配置普通索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息配置表';
 
 -- 消息转发配置表
@@ -55,7 +56,8 @@ CREATE TABLE `amf_message_forwarding_config` (
   `target_system` varchar(30) NOT NULL COMMENT '目标系统名称',
   `forwarding_way` char(2) NOT NULL COMMENT '转发到目标系统的方式：01-Http，02-Kafka，03-RocketMQ',
   `target_address` varchar(200) NOT NULL COMMENT '目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔）',
-  `retry_times` tinyint NOT NULL DEFAULT '0' COMMENT '重试次数',
+  `retry_times` tinyint NOT NULL DEFAULT 0 COMMENT '重试次数',
+  `callback_required` tinyint unsigned NOT NULL COMMENT '是否需要回调，1-是，0-否',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否删除标记：0-否，1-是',
   `created_by` varchar(20) NOT NULL COMMENT '创建人ID',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间，默认值为系统当前时间',

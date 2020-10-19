@@ -5,8 +5,7 @@
 	<!-- 插入 -->
 	<insert id="save"
 		parameterType="com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO"
-		useGeneratedKeys="true" keyProperty="id" keyColumn="id"
-		statementType="PREPARED" timeout="10">
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id" statementType="PREPARED" timeout="10">
 		insert into `amf_source_system_config`
 		(
 		<trim suffixOverrides=",">

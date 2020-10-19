@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.allen.message.forwarding.metadata.dao.SourceSystemConfigDAO;
-import com.allen.message.forwarding.metadata.model.BusinessLineConfigDTO;
+import com.allen.message.forwarding.metadata.model.BusinessLineConfigVO;
 import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
-import com.allen.message.forwarding.metadata.model.SourceSystemConfigDTO;
+import com.allen.message.forwarding.metadata.model.SourceSystemConfigVO;
 import com.allen.message.forwarding.metadata.service.BusinessLineConfigService;
 import com.allen.message.forwarding.metadata.service.SourceSystemConfigService;
 import com.allen.tool.string.StringUtil;
@@ -48,7 +48,7 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 
 	@Transactional
 	@Override
-	public void save(SourceSystemConfigDTO sourceSystemConfigDTO) {
+	public void save(SourceSystemConfigVO sourceSystemConfigDTO) {
 		AmfSourceSystemConfigDO sourceSystemConfigDO = toDO(sourceSystemConfigDTO);
 		sourceSystemConfigDO.setDeleted(0);
 		LocalDateTime now = LocalDateTime.now();
@@ -63,7 +63,7 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 
 	@Transactional
 	@Override
-	public void update(SourceSystemConfigDTO sourceSystemConfigDTO) {
+	public void update(SourceSystemConfigVO sourceSystemConfigDTO) {
 		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigDAO.get(sourceSystemConfigDTO.getId());
 		if (sourceSystemConfigDO == null) {
 			LOGGER.info("未查到对应的来源系统信息，来源系统主键：{}", sourceSystemConfigDTO.getId());
@@ -97,12 +97,12 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	}
 
 	@Override
-	public SourceSystemConfigDTO get(Long id) {
+	public SourceSystemConfigVO get(Long id) {
 		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigDAO.get(id);
 		if (sourceSystemConfigDO == null) {
 			return null;
 		}
-		BusinessLineConfigDTO businessLineConfigDTO = businessLineConfigService
+		BusinessLineConfigVO businessLineConfigDTO = businessLineConfigService
 				.get(sourceSystemConfigDO.getBusinessLineConfigId());
 		if (businessLineConfigDTO == null) {
 			// 如果所属业务线为空，则返回null
@@ -117,8 +117,8 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	}
 
 	@Override
-	public List<SourceSystemConfigDTO> list4Paging(Long businessLineConfigId, int pageNo, int pageSize) {
-		BusinessLineConfigDTO businessLineConfigDTO = businessLineConfigService.get(businessLineConfigId);
+	public List<SourceSystemConfigVO> list4Paging(Long businessLineConfigId, int pageNo, int pageSize) {
+		BusinessLineConfigVO businessLineConfigDTO = businessLineConfigService.get(businessLineConfigId);
 		if (businessLineConfigDTO == null) {
 			return Collections.emptyList();
 		}
@@ -137,7 +137,7 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	 * @param sourceSystemConfigDTO DTO对象
 	 * @return DO对象
 	 */
-	private AmfSourceSystemConfigDO toDO(SourceSystemConfigDTO sourceSystemConfigDTO) {
+	private AmfSourceSystemConfigDO toDO(SourceSystemConfigVO sourceSystemConfigDTO) {
 		if (sourceSystemConfigDTO == null) {
 			return null;
 		}
@@ -160,12 +160,12 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	 * @param businessLineConfigDTO 业务线信息对象
 	 * @return DTO对象
 	 */
-	private SourceSystemConfigDTO toDTO(AmfSourceSystemConfigDO sourceSystemConfigDO,
-			BusinessLineConfigDTO businessLineConfigDTO) {
+	private SourceSystemConfigVO toDTO(AmfSourceSystemConfigDO sourceSystemConfigDO,
+			BusinessLineConfigVO businessLineConfigDTO) {
 		if (sourceSystemConfigDO == null) {
 			return null;
 		}
-		SourceSystemConfigDTO sourceSystemConfigDTO = new SourceSystemConfigDTO();
+		SourceSystemConfigVO sourceSystemConfigDTO = new SourceSystemConfigVO();
 		sourceSystemConfigDTO.setId(sourceSystemConfigDO.getId());
 		sourceSystemConfigDTO.setBusinessLineConfigId(sourceSystemConfigDO.getBusinessLineConfigId());
 		sourceSystemConfigDTO.setSourceSystemId(sourceSystemConfigDO.getSourceSystemId());

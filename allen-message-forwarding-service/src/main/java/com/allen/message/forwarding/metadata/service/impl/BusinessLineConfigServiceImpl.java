@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.allen.message.forwarding.metadata.dao.BusinessLineConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfBusinessLineConfigDO;
-import com.allen.message.forwarding.metadata.model.BusinessLineConfigDTO;
+import com.allen.message.forwarding.metadata.model.BusinessLineConfigVO;
 import com.allen.message.forwarding.metadata.service.BusinessLineConfigService;
 import com.allen.message.forwarding.metadata.service.SourceSystemConfigService;
 import com.allen.tool.exception.CustomBusinessException;
@@ -45,7 +45,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 
 	@Transactional
 	@Override
-	public void save(BusinessLineConfigDTO businessLineConfigDTO) {
+	public void save(BusinessLineConfigVO businessLineConfigDTO) {
 		AmfBusinessLineConfigDO businessLineConfigDO = toDO(businessLineConfigDTO);
 		businessLineConfigDO.setDeleted(0);
 		LocalDateTime now = LocalDateTime.now();
@@ -61,7 +61,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 
 	@Transactional
 	@Override
-	public void update(BusinessLineConfigDTO businessLineConfigDTO) {
+	public void update(BusinessLineConfigVO businessLineConfigDTO) {
 		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(businessLineConfigDTO.getId());
 		if (businessLineConfigDO == null) {
 			LOGGER.info("未查到对应的业务线信息，业务线主键：{}", businessLineConfigDTO.getId());
@@ -99,19 +99,19 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	}
 
 	@Override
-	public BusinessLineConfigDTO get(Long id) {
+	public BusinessLineConfigVO get(Long id) {
 		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(id);
 		return toDTO(businessLineConfigDO);
 	}
 
 	@Override
-	public BusinessLineConfigDTO getByBusinessLineId(String businessLineId) {
+	public BusinessLineConfigVO getByBusinessLineId(String businessLineId) {
 		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.getByBusinessLineId(businessLineId);
 		return toDTO(businessLineConfigDO);
 	}
 
 	@Override
-	public List<BusinessLineConfigDTO> list4Fuzzy(String businessLineId, String businessLineName) {
+	public List<BusinessLineConfigVO> list4Fuzzy(String businessLineId, String businessLineName) {
 		// TODO Auto-generated method stub
 		if (StringUtil.isBlank(businessLineId) && StringUtil.isBlank(businessLineName)) {
 			LOGGER.info("业务线ID和业务线名称不能同时为空");
@@ -134,7 +134,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	}
 
 	@Override
-	public List<BusinessLineConfigDTO> list4Paging(int pageNo, int pageSize) {
+	public List<BusinessLineConfigVO> list4Paging(int pageNo, int pageSize) {
 		int startNo = (pageNo - 1) * pageSize;
 		List<AmfBusinessLineConfigDO> businessLineConfigDOList = businessLineConfigDAO.list4Paging(startNo, pageSize);
 		return toDTOList(businessLineConfigDOList);
@@ -146,7 +146,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	 * @param businessLineConfigDTO DTO对象
 	 * @return DO对象
 	 */
-	private AmfBusinessLineConfigDO toDO(BusinessLineConfigDTO businessLineConfigDTO) {
+	private AmfBusinessLineConfigDO toDO(BusinessLineConfigVO businessLineConfigDTO) {
 		if (businessLineConfigDTO == null) {
 			return null;
 		}
@@ -167,11 +167,11 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	 * @param businessLineConfigDO DO对象
 	 * @return DTO对象
 	 */
-	private BusinessLineConfigDTO toDTO(AmfBusinessLineConfigDO businessLineConfigDO) {
+	private BusinessLineConfigVO toDTO(AmfBusinessLineConfigDO businessLineConfigDO) {
 		if (businessLineConfigDO == null) {
 			return null;
 		}
-		BusinessLineConfigDTO businessLineConfigDTO = new BusinessLineConfigDTO();
+		BusinessLineConfigVO businessLineConfigDTO = new BusinessLineConfigVO();
 		businessLineConfigDTO.setId(businessLineConfigDO.getId());
 		businessLineConfigDTO.setBusinessLineId(businessLineConfigDO.getBusinessLineId());
 		businessLineConfigDTO.setBusinessLineName(businessLineConfigDO.getBusinessLineName());
@@ -188,7 +188,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	 * @param businessLineConfigDOList DO列表
 	 * @return DTO列表
 	 */
-	private List<BusinessLineConfigDTO> toDTOList(List<AmfBusinessLineConfigDO> businessLineConfigDOList) {
+	private List<BusinessLineConfigVO> toDTOList(List<AmfBusinessLineConfigDO> businessLineConfigDOList) {
 		if (businessLineConfigDOList == null || businessLineConfigDOList.isEmpty()) {
 			return Collections.emptyList();
 		}

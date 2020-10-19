@@ -5,8 +5,7 @@
 	<!-- 插入 -->
 	<insert id="save"
 		parameterType="com.allen.message.forwarding.metadata.model.AmfBusinessLineConfigDO"
-		useGeneratedKeys="true" keyProperty="id" keyColumn="id"
-		statementType="PREPARED" timeout="10">
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id" statementType="PREPARED" timeout="10">
 		insert into `amf_business_line_config`
 		(
 		<trim suffixOverrides=",">
@@ -142,7 +141,7 @@
 		</where>
 	</select>
 
-	<select id="count" parameterType="string" resultType="int">
+	<select id="count" resultType="int">
 		select count(*)
 		from  `amf_business_line_config`
 		where `is_deleted` = 0
