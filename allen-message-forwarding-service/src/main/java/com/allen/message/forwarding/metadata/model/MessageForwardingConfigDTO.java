@@ -23,8 +23,8 @@ public class MessageForwardingConfigDTO implements Serializable {
 	/**
 	 * 消息ID
 	 */
-	@ApiModelProperty(value = "消息ID", dataType = "Long")
-	private String messageId;
+	@ApiModelProperty(value = "消息ID", dataType = "Integer")
+	private Integer messageId;
 
 	/**
 	 * 目标系统名称，最长30位
@@ -50,11 +50,17 @@ public class MessageForwardingConfigDTO implements Serializable {
 	@ApiModelProperty(value = "重试次数，默认值为3，最大值为10次", dataType = "Integer")
 	private Integer retryTimes;
 
-	public String getMessageId() {
+	/**
+	 * 是否需要回调，0-否，1-是，默认为0，回调重试次数固定为3
+	 */
+	@ApiModelProperty(value = "是否需要回调，0-否，1-是，默认为0", dataType = "Integer")
+	private Integer callbackRequired;
+
+	public Integer getMessageId() {
 		return messageId;
 	}
 
-	public void setMessageId(String messageId) {
+	public void setMessageId(Integer messageId) {
 		this.messageId = messageId;
 	}
 
@@ -90,13 +96,21 @@ public class MessageForwardingConfigDTO implements Serializable {
 		this.retryTimes = retryTimes;
 	}
 
+	public Integer getCallbackRequired() {
+		return callbackRequired;
+	}
+
+	public void setCallbackRequired(Integer callbackRequired) {
+		this.callbackRequired = callbackRequired;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
 		sbuilder.append("MessageForwardingConfigDTO[").append(", messageId=").append(messageId)
 				.append(", targetSystem=").append(targetSystem).append(", forwardingWay=").append(forwardingWay)
 				.append(", targetAddress=").append(targetAddress).append(", retryTimes=").append(retryTimes)
-				.append("]");
+				.append(", callbackRequired=").append(callbackRequired).append("]");
 		return sbuilder.toString();
 	}
 }

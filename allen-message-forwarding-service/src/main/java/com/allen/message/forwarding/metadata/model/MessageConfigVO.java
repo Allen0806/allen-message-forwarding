@@ -231,7 +231,7 @@ public class MessageConfigVO implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
-		sbuilder.append("AmfMessageConfigDO[").append("id=").append(id).append(", businessLineId=")
+		sbuilder.append("MessageConfigVO[").append("id=").append(id).append(", businessLineId=")
 				.append(businessLineId).append(", businessLineName=").append(businessLineName)
 				.append(", sourceSystemId=").append(sourceSystemId).append(", sourceSystemName=")
 				.append(sourceSystemName).append(", messageId=").append(messageId).append(", messageName=")

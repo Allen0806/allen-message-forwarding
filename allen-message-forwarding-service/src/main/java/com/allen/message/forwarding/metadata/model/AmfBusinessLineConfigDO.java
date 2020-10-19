@@ -3,8 +3,6 @@ package com.allen.message.forwarding.metadata.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import io.swagger.annotations.ApiModel;
-
 /**
  * 消息所属业务线配置信息DO类，用来存取消息所属业务线配置信息
  *
@@ -12,7 +10,6 @@ import io.swagger.annotations.ApiModel;
  * @date Jul 14, 2020
  * @since 1.0.0
  */
-@ApiModel("消息所属业务配置信息")
 public class AmfBusinessLineConfigDO implements Serializable {
 
 	/**

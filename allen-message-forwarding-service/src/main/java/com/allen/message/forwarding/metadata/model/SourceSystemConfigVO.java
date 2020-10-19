@@ -180,7 +180,7 @@ public class SourceSystemConfigVO implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
-		sbuilder.append("AmfSourceSystemConfigDO[").append("id=").append(id).append(", businessLineConfigId=")
+		sbuilder.append("SourceSystemConfigVO[").append("id=").append(id).append(", businessLineConfigId=")
 				.append(businessLineConfigId).append(", businessLineId=").append(businessLineId)
 				.append(", businessLineName=").append(businessLineName).append(", sourceSystemId=")
 				.append(sourceSystemId).append(", sourceSystemName=").append(sourceSystemName).append(", createdBy=")

@@ -24,19 +24,19 @@ public interface SourceSystemConfigService {
 	/**
 	 * 新增消息来源系统配置信息
 	 * 
-	 * @param sourceSystemConfigDTO 消息来源系统配置信息
+	 * @param sourceSystemConfigVO 消息来源系统配置信息
 	 */
 	@Validated({ ValidationGroup.Insert.class, Default.class })
-	void save(@NotNull(message = "消息来源系统配置信息不能为空") @Valid SourceSystemConfigVO sourceSystemConfigDTO);
+	void save(@NotNull(message = "消息来源系统配置信息不能为空") @Valid SourceSystemConfigVO sourceSystemConfigVO);
 
 	/**
 	 * 修改消息来源系统配置信息
 	 * 
-	 * @param sourceSystemConfigDTO
+	 * @param sourceSystemConfigVO 消息来源系统配置信息
 	 */
 	@Validated(ValidationGroup.Update.class)
 	void update(@NotNull(message = "消息来源系统配置信息不能为空", groups = {
-			ValidationGroup.Update.class }) @Valid SourceSystemConfigVO sourceSystemConfigDTO);
+			ValidationGroup.Update.class }) @Valid SourceSystemConfigVO sourceSystemConfigVO);
 
 	/**
 	 * 根据主键ID删除消息来源系统配置信息，逻辑删除。如果有对应的消息配置，则不允许删除
@@ -70,7 +70,6 @@ public interface SourceSystemConfigService {
 	 * @param pageSize             每页行数
 	 * @return 分页查询结果
 	 */
-	List<SourceSystemConfigVO> list4Paging(
-			@NotNull(message = "消息来源系统配置信息业务线主键不能为空") Long businessLineConfigId,
+	List<SourceSystemConfigVO> list4Paging(@NotNull(message = "消息来源系统配置信息业务线主键不能为空") Long businessLineConfigId,
 			@NotNull(message = "当前页数不能为空") int pageNo, @NotNull(message = "每页行数不能为空") int pageSize);
 }

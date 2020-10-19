@@ -42,8 +42,8 @@ public class SourceSystemConfigController {
 	 */
 	@PostMapping("/meta/sourcesytemconfig/save")
 	public BaseResult<Object> save(
-			@Validated({ ValidationGroup.Insert.class }) @RequestBody SourceSystemConfigVO sourceSystemConfigDTO) {
-		sourceSystemConfigService.save(sourceSystemConfigDTO);
+			@Validated({ ValidationGroup.Insert.class }) @RequestBody SourceSystemConfigVO sourceSystemConfigVO) {
+		sourceSystemConfigService.save(sourceSystemConfigVO);
 		return BaseResult.success();
 	}
 
@@ -55,8 +55,8 @@ public class SourceSystemConfigController {
 	 */
 	@PostMapping("/meta/sourcesytemconfig/update")
 	public BaseResult<Object> update(
-			@Validated({ ValidationGroup.Update.class }) @RequestBody SourceSystemConfigVO sourceSystemConfigDTO) {
-		sourceSystemConfigService.update(sourceSystemConfigDTO);
+			@Validated({ ValidationGroup.Update.class }) @RequestBody SourceSystemConfigVO sourceSystemConfigVO) {
+		sourceSystemConfigService.update(sourceSystemConfigVO);
 		return BaseResult.success();
 	}
 

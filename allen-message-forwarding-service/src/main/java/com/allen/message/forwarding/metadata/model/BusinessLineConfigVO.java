@@ -136,7 +136,7 @@ public class BusinessLineConfigVO implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
-		sbuilder.append("AmfBusinessLineConfigDO[").append("id=").append(id).append(", businessLineId=")
+		sbuilder.append("BusinessLineConfigVO[").append("id=").append(id).append(", businessLineId=")
 				.append(businessLineId).append(", businessLineName=").append(businessLineName).append(", createdBy=")
 				.append(createdBy).append(", createTime=").append(createTime).append(", updatedBy=").append(updatedBy)
 				.append(", updateTime=").append(updateTime).append("]");

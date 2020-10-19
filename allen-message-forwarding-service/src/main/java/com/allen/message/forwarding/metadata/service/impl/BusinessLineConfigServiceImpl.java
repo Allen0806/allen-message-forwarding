@@ -45,8 +45,8 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 
 	@Transactional
 	@Override
-	public void save(BusinessLineConfigVO businessLineConfigDTO) {
-		AmfBusinessLineConfigDO businessLineConfigDO = toDO(businessLineConfigDTO);
+	public void save(BusinessLineConfigVO businessLineConfigVO) {
+		AmfBusinessLineConfigDO businessLineConfigDO = toDO(businessLineConfigVO);
 		businessLineConfigDO.setDeleted(0);
 		LocalDateTime now = LocalDateTime.now();
 		businessLineConfigDO.setCreateTime(now);
@@ -55,30 +55,30 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 			businessLineConfigDO.setUpdatedBy(businessLineConfigDO.getCreatedBy());
 		}
 		businessLineConfigDAO.save(businessLineConfigDO);
-		LOGGER.info("保存消息所属业务线配置信息成功，业务线名称：{}，创建人：{}", businessLineConfigDTO.getBusinessLineName(),
-				businessLineConfigDTO.getCreatedBy());
+		LOGGER.info("保存消息所属业务线配置信息成功，业务线名称：{}，创建人：{}", businessLineConfigVO.getBusinessLineName(),
+				businessLineConfigVO.getCreatedBy());
 	}
 
 	@Transactional
 	@Override
-	public void update(BusinessLineConfigVO businessLineConfigDTO) {
-		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(businessLineConfigDTO.getId());
+	public void update(BusinessLineConfigVO businessLineConfigVO) {
+		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(businessLineConfigVO.getId());
 		if (businessLineConfigDO == null) {
-			LOGGER.info("未查到对应的业务线信息，业务线主键：{}", businessLineConfigDTO.getId());
+			LOGGER.info("未查到对应的业务线信息，业务线主键：{}", businessLineConfigVO.getId());
 			return;
 		}
-		if (businessLineConfigDO.getBusinessLineName().equals(businessLineConfigDTO.getBusinessLineName())) {
-			LOGGER.info("业务线名称没有变化，不进行消息所属业务线配置信息更新操作，业务线名称：{}", businessLineConfigDTO.getBusinessLineName());
+		if (businessLineConfigDO.getBusinessLineName().equals(businessLineConfigVO.getBusinessLineName())) {
+			LOGGER.info("业务线名称没有变化，不进行消息所属业务线配置信息更新操作，业务线名称：{}", businessLineConfigVO.getBusinessLineName());
 			return;
 		}
-		businessLineConfigDO.setBusinessLineName(businessLineConfigDTO.getBusinessLineName());
-		businessLineConfigDO.setUpdatedBy(businessLineConfigDTO.getUpdatedBy());
+		businessLineConfigDO.setBusinessLineName(businessLineConfigVO.getBusinessLineName());
+		businessLineConfigDO.setUpdatedBy(businessLineConfigVO.getUpdatedBy());
 		businessLineConfigDO.setUpdateTime(LocalDateTime.now());
 		businessLineConfigDAO.update(businessLineConfigDO);
 		// TODO 更新消息配置信息的业务线名称
 
-		LOGGER.info("更新消息所属业务线配置信息成功，业务线名称：{}，修改人：{}", businessLineConfigDTO.getBusinessLineName(),
-				businessLineConfigDTO.getUpdatedBy());
+		LOGGER.info("更新消息所属业务线配置信息成功，业务线名称：{}，修改人：{}", businessLineConfigVO.getBusinessLineName(),
+				businessLineConfigVO.getUpdatedBy());
 	}
 
 	@Transactional
@@ -101,13 +101,13 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	@Override
 	public BusinessLineConfigVO get(Long id) {
 		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(id);
-		return toDTO(businessLineConfigDO);
+		return toVO(businessLineConfigDO);
 	}
 
 	@Override
 	public BusinessLineConfigVO getByBusinessLineId(String businessLineId) {
 		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.getByBusinessLineId(businessLineId);
-		return toDTO(businessLineConfigDO);
+		return toVO(businessLineConfigDO);
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		}
 		List<AmfBusinessLineConfigDO> businessLineConfigDOList = businessLineConfigDAO.list4Fuzzy(businessLineId,
 				businessLineName);
-		return toDTOList(businessLineConfigDOList);
+		return toVOList(businessLineConfigDOList);
 	}
 
 	@Override
@@ -137,27 +137,27 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	public List<BusinessLineConfigVO> list4Paging(int pageNo, int pageSize) {
 		int startNo = (pageNo - 1) * pageSize;
 		List<AmfBusinessLineConfigDO> businessLineConfigDOList = businessLineConfigDAO.list4Paging(startNo, pageSize);
-		return toDTOList(businessLineConfigDOList);
+		return toVOList(businessLineConfigDOList);
 	}
 
 	/**
 	 * 将DTO对象转换为DO对象
 	 * 
-	 * @param businessLineConfigDTO DTO对象
+	 * @param businessLineConfigVO DTO对象
 	 * @return DO对象
 	 */
-	private AmfBusinessLineConfigDO toDO(BusinessLineConfigVO businessLineConfigDTO) {
-		if (businessLineConfigDTO == null) {
+	private AmfBusinessLineConfigDO toDO(BusinessLineConfigVO businessLineConfigVO) {
+		if (businessLineConfigVO == null) {
 			return null;
 		}
 		AmfBusinessLineConfigDO businessLineConfigDO = new AmfBusinessLineConfigDO();
-		businessLineConfigDO.setId(businessLineConfigDTO.getId());
-		businessLineConfigDO.setBusinessLineId(businessLineConfigDTO.getBusinessLineId());
-		businessLineConfigDO.setBusinessLineName(businessLineConfigDTO.getBusinessLineName());
-		businessLineConfigDO.setCreatedBy(businessLineConfigDTO.getCreatedBy());
-		businessLineConfigDO.setCreateTime(businessLineConfigDTO.getCreateTime());
-		businessLineConfigDO.setUpdatedBy(businessLineConfigDTO.getUpdatedBy());
-		businessLineConfigDO.setUpdateTime(businessLineConfigDTO.getUpdateTime());
+		businessLineConfigDO.setId(businessLineConfigVO.getId());
+		businessLineConfigDO.setBusinessLineId(businessLineConfigVO.getBusinessLineId());
+		businessLineConfigDO.setBusinessLineName(businessLineConfigVO.getBusinessLineName());
+		businessLineConfigDO.setCreatedBy(businessLineConfigVO.getCreatedBy());
+		businessLineConfigDO.setCreateTime(businessLineConfigVO.getCreateTime());
+		businessLineConfigDO.setUpdatedBy(businessLineConfigVO.getUpdatedBy());
+		businessLineConfigDO.setUpdateTime(businessLineConfigVO.getUpdateTime());
 		return businessLineConfigDO;
 	}
 
@@ -167,19 +167,19 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	 * @param businessLineConfigDO DO对象
 	 * @return DTO对象
 	 */
-	private BusinessLineConfigVO toDTO(AmfBusinessLineConfigDO businessLineConfigDO) {
+	private BusinessLineConfigVO toVO(AmfBusinessLineConfigDO businessLineConfigDO) {
 		if (businessLineConfigDO == null) {
 			return null;
 		}
-		BusinessLineConfigVO businessLineConfigDTO = new BusinessLineConfigVO();
-		businessLineConfigDTO.setId(businessLineConfigDO.getId());
-		businessLineConfigDTO.setBusinessLineId(businessLineConfigDO.getBusinessLineId());
-		businessLineConfigDTO.setBusinessLineName(businessLineConfigDO.getBusinessLineName());
-		businessLineConfigDTO.setCreatedBy(businessLineConfigDO.getCreatedBy());
-		businessLineConfigDTO.setCreateTime(businessLineConfigDO.getCreateTime());
-		businessLineConfigDTO.setUpdatedBy(businessLineConfigDO.getUpdatedBy());
-		businessLineConfigDTO.setUpdateTime(businessLineConfigDO.getUpdateTime());
-		return businessLineConfigDTO;
+		BusinessLineConfigVO businessLineConfigVO = new BusinessLineConfigVO();
+		businessLineConfigVO.setId(businessLineConfigDO.getId());
+		businessLineConfigVO.setBusinessLineId(businessLineConfigDO.getBusinessLineId());
+		businessLineConfigVO.setBusinessLineName(businessLineConfigDO.getBusinessLineName());
+		businessLineConfigVO.setCreatedBy(businessLineConfigDO.getCreatedBy());
+		businessLineConfigVO.setCreateTime(businessLineConfigDO.getCreateTime());
+		businessLineConfigVO.setUpdatedBy(businessLineConfigDO.getUpdatedBy());
+		businessLineConfigVO.setUpdateTime(businessLineConfigDO.getUpdateTime());
+		return businessLineConfigVO;
 	}
 
 	/**
@@ -188,11 +188,11 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	 * @param businessLineConfigDOList DO列表
 	 * @return DTO列表
 	 */
-	private List<BusinessLineConfigVO> toDTOList(List<AmfBusinessLineConfigDO> businessLineConfigDOList) {
+	private List<BusinessLineConfigVO> toVOList(List<AmfBusinessLineConfigDO> businessLineConfigDOList) {
 		if (businessLineConfigDOList == null || businessLineConfigDOList.isEmpty()) {
 			return Collections.emptyList();
 		}
-		return businessLineConfigDOList.stream().map(e -> toDTO(e)).collect(Collectors.toList());
+		return businessLineConfigDOList.stream().map(e -> toVO(e)).collect(Collectors.toList());
 	}
 
 }

@@ -48,8 +48,8 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 
 	@Transactional
 	@Override
-	public void save(SourceSystemConfigVO sourceSystemConfigDTO) {
-		AmfSourceSystemConfigDO sourceSystemConfigDO = toDO(sourceSystemConfigDTO);
+	public void save(SourceSystemConfigVO sourceSystemConfigVO) {
+		AmfSourceSystemConfigDO sourceSystemConfigDO = toDO(sourceSystemConfigVO);
 		sourceSystemConfigDO.setDeleted(0);
 		LocalDateTime now = LocalDateTime.now();
 		sourceSystemConfigDO.setCreateTime(now);
@@ -63,17 +63,17 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 
 	@Transactional
 	@Override
-	public void update(SourceSystemConfigVO sourceSystemConfigDTO) {
-		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigDAO.get(sourceSystemConfigDTO.getId());
+	public void update(SourceSystemConfigVO sourceSystemConfigVO) {
+		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigDAO.get(sourceSystemConfigVO.getId());
 		if (sourceSystemConfigDO == null) {
-			LOGGER.info("未查到对应的来源系统信息，来源系统主键：{}", sourceSystemConfigDTO.getId());
+			LOGGER.info("未查到对应的来源系统信息，来源系统主键：{}", sourceSystemConfigVO.getId());
 			return;
 		}
-		if (sourceSystemConfigDO.getSourceSystemName().equals(sourceSystemConfigDTO.getSourceSystemName())) {
-			LOGGER.info("来源系统名称没有变化，不进行更新操作，来源系统名称：{}", sourceSystemConfigDTO.getSourceSystemName());
+		if (sourceSystemConfigDO.getSourceSystemName().equals(sourceSystemConfigVO.getSourceSystemName())) {
+			LOGGER.info("来源系统名称没有变化，不进行更新操作，来源系统名称：{}", sourceSystemConfigVO.getSourceSystemName());
 			return;
 		}
-		sourceSystemConfigDO.setSourceSystemName(sourceSystemConfigDTO.getSourceSystemName());
+		sourceSystemConfigDO.setSourceSystemName(sourceSystemConfigVO.getSourceSystemName());
 		sourceSystemConfigDO.setUpdatedBy(sourceSystemConfigDO.getUpdatedBy());
 		sourceSystemConfigDO.setUpdateTime(LocalDateTime.now());
 		sourceSystemConfigDAO.update(sourceSystemConfigDO);
@@ -108,7 +108,7 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 			// 如果所属业务线为空，则返回null
 			return null;
 		}
-		return toDTO(sourceSystemConfigDO, businessLineConfigDTO);
+		return toVO(sourceSystemConfigDO, businessLineConfigDTO);
 	}
 
 	@Override
@@ -128,28 +128,28 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 		if (sourceSystemConfigDOList == null || sourceSystemConfigDOList.isEmpty()) {
 			return Collections.emptyList();
 		}
-		return sourceSystemConfigDOList.stream().map(e -> toDTO(e, businessLineConfigDTO)).collect(Collectors.toList());
+		return sourceSystemConfigDOList.stream().map(e -> toVO(e, businessLineConfigDTO)).collect(Collectors.toList());
 	}
 
 	/**
 	 * 将DTO对象转换为DO对象
 	 * 
-	 * @param sourceSystemConfigDTO DTO对象
+	 * @param sourceSystemConfigVO DTO对象
 	 * @return DO对象
 	 */
-	private AmfSourceSystemConfigDO toDO(SourceSystemConfigVO sourceSystemConfigDTO) {
-		if (sourceSystemConfigDTO == null) {
+	private AmfSourceSystemConfigDO toDO(SourceSystemConfigVO sourceSystemConfigVO) {
+		if (sourceSystemConfigVO == null) {
 			return null;
 		}
 		AmfSourceSystemConfigDO sourceSystemConfigDO = new AmfSourceSystemConfigDO();
-		sourceSystemConfigDO.setId(sourceSystemConfigDTO.getId());
-		sourceSystemConfigDO.setBusinessLineConfigId(sourceSystemConfigDTO.getBusinessLineConfigId());
-		sourceSystemConfigDO.setSourceSystemId(sourceSystemConfigDTO.getSourceSystemId());
-		sourceSystemConfigDO.setSourceSystemName(sourceSystemConfigDTO.getSourceSystemName());
-		sourceSystemConfigDO.setCreatedBy(sourceSystemConfigDTO.getCreatedBy());
-		sourceSystemConfigDO.setCreateTime(sourceSystemConfigDTO.getCreateTime());
-		sourceSystemConfigDO.setUpdatedBy(sourceSystemConfigDTO.getUpdatedBy());
-		sourceSystemConfigDO.setUpdateTime(sourceSystemConfigDTO.getUpdateTime());
+		sourceSystemConfigDO.setId(sourceSystemConfigVO.getId());
+		sourceSystemConfigDO.setBusinessLineConfigId(sourceSystemConfigVO.getBusinessLineConfigId());
+		sourceSystemConfigDO.setSourceSystemId(sourceSystemConfigVO.getSourceSystemId());
+		sourceSystemConfigDO.setSourceSystemName(sourceSystemConfigVO.getSourceSystemName());
+		sourceSystemConfigDO.setCreatedBy(sourceSystemConfigVO.getCreatedBy());
+		sourceSystemConfigDO.setCreateTime(sourceSystemConfigVO.getCreateTime());
+		sourceSystemConfigDO.setUpdatedBy(sourceSystemConfigVO.getUpdatedBy());
+		sourceSystemConfigDO.setUpdateTime(sourceSystemConfigVO.getUpdateTime());
 		return sourceSystemConfigDO;
 	}
 
@@ -157,28 +157,28 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	 * 将DO对象转换为DTO对象
 	 * 
 	 * @param sourceSystemConfigDTO DO对象
-	 * @param businessLineConfigDTO 业务线信息对象
+	 * @param businessLineConfigVO 业务线信息对象
 	 * @return DTO对象
 	 */
-	private SourceSystemConfigVO toDTO(AmfSourceSystemConfigDO sourceSystemConfigDO,
-			BusinessLineConfigVO businessLineConfigDTO) {
+	private SourceSystemConfigVO toVO(AmfSourceSystemConfigDO sourceSystemConfigDO,
+			BusinessLineConfigVO businessLineConfigVO) {
 		if (sourceSystemConfigDO == null) {
 			return null;
 		}
-		SourceSystemConfigVO sourceSystemConfigDTO = new SourceSystemConfigVO();
-		sourceSystemConfigDTO.setId(sourceSystemConfigDO.getId());
-		sourceSystemConfigDTO.setBusinessLineConfigId(sourceSystemConfigDO.getBusinessLineConfigId());
-		sourceSystemConfigDTO.setSourceSystemId(sourceSystemConfigDO.getSourceSystemId());
-		sourceSystemConfigDTO.setSourceSystemName(sourceSystemConfigDO.getSourceSystemName());
-		sourceSystemConfigDTO.setCreatedBy(sourceSystemConfigDO.getCreatedBy());
-		sourceSystemConfigDTO.setCreateTime(sourceSystemConfigDO.getCreateTime());
-		sourceSystemConfigDTO.setUpdatedBy(sourceSystemConfigDO.getUpdatedBy());
-		sourceSystemConfigDTO.setUpdateTime(sourceSystemConfigDO.getUpdateTime());
-		if (businessLineConfigDTO != null) {
-			sourceSystemConfigDTO.setBusinessLineId(businessLineConfigDTO.getBusinessLineId());
-			sourceSystemConfigDTO.setBusinessLineName(businessLineConfigDTO.getBusinessLineName());
+		SourceSystemConfigVO sourceSystemConfigVO = new SourceSystemConfigVO();
+		sourceSystemConfigVO.setId(sourceSystemConfigDO.getId());
+		sourceSystemConfigVO.setBusinessLineConfigId(sourceSystemConfigDO.getBusinessLineConfigId());
+		sourceSystemConfigVO.setSourceSystemId(sourceSystemConfigDO.getSourceSystemId());
+		sourceSystemConfigVO.setSourceSystemName(sourceSystemConfigDO.getSourceSystemName());
+		sourceSystemConfigVO.setCreatedBy(sourceSystemConfigDO.getCreatedBy());
+		sourceSystemConfigVO.setCreateTime(sourceSystemConfigDO.getCreateTime());
+		sourceSystemConfigVO.setUpdatedBy(sourceSystemConfigDO.getUpdatedBy());
+		sourceSystemConfigVO.setUpdateTime(sourceSystemConfigDO.getUpdateTime());
+		if (businessLineConfigVO != null) {
+			sourceSystemConfigVO.setBusinessLineId(businessLineConfigVO.getBusinessLineId());
+			sourceSystemConfigVO.setBusinessLineName(businessLineConfigVO.getBusinessLineName());
 		}
-		return sourceSystemConfigDTO;
+		return sourceSystemConfigVO;
 	}
 
 }

@@ -24,21 +24,19 @@ public interface BusinessLineConfigService {
 	/**
 	 * 新增消息所属业务线配置信息
 	 * 
-	 * @param businessLineConfigDTO 消息所属业务线配置信息
-	 * @return 新增成功数量
+	 * @param businessLineConfigVO 消息所属业务线配置信息
 	 */
 	@Validated({ ValidationGroup.Insert.class, Default.class })
-	void save(@NotNull(message = "消息所属业务线配置信息不能为空") @Valid BusinessLineConfigVO businessLineConfigDTO);
+	void save(@NotNull(message = "消息所属业务线配置信息不能为空") @Valid BusinessLineConfigVO businessLineConfigVO);
 
 	/**
 	 * 修改消息所属业务线配置信息
 	 * 
-	 * @param businessLineConfigDTO 消息所属业务线配置信息
-	 * @return 修改成功数量
+	 * @param businessLineConfigVO 消息所属业务线配置信息
 	 */
 	@Validated(ValidationGroup.Update.class)
 	void update(@NotNull(message = "消息所属业务线配置信息不能为空", groups = {
-			ValidationGroup.Update.class }) @Valid BusinessLineConfigVO businessLineConfigDTO);
+			ValidationGroup.Update.class }) @Valid BusinessLineConfigVO businessLineConfigVO);
 
 	/**
 	 * 根据主键ID删除消息所属业务线配置信息，逻辑删除。如果有对应的消息来源系统配置信息，则不允许删除
