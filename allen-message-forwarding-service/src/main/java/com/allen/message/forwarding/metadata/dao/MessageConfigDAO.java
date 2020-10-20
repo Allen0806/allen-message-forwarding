@@ -60,7 +60,7 @@ public interface MessageConfigDAO {
 	AmfMessageConfigDO get(Long id);
 
 	/**
-	 * 根据消息配置ID获取消息配置信息
+	 * 根据消息配置ID获取有效的消息配置信息
 	 * 
 	 * @param messageId 消息配置ID
 	 * @return 消息配置信息

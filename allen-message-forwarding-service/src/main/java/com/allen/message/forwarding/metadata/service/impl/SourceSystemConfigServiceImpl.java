@@ -74,7 +74,7 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 			return;
 		}
 		sourceSystemConfigDO.setSourceSystemName(sourceSystemConfigVO.getSourceSystemName());
-		sourceSystemConfigDO.setUpdatedBy(sourceSystemConfigDO.getUpdatedBy());
+		sourceSystemConfigDO.setUpdatedBy(sourceSystemConfigVO.getUpdatedBy());
 		sourceSystemConfigDO.setUpdateTime(LocalDateTime.now());
 		sourceSystemConfigDAO.update(sourceSystemConfigDO);
 		// TODO 更新消息信息的来源系统名称
@@ -132,9 +132,9 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	}
 
 	/**
-	 * 将DTO对象转换为DO对象
+	 * 将VO对象转换为DO对象
 	 * 
-	 * @param sourceSystemConfigVO DTO对象
+	 * @param sourceSystemConfigVO VO对象
 	 * @return DO对象
 	 */
 	private AmfSourceSystemConfigDO toDO(SourceSystemConfigVO sourceSystemConfigVO) {
@@ -154,11 +154,11 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	}
 
 	/**
-	 * 将DO对象转换为DTO对象
+	 * 将DO对象转换为VO对象
 	 * 
 	 * @param sourceSystemConfigDTO DO对象
 	 * @param businessLineConfigVO 业务线信息对象
-	 * @return DTO对象
+	 * @return VO对象
 	 */
 	private SourceSystemConfigVO toVO(AmfSourceSystemConfigDO sourceSystemConfigDO,
 			BusinessLineConfigVO businessLineConfigVO) {

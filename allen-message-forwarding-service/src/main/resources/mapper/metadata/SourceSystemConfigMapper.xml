@@ -45,7 +45,7 @@
 				#{businessLineConfigId},
 			</if>
 				<!-- 插入时最大值累加，保证唯一性，初始值为1000 -->
-				case when max(source_system_id) > 999 then max(source_system_id) + 1 else 1000 end,
+				case when max(source_system_id) is not null then max(source_system_id) + 1 else 1000 end,
 			<if test="sourceSystemName!=null">
 				#{sourceSystemName},
 			</if>

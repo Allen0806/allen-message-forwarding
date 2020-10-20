@@ -37,11 +37,11 @@ public class MessageForwardingConfigVO implements Serializable {
 	private Long id;
 
 	/**
-	 * 消息配置主键ID，新增时不可为空
+	 * 消息ID，新增时和修改时不可为空
 	 */
-	@ApiModelProperty(value = "消息配置主键ID，新增时不可为空", dataType = "Long", required = true)
-	@NotNull(message = "消息配置主键ID不能为空", groups = { ValidationGroup.Insert.class })
-	private Long messageConfigId;
+	@ApiModelProperty(value = "消息配置主键ID，新增时不可为空", dataType = "Integer", required = true)
+	@NotNull(message = "消息ID不能为空")
+	private Integer messageId;
 
 	/**
 	 * 目标系统名称，最长30位，新增时不可为空
@@ -117,12 +117,12 @@ public class MessageForwardingConfigVO implements Serializable {
 		this.id = id;
 	}
 
-	public Long getMessageConfigId() {
-		return messageConfigId;
+	public Integer getMessageId() {
+		return messageId;
 	}
 
-	public void setMessageConfigId(Long messageConfigId) {
-		this.messageConfigId = messageConfigId;
+	public void setMessageId(Integer messageId) {
+		this.messageId = messageId;
 	}
 
 	public String getTargetSystem() {
@@ -200,11 +200,11 @@ public class MessageForwardingConfigVO implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
-		sbuilder.append("MessageForwardingConfigVO[").append("id=").append(id).append(", messageConfigId=")
-				.append(messageConfigId).append(", targetSystem=").append(targetSystem).append(", forwardingWay=")
-				.append(forwardingWay).append(", targetAddress=").append(targetAddress).append(", retryTimes=")
-				.append(retryTimes).append(", callbackRequired=").append(callbackRequired).append(", createdBy=")
-				.append(createdBy).append(", createTime=").append(createTime).append(", updatedBy=").append(updatedBy)
+		sbuilder.append("MessageForwardingConfigVO[").append("id=").append(id).append(", messageId=").append(messageId)
+				.append(", targetSystem=").append(targetSystem).append(", forwardingWay=").append(forwardingWay)
+				.append(", targetAddress=").append(targetAddress).append(", retryTimes=").append(retryTimes)
+				.append(", callbackRequired=").append(callbackRequired).append(", createdBy=").append(createdBy)
+				.append(", createTime=").append(createTime).append(", updatedBy=").append(updatedBy)
 				.append(", updateTime=").append(updateTime).append("]");
 		return sbuilder.toString();
 	}

@@ -23,9 +23,9 @@ public class AmfMessageForwardingConfigDO implements Serializable {
 	private Long id;
 
 	/**
-	 * 消息配置主键ID，新增时不可为空
+	 * 消息ID，新增时不可为空
 	 */
-	private Long messageConfigId;
+	private Integer messageId;
 
 	/**
 	 * 目标系统名称，最长30位，新增时不可为空
@@ -85,12 +85,12 @@ public class AmfMessageForwardingConfigDO implements Serializable {
 		this.id = id;
 	}
 
-	public Long getMessageConfigId() {
-		return messageConfigId;
+	public Integer getMessageId() {
+		return messageId;
 	}
 
-	public void setMessageConfigId(Long messageConfigId) {
-		this.messageConfigId = messageConfigId;
+	public void setMessageId(Integer messageId) {
+		this.messageId = messageId;
 	}
 
 	public String getTargetSystem() {
@@ -176,11 +176,11 @@ public class AmfMessageForwardingConfigDO implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
-		sbuilder.append("AmfSourceSystemConfigDO[").append("id=").append(id).append(", messageConfigId=")
-				.append(messageConfigId).append(", targetSystem=").append(targetSystem).append(", forwardingWay=")
-				.append(forwardingWay).append(", targetAddress=").append(targetAddress).append(", retryTimes=")
-				.append(retryTimes).append(", callbackRequired=").append(callbackRequired).append(", deleted=")
-				.append(deleted).append(", createdBy=").append(createdBy).append(", createTime=").append(createTime)
+		sbuilder.append("AmfSourceSystemConfigDO[").append("id=").append(id).append(", messageId=").append(messageId)
+				.append(", targetSystem=").append(targetSystem).append(", forwardingWay=").append(forwardingWay)
+				.append(", targetAddress=").append(targetAddress).append(", retryTimes=").append(retryTimes)
+				.append(", callbackRequired=").append(callbackRequired).append(", deleted=").append(deleted)
+				.append(", createdBy=").append(createdBy).append(", createTime=").append(createTime)
 				.append(", updatedBy=").append(updatedBy).append(", updateTime=").append(updateTime).append("]");
 		return sbuilder.toString();
 	}

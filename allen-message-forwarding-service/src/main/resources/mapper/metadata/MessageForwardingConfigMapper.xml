@@ -13,7 +13,7 @@
 				`id`,
 			</if>
 			<if test="messageConfigId != null">
-				`message_config_id`,
+				`message_id`,
 			</if>
 			<if test="targetSystem != null">
 				`target_system`,
@@ -52,8 +52,8 @@
 			<if test="id != null">
 				#{id},
 			</if>
-			<if test="messageConfigId != null">
-				#{messageConfigId},
+			<if test="messageId != null">
+				#{messageId},
 			</if>
 			<if test="targetSystem != null">
 				#{targetSystem},
@@ -125,14 +125,12 @@
     <!-- 通用查询语句块 -->
 	<sql id="messageForwardingConfigColumns">
 		id,
-		business_line_id,
-		business_line_name,
-		souce_system_id,
-		source_system_name,
 		message_id,
-		message_name,
-		message_status,
-		callback_url,
+		target_system,
+		forwarding_way,
+		target_address,
+		retry_times,
+		callback_required,
 		is_deleted,
 		created_by,
 		create_time,
@@ -142,7 +140,7 @@
     
     <resultMap id="messageForwardingConfigResultMap" type=com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO >
         <result property="id" column="id"/>
-        <result property="messageConfigId" column="message_config_id"/>
+        <result property="messageId" column="message_id"/>
         <result property="targetSystem" column="target_system"/>
         <result property="forwardingWay" column="forwarding_way"/>
         <result property=targetAddress column="target_address"/>
@@ -163,11 +161,11 @@
         and   `is_deleted` = 0
     </select>
     
-	<select id="list" parameterType="long" resultMap="messageForwardingConfigResultMap">
+	<select id="list" parameterType="int" resultMap="messageForwardingConfigResultMap">
         select
         <include refid="messageForwardingConfigColumns"></include>
         from  `amf_message_forwarding_config`
-        where `message_config_id` = #{messageConfigId}
+        where `message_id` = #{messageId}
         and `is_deleted` = 0
 	</select>
 </mapper>

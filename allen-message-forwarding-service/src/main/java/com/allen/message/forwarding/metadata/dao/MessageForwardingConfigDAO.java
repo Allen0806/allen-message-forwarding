@@ -37,11 +37,11 @@ public interface MessageForwardingConfigDAO {
 	AmfMessageForwardingConfigDO get(Long id);
 
 	/**
-	 * 根据消息配置主键ID获取消息转发配置信息
+	 * 根据消息ID获取消息转发配置信息
 	 * 
-	 * @param messageConfigId 消息配置主键ID
+	 * @param messageId 消息ID
 	 * @return 消息转发配置信息
 	 */
-	List<AmfMessageForwardingConfigDO> list(Long messageConfigId);
+	List<AmfMessageForwardingConfigDO> list(Integer messageId);
 
 }

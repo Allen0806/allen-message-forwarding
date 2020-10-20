@@ -68,9 +68,10 @@ public class MessageConfigVO implements Serializable {
 	private String sourceSystemName;
 
 	/**
-	 * 消息ID，由6位数字组成，步长为1，初始值为100000，全局唯一，系统自动生成
+	 * 消息ID，由6位数字组成，步长为1，初始值为100000，全局唯一，系统自动生成，修改消息配置信息时不能为空，用来清除缓存
 	 */
 	@ApiModelProperty(value = "消息ID，由6位数字组成，步长为1，初始值为100000，全局唯一，系统自动生成", dataType = "Integer", required = false)
+	@NotNull(message = "消息ID不能为空", groups = { ValidationGroup.Update.class })
 	@Range(min = 100000, max = 999999, message = "消息ID取值范围为100000~999999")
 	private Integer messageId;
 
@@ -231,13 +232,13 @@ public class MessageConfigVO implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
-		sbuilder.append("MessageConfigVO[").append("id=").append(id).append(", businessLineId=")
-				.append(businessLineId).append(", businessLineName=").append(businessLineName)
-				.append(", sourceSystemId=").append(sourceSystemId).append(", sourceSystemName=")
-				.append(sourceSystemName).append(", messageId=").append(messageId).append(", messageName=")
-				.append(messageName).append(", messageStatus=").append(messageStatus).append(", callbackUrl=")
-				.append(callbackUrl).append(", createdBy=").append(createdBy).append(", createTime=").append(createTime)
-				.append(", updatedBy=").append(updatedBy).append(", updateTime=").append(updateTime).append("]");
+		sbuilder.append("MessageConfigVO[").append("id=").append(id).append(", businessLineId=").append(businessLineId)
+				.append(", businessLineName=").append(businessLineName).append(", sourceSystemId=")
+				.append(sourceSystemId).append(", sourceSystemName=").append(sourceSystemName).append(", messageId=")
+				.append(messageId).append(", messageName=").append(messageName).append(", messageStatus=")
+				.append(messageStatus).append(", callbackUrl=").append(callbackUrl).append(", createdBy=")
+				.append(createdBy).append(", createTime=").append(createTime).append(", updatedBy=").append(updatedBy)
+				.append(", updateTime=").append(updateTime).append("]");
 		return sbuilder.toString();
 	}
 

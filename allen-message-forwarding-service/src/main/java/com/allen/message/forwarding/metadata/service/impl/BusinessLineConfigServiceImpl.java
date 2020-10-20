@@ -141,9 +141,9 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	}
 
 	/**
-	 * 将DTO对象转换为DO对象
+	 * 将VO对象转换为DO对象
 	 * 
-	 * @param businessLineConfigVO DTO对象
+	 * @param businessLineConfigVO VO对象
 	 * @return DO对象
 	 */
 	private AmfBusinessLineConfigDO toDO(BusinessLineConfigVO businessLineConfigVO) {
@@ -162,10 +162,10 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	}
 
 	/**
-	 * 将DO对象转换为DTO对象
+	 * 将DO对象转换为VO对象
 	 * 
 	 * @param businessLineConfigDO DO对象
-	 * @return DTO对象
+	 * @return VO对象
 	 */
 	private BusinessLineConfigVO toVO(AmfBusinessLineConfigDO businessLineConfigDO) {
 		if (businessLineConfigDO == null) {
@@ -183,10 +183,10 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	}
 
 	/**
-	 * 将DO列表转换为DTO列表
+	 * 将DO列表转换为VO列表
 	 * 
 	 * @param businessLineConfigDOList DO列表
-	 * @return DTO列表
+	 * @return VO列表
 	 */
 	private List<BusinessLineConfigVO> toVOList(List<AmfBusinessLineConfigDO> businessLineConfigDOList) {
 		if (businessLineConfigDOList == null || businessLineConfigDOList.isEmpty()) {
