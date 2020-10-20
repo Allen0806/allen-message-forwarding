@@ -2,9 +2,6 @@ package com.allen.message.forwarding.metadata.service.impl;
 
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,7 @@ import com.allen.message.forwarding.metadata.dao.MessageConfigDAO;
 import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
 import com.allen.message.forwarding.metadata.model.MessageConfigVO;
 import com.allen.message.forwarding.metadata.service.MessageConfigService;
-import com.allen.tool.validation.ValidationGroup.Update;
+import com.allen.message.forwarding.metadata.service.MessageForwardingConfigService;
 
 /**
  * 消息配置管理服务层接口实现类
@@ -34,6 +31,9 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	 */
 	@Autowired
 	private MessageConfigDAO messageConfigDAO;
+	
+	@Autowired
+	private MessageForwardingConfigService messageForwardingConfigService;
 
 	@Override
 	public void save(MessageConfigVO messageConfigVO) {
