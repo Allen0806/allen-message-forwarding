@@ -12,6 +12,14 @@ import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
 import com.allen.message.forwarding.metadata.model.MessageForwardingConfigVO;
 import com.allen.tool.validation.ValidationGroup;
 
+/**
+ * 消息转发配置服务层接口
+ *
+ * @author Allen
+ * @date 2020年10月26日
+ * @since 1.0.0
+ */
+@Validated
 public interface MessageForwardingConfigService {
 
 	/**
@@ -33,20 +41,20 @@ public interface MessageForwardingConfigService {
 	void update(@NotNull(message = "消息转发配置信息不能为空") @Valid MessageForwardingConfigVO messageForwardingConfigVO);
 
 	/**
-	 * 根据主键获取消息转发配置信息
-	 * 
-	 * @param id 主键ID
-	 * @return 消息转发配置信息
-	 */
-	MessageForwardingConfigVO get(Long id);
-
-	/**
 	 * 根据主键删除消息转发配置信息，逻辑删除
 	 * 
 	 * @param id        主键ID
 	 * @param updatedBy 修改人ID
 	 */
 	void remove(@NotNull(message = "主键ID不能为空") Long id, @NotNull(message = "修改人ID不能为空") String updatedBy);
+
+	/**
+	 * 根据主键获取消息转发配置信息
+	 * 
+	 * @param id 主键ID
+	 * @return 消息转发配置信息
+	 */
+	MessageForwardingConfigVO get(@NotNull(message = "消息转发配置信息主键ID不能为空") Long id);
 
 	/**
 	 * 根据消息ID获取消息转发配置数量

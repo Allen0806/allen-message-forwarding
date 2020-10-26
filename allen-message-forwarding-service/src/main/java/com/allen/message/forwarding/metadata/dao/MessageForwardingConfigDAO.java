@@ -12,7 +12,7 @@ import com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO;
  * @since 1.0.0
  */
 public interface MessageForwardingConfigDAO {
-	
+
 	/**
 	 * 新增消息转发配置信息
 	 * 
@@ -36,6 +36,14 @@ public interface MessageForwardingConfigDAO {
 	 * @return 消息转发配置信息
 	 */
 	AmfMessageForwardingConfigDO get(Long id);
+
+	/**
+	 * 根据消息ID获取消息转发配置信息数量
+	 * 
+	 * @param messageId 消息ID
+	 * @return 消息转发配置数量
+	 */
+	int count(Integer messageId);
 
 	/**
 	 * 根据消息ID获取消息转发配置信息

@@ -16,6 +16,7 @@ import com.allen.message.forwarding.metadata.model.BusinessLineConfigVO;
 import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
 import com.allen.message.forwarding.metadata.model.SourceSystemConfigVO;
 import com.allen.message.forwarding.metadata.service.BusinessLineConfigService;
+import com.allen.message.forwarding.metadata.service.MessageConfigService;
 import com.allen.message.forwarding.metadata.service.SourceSystemConfigService;
 import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.string.StringUtil;
@@ -42,6 +43,12 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	private BusinessLineConfigService businessLineConfigService;
 
 	/**
+	 * 消息配置管理服务实例
+	 */
+	@Autowired
+	private MessageConfigService messageConfigService;
+
+	/**
 	 * 消息来源系统配置信息DAO层接口实例
 	 */
 	@Autowired
@@ -59,7 +66,8 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 			sourceSystemConfigDO.setUpdatedBy(sourceSystemConfigDO.getCreatedBy());
 		}
 		sourceSystemConfigDAO.save(sourceSystemConfigDO);
-		LOGGER.info("保存消息来源系统配置信息成功，来源系统名称：{}", sourceSystemConfigDO.getSourceSystemName());
+		LOGGER.info("保存消息来源系统配置信息成功，来源系统名称：{}，创建人：{}", sourceSystemConfigDO.getSourceSystemName(),
+				sourceSystemConfigDO.getCreatedBy());
 	}
 
 	@Transactional
@@ -78,18 +86,26 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 		sourceSystemConfigDO.setUpdatedBy(sourceSystemConfigVO.getUpdatedBy());
 		sourceSystemConfigDO.setUpdateTime(LocalDateTime.now());
 		sourceSystemConfigDAO.update(sourceSystemConfigDO);
-		// TODO 更新消息信息的来源系统名称
-
-		LOGGER.info("更新消息来源系统配置信息成功，来源系统名称：{}", sourceSystemConfigDO.getSourceSystemName());
+		// 更新消息信息的来源系统名称
+		messageConfigService.updateSourceSystemName(sourceSystemConfigDO.getSourceSystemId(),
+				sourceSystemConfigDO.getSourceSystemName());
+		LOGGER.info("更新消息来源系统配置信息成功，来源系统名称：{}，修改人：{}", sourceSystemConfigDO.getSourceSystemName(),
+				sourceSystemConfigDO.getUpdatedBy());
 	}
 
 	@Transactional
 	@Override
 	public void remove(Long id, String updatedBy) {
-		// TODO 查询该消息来源系统是否有关联的有效的消息配置信息，如果有则不允许更新
-
-		AmfSourceSystemConfigDO sourceSystemConfigDO = new AmfSourceSystemConfigDO();
-		sourceSystemConfigDO.setId(id);
+		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigDAO.get(id);
+		if (sourceSystemConfigDO == null) {
+			return;
+		}
+		// 查询该消息来源系统是否有关联的有效的消息配置信息，如果有则不允许更新
+		int messageCount = messageConfigService.countBySourceSystemId(sourceSystemConfigDO.getSourceSystemId());
+		if (messageCount > 0) {
+			LOGGER.info("存在未删除的消息配置信息，不能进行来源系统配置信息删除操作，来源系统名称：{}", sourceSystemConfigDO.getSourceSystemName());
+			throw new CustomBusinessException("MF0006", "存在未删除的消息配置信息，不能进行来源系统配置信息删除操作");
+		}
 		sourceSystemConfigDO.setDeleted(1);
 		sourceSystemConfigDO.setUpdatedBy(updatedBy);
 		sourceSystemConfigDO.setUpdateTime(LocalDateTime.now());

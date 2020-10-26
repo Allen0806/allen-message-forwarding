@@ -15,6 +15,7 @@ import com.allen.message.forwarding.metadata.dao.BusinessLineConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfBusinessLineConfigDO;
 import com.allen.message.forwarding.metadata.model.BusinessLineConfigVO;
 import com.allen.message.forwarding.metadata.service.BusinessLineConfigService;
+import com.allen.message.forwarding.metadata.service.MessageConfigService;
 import com.allen.message.forwarding.metadata.service.SourceSystemConfigService;
 import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.string.StringUtil;
@@ -34,8 +35,17 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(BusinessLineConfigServiceImpl.class);
 
+	/**
+	 * 来源系统配置管理服务实例
+	 */
 	@Autowired
 	private SourceSystemConfigService sourceSystemConfigService;
+
+	/**
+	 * 消息配置管理服务实例
+	 */
+	@Autowired
+	private MessageConfigService messageConfigService;
 
 	/**
 	 * 业务线信息DAO层接口实例
@@ -75,8 +85,9 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		businessLineConfigDO.setUpdatedBy(businessLineConfigVO.getUpdatedBy());
 		businessLineConfigDO.setUpdateTime(LocalDateTime.now());
 		businessLineConfigDAO.update(businessLineConfigDO);
-		// TODO 更新消息配置信息的业务线名称
-
+		// 更新消息配置信息的业务线名称
+		messageConfigService.updateBusinessLineName(businessLineConfigDO.getBusinessLineId(),
+				businessLineConfigDO.getBusinessLineName());
 		LOGGER.info("更新消息所属业务线配置信息成功，业务线名称：{}，修改人：{}", businessLineConfigVO.getBusinessLineName(),
 				businessLineConfigVO.getUpdatedBy());
 	}
@@ -112,7 +123,6 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 
 	@Override
 	public List<BusinessLineConfigVO> list4Fuzzy(String businessLineId, String businessLineName) {
-		// TODO Auto-generated method stub
 		if (StringUtil.isBlank(businessLineId) && StringUtil.isBlank(businessLineName)) {
 			LOGGER.info("业务线ID和业务线名称不能同时为空");
 			throw new CustomBusinessException("MF0002", "业务线ID和业务线名称不能同时为空");

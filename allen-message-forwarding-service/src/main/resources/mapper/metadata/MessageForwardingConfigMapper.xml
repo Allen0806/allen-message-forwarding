@@ -161,6 +161,13 @@
         and   `is_deleted` = 0
     </select>
     
+    <select id="count" parameterType="int" resultType="int">
+        select count(*)
+        from  `amf_message_forwarding_config`
+        where `message_id` = #{messageId}
+        and `is_deleted` = 0
+	</select>
+    
 	<select id="list" parameterType="int" resultMap="messageForwardingConfigResultMap">
         select
         <include refid="messageForwardingConfigColumns"></include>
