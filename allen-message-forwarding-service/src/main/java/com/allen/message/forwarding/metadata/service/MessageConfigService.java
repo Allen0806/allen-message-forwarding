@@ -36,8 +36,7 @@ public interface MessageConfigService {
 	 * @param messageConfigVO 消息配置信息
 	 */
 	@Validated({ ValidationGroup.Update.class, Default.class })
-	void update(@NotNull(message = "消息配置信息不能为空", groups = {
-			ValidationGroup.Update.class }) @Valid MessageConfigVO messageConfigVO);
+	void update(@NotNull(message = "消息配置信息不能为空") @Valid MessageConfigVO messageConfigVO);
 
 	/**
 	 * 根据业务线ID更新消息配置信息的业务线名称
@@ -58,12 +57,12 @@ public interface MessageConfigService {
 			@NotNull(message = "来源系统名称不能为空") String sourceSystemName);
 
 	/**
-	 * 根据主键ID删除消息配置信息，逻辑删除。如果有对应的消息转发配置信息，则不允许删除
+	 * 根据消息ID删除消息配置信息，逻辑删除。如果有对应的消息转发配置信息，则不允许删除
 	 * 
-	 * @param id        主键ID
+	 * @param messageId 消息ID
 	 * @param updatedBy 修改人ID
 	 */
-	void remove(@NotNull(message = "消息配置信息主键ID不能为空") Long id, @NotNull(message = "修改人ID不能为空") String updatedBy);
+	void remove(@NotNull(message = "消息ID不能为空") Integer messageId, @NotNull(message = "修改人ID不能为空") String updatedBy);
 
 	/**
 	 * 根据主键ID获取未删除的消息配置信息
@@ -79,23 +78,24 @@ public interface MessageConfigService {
 	 * @param sourceSystemId 来源系统ID
 	 * @return 消息配置数量
 	 */
-	int count(@NotNull(message = "来源系统ID不能为空") Integer sourceSystemId);
+	int countBySourceSystemId(@NotNull(message = "来源系统ID不能为空") Integer sourceSystemId);
 
 	/**
 	 * 分页查询未标记为删除的消息配置信息
 	 * 
-	 * @param startNo  起始行号
-	 * @param pageSize 每页行数
+	 * @param sourceSystemId 消息来源系统ID
+	 * @param startNo        起始行号
+	 * @param pageSize       每页行数
 	 * @return 分页查询结果
 	 */
-	List<MessageConfigVO> list4Paging(@NotNull(message = "来源系统ID不能为空") Integer sourceSystemId,
+	List<MessageConfigVO> listBySourceSystemId4Paging(@NotNull(message = "来源系统ID不能为空") Integer sourceSystemId,
 			@NotNull(message = "当前页数不能为空") int pageNo, @NotNull(message = "每页行数不能为空") int pageSize);
 
 	/**
-	 * 根据消息配置ID获取未删除的消息配置信息，包含消息转发信息
+	 * 根据消息ID获取未删除的消息配置信息，包含消息转发信息
 	 * 
-	 * @param messageId 消息配置ID
+	 * @param messageId 消息ID
 	 * @return 消息配置信息，包含消息转发信息
 	 */
-	MessageConfigDTO getByMessageId(@NotNull(message = "消息配置ID不能为空") Integer messageId);
+	MessageConfigDTO getByMessageId(@NotNull(message = "消息ID不能为空") Integer messageId);
 }

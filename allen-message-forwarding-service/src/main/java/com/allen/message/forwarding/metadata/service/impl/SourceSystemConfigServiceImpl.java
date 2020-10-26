@@ -17,6 +17,7 @@ import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
 import com.allen.message.forwarding.metadata.model.SourceSystemConfigVO;
 import com.allen.message.forwarding.metadata.service.BusinessLineConfigService;
 import com.allen.message.forwarding.metadata.service.SourceSystemConfigService;
+import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.string.StringUtil;
 
 /**
@@ -122,6 +123,9 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 		if (businessLineConfigDTO == null) {
 			return Collections.emptyList();
 		}
+		if (pageNo < 1 || pageSize < 1) {
+			throw new CustomBusinessException("MF0003", "当前页数或每页行数不能小于1");
+		}
 		int startNo = (pageNo - 1) * pageSize;
 		List<AmfSourceSystemConfigDO> sourceSystemConfigDOList = sourceSystemConfigDAO.list4Paging(businessLineConfigId,
 				startNo, pageSize);
@@ -157,7 +161,7 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	 * 将DO对象转换为VO对象
 	 * 
 	 * @param sourceSystemConfigDTO DO对象
-	 * @param businessLineConfigVO 业务线信息对象
+	 * @param businessLineConfigVO  业务线信息对象
 	 * @return VO对象
 	 */
 	private SourceSystemConfigVO toVO(AmfSourceSystemConfigDO sourceSystemConfigDO,

@@ -1,31 +1,39 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.allen.message.forwarding.metadata.constant.CacheNameConstant;
 import com.allen.message.forwarding.metadata.dao.MessageConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfMessageConfigDO;
 import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
 import com.allen.message.forwarding.metadata.model.MessageConfigVO;
+import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
 import com.allen.message.forwarding.metadata.service.MessageConfigService;
 import com.allen.message.forwarding.metadata.service.MessageForwardingConfigService;
+import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.string.StringUtil;
 
 /**
- * 消息配置管理服务层接口实现类
+ * 消息配置管理服务层接口实现类，缓存直接使用redis版本
  *
  * @author Allen
  * @date 2020年10月19日
  * @since 1.0.0
  */
+@Service
 public class MessageConfigServiceImpl implements MessageConfigService {
 
 	/**
@@ -44,13 +52,20 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	 */
 	@Autowired
 	private MessageForwardingConfigService messageForwardingConfigService;
-	
+
 	/**
 	 * redisTemplate实例
 	 */
 	@Autowired
 	private RedisTemplate<String, MessageConfigDTO> redisTemplate;
 
+	/**
+	 * Redisson客户端实例
+	 */
+	@Autowired
+	private RedissonClient redissonClient;
+
+	@Transactional
 	@Override
 	public void save(MessageConfigVO messageConfigVO) {
 		AmfMessageConfigDO messageConfigDO = toDO(messageConfigVO);
@@ -65,7 +80,9 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 		LOGGER.info("保存消息配置信息成功，消息名称：{}", messageConfigDO.getMessageName());
 	}
 
-	@CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageConfigVO.messageId")
+	// @CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key =
+	// "#messageConfigVO.messageId")
+	@Transactional
 	@Override
 	public void update(MessageConfigVO messageConfigVO) {
 		AmfMessageConfigDO messageConfigDO = messageConfigDAO.get(messageConfigVO.getId());
@@ -90,52 +107,140 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 		messageConfigDO.setUpdatedBy(messageConfigVO.getUpdatedBy());
 		messageConfigDAO.update(messageConfigDO);
 		LOGGER.info("更新消息配置信息成功，消息名称：{}", messageConfigDO.getMessageName());
-		// TODO 清除缓存
+		// 清除缓存
+		evictCache(messageConfigDO);
 	}
 
+	@Transactional
 	@Override
 	public void updateBusinessLineName(String businessLineId, String businessLineName) {
-		// TODO Auto-generated method stub
-
+		int count = messageConfigDAO.updateBusinessLineName(businessLineId, businessLineName);
+		if (count == 0) {
+			return;
+		}
+//	 	清除缓存
+		int pageSize = 10;
+		int pageAmount = count / pageSize + 1;
+		int startNo;
+		for (int i = 0; i < pageAmount; i++) {
+			startNo = pageSize * i;
+			List<AmfMessageConfigDO> messageConfigDOList = messageConfigDAO.listByBusinessLineId4Paging(businessLineId,
+					startNo, pageSize);
+			messageConfigDOList.parallelStream().forEach(e -> evictCache(e));
+		}
 	}
 
+	@Transactional
 	@Override
 	public void updateSourceSystemName(Integer sourceSystemId, String sourceSystemName) {
-		// TODO Auto-generated method stub
-
+		int count = messageConfigDAO.updateSourceSystemName(sourceSystemId, sourceSystemName);
+		if (count == 0) {
+			return;
+		}
+		// 清除缓存
+		int pageSize = 10;
+		int pageAmount = count / pageSize + 1;
+		int startNo;
+		for (int i = 0; i < pageAmount; i++) {
+			startNo = pageSize * i;
+			List<AmfMessageConfigDO> messageConfigDOList = messageConfigDAO.listBySourceSystemId4Paging(sourceSystemId,
+					startNo, pageSize);
+			messageConfigDOList.parallelStream().forEach(e -> evictCache(e));
+		}
 	}
 
+	// @CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key =
+	// "#messageId")
+	@Transactional
 	@Override
-	public void remove(Long id, String updatedBy) {
-		// TODO Auto-generated method stub
-
+	public void remove(Integer messageId, String updatedBy) {
+		AmfMessageConfigDO messageConfigDO = messageConfigDAO.getByMessageId(messageId);
+		if (messageConfigDO == null) {
+			return;
+		}
+		int messageForwardingConfigCount = messageForwardingConfigService.count(messageId);
+		if (messageForwardingConfigCount > 0) {
+			throw new CustomBusinessException("MF0004", "存在有效的消息转发信息，不能删除");
+		}
+		messageConfigDO.setDeleted(1);
+		messageConfigDO.setUpdatedBy(updatedBy);
+		messageConfigDAO.update(messageConfigDO);
+		evictCache(messageConfigDO);
 	}
 
 	@Override
 	public MessageConfigVO get(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		AmfMessageConfigDO messageConfigDO = messageConfigDAO.get(id);
+		return toVO(messageConfigDO);
 	}
 
 	@Override
-	public int count(Integer sourceSystemId) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int countBySourceSystemId(Integer sourceSystemId) {
+		return messageConfigDAO.countBySourceSystemId(sourceSystemId);
 	}
 
 	@Override
-	public List<MessageConfigVO> list4Paging(Integer sourceSystemId, int pageNo, int pageSize) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<MessageConfigVO> listBySourceSystemId4Paging(Integer sourceSystemId, int pageNo, int pageSize) {
+		if (pageNo < 1 || pageSize < 1) {
+			throw new CustomBusinessException("MF0003", "当前页数或每页行数不能小于1");
+		}
+		int startNo = (pageNo - 1) * pageSize;
+		List<AmfMessageConfigDO> messageConfigDOList = messageConfigDAO.listBySourceSystemId4Paging(sourceSystemId,
+				startNo, pageSize);
+		if (messageConfigDOList == null || messageConfigDOList.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return messageConfigDOList.parallelStream().map(e -> toVO(e)).collect(Collectors.toList());
 	}
 
 	/**
 	 * redis中缓存的key为：cacheNames::key
 	 */
-	@Cacheable(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageId")
+	// @Cacheable(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key =
+	// "#messageId")
 	@Override
 	public MessageConfigDTO getByMessageId(Integer messageId) {
-		// TODO Auto-generated method stub
+		// 优先从缓存里获取
+		MessageConfigDTO messageConfigDTO = getFromCache(messageId);
+		if (messageConfigDTO != null) {
+			return messageConfigDTO;
+		}
+		String lockKey = CacheNameConstant.MESSAGE_CONFIG_LOCK_NAME + messageId;
+		RLock lock = redissonClient.getLock(lockKey);
+		try {
+			if (lock.tryLock(5, 5, TimeUnit.SECONDS)) {
+				try {
+					// 再次从缓存里获取，二次检查
+					messageConfigDTO = getFromCache(messageId);
+					if (messageConfigDTO != null) {
+						return messageConfigDTO;
+					}
+
+					AmfMessageConfigDO messageConfigDO = messageConfigDAO.getByMessageId(messageId);
+					if (messageConfigDO == null) {
+						return null;
+					}
+					List<MessageForwardingConfigDTO> forwardingConfigs = messageForwardingConfigService
+							.list4Process(messageId);
+					// 如果转发信息为空，则返回null
+					if (forwardingConfigs == null || forwardingConfigs.isEmpty()) {
+						return null;
+					}
+					messageConfigDTO = toDTO(messageConfigDO);
+					messageConfigDTO.setForwardingConfigs(forwardingConfigs);
+					cacheable(messageConfigDTO);
+					return messageConfigDTO;
+				} catch (Exception e) {
+					LOGGER.error("获取消息配置信息异常，消息ID：{}", messageId, e);
+					throw new CustomBusinessException("MF0005", "获取消息配置信息异常", e);
+				} finally {
+					lock.unlock();
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("锁处理异常，消息ID：{}", messageId, e);
+			throw new CustomBusinessException("MF0005", "获取消息配置信息异常", e);
+		}
 		return null;
 	}
 
@@ -212,6 +317,48 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 		messageConfigDTO.setMessageName(messageConfigDO.getMessageName());
 		messageConfigDTO.setCallbackUrl(messageConfigDO.getCallbackUrl());
 		return messageConfigDTO;
+	}
+
+	/**
+	 * 清除缓存
+	 * 
+	 * @param messageConfigDO 消息配置信息
+	 */
+	private void evictCache(AmfMessageConfigDO messageConfigDO) {
+		// 清除缓存
+		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageConfigDO.getMessageId();
+		if (redisTemplate.hasKey(cacheKey)) {
+			redisTemplate.delete(cacheKey);
+		}
+	}
+
+	/**
+	 * 从缓存中获取消息配置信息
+	 * 
+	 * @param messageId 消息ID
+	 * @return
+	 */
+	private MessageConfigDTO getFromCache(Integer messageId) {
+		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageId;
+		if (redisTemplate.hasKey(cacheKey)) {
+			MessageConfigDTO messageConfigDTO = redisTemplate.opsForValue().get(cacheKey);
+			if (messageConfigDTO != null) {
+				return messageConfigDTO;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 将消息配置信息设置到缓存中
+	 * 
+	 * @param messageConfigDTO
+	 */
+	private void cacheable(MessageConfigDTO messageConfigDTO) {
+		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageConfigDTO.getMessageId();
+		if (!redisTemplate.hasKey(cacheKey)) {
+			redisTemplate.opsForValue().set(cacheKey, messageConfigDTO);
+		}
 	}
 
 }

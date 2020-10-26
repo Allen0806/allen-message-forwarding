@@ -12,6 +12,7 @@ import com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO;
  * @since 1.0.0
  */
 public interface MessageForwardingConfigDAO {
+	
 	/**
 	 * 新增消息转发配置信息
 	 * 

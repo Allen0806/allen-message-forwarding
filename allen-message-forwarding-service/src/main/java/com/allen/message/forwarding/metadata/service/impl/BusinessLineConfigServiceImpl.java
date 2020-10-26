@@ -88,7 +88,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		int sourceSystemAmount = sourceSystemConfigService.count(id);
 		if (sourceSystemAmount > 0) {
 			LOGGER.info("存在未删除的来源系统信息，不能进行业务线配置信息删除操作，业务线主键：{}", id);
-			throw new CustomBusinessException("MF0101", "存在未删除的来源系统信息，不能进行业务线配置信息删除操作");
+			throw new CustomBusinessException("MF0001", "存在未删除的来源系统信息，不能进行业务线配置信息删除操作");
 		}
 		AmfBusinessLineConfigDO businessLineConfigDO = new AmfBusinessLineConfigDO();
 		businessLineConfigDO.setId(id);
@@ -115,7 +115,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		// TODO Auto-generated method stub
 		if (StringUtil.isBlank(businessLineId) && StringUtil.isBlank(businessLineName)) {
 			LOGGER.info("业务线ID和业务线名称不能同时为空");
-			throw new CustomBusinessException("MF0102", "业务线ID和业务线名称不能同时为空");
+			throw new CustomBusinessException("MF0002", "业务线ID和业务线名称不能同时为空");
 		}
 		if (StringUtil.isNotBlank(businessLineId)) {
 			businessLineId = businessLineId.trim() + "%";
@@ -135,6 +135,9 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 
 	@Override
 	public List<BusinessLineConfigVO> list4Paging(int pageNo, int pageSize) {
+		if (pageNo < 1 || pageSize < 1) {
+			throw new CustomBusinessException("MF0003", "当前页数或每页行数不能小于1");
+		}
 		int startNo = (pageNo - 1) * pageSize;
 		List<AmfBusinessLineConfigDO> businessLineConfigDOList = businessLineConfigDAO.list4Paging(startNo, pageSize);
 		return toVOList(businessLineConfigDOList);

@@ -68,12 +68,31 @@ public interface MessageConfigDAO {
 	AmfMessageConfigDO getByMessageId(Integer messageId);
 
 	/**
+	 * 统计给定的业务线下的未删除的消息配置数量
+	 * 
+	 * @param businessLineId 业务线Id
+	 * @return 消息配置数量
+	 */
+	int countByBusinessLineId(String businessLineId);
+
+	/**
+	 * 分页查询给定的业务线下的未删除的消息配置信息
+	 * 
+	 * @param businessLineId 业务线Id
+	 * @param startNo        起始行号
+	 * @param pageSize       每页行数
+	 * @return 分页查询结果
+	 */
+	List<AmfMessageConfigDO> listByBusinessLineId4Paging(@Param("businessLineId") String businessLineId,
+			@Param("startNo") int startNo, @Param("pageSize") int pageSize);
+
+	/**
 	 * 统计给定的来源系统下的未删除的消息配置数量
 	 * 
 	 * @param sourceSystemId 来源系统Id
 	 * @return 消息配置数量
 	 */
-	int count(Integer sourceSystemId);
+	int countBySourceSystemId(Integer sourceSystemId);
 
 	/**
 	 * 分页查询给定的来源系统下的未删除的消息配置信息
@@ -83,6 +102,6 @@ public interface MessageConfigDAO {
 	 * @param pageSize       每页行数
 	 * @return 分页查询结果
 	 */
-	List<AmfMessageConfigDO> list4Paging(@Param("sourceSystemId") Integer sourceSystemId, @Param("startNo") int startNo,
-			@Param("pageSize") int pageSize);
+	List<AmfMessageConfigDO> listBySourceSystemId4Paging(@Param("sourceSystemId") Integer sourceSystemId,
+			@Param("startNo") int startNo, @Param("pageSize") int pageSize);
 }

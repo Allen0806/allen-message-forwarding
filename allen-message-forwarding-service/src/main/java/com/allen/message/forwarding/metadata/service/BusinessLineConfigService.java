@@ -34,9 +34,8 @@ public interface BusinessLineConfigService {
 	 * 
 	 * @param businessLineConfigVO 消息所属业务线配置信息
 	 */
-	@Validated(ValidationGroup.Update.class)
-	void update(@NotNull(message = "消息所属业务线配置信息不能为空", groups = {
-			ValidationGroup.Update.class }) @Valid BusinessLineConfigVO businessLineConfigVO);
+	@Validated({ ValidationGroup.Update.class, Default.class })
+	void update(@NotNull(message = "消息所属业务线配置信息不能为空") @Valid BusinessLineConfigVO businessLineConfigVO);
 
 	/**
 	 * 根据主键ID删除消息所属业务线配置信息，逻辑删除。如果有对应的消息来源系统配置信息，则不允许删除

@@ -191,7 +191,24 @@
         and   `is_deleted` = 0
     </select>
     
-	<select id="count" parameterType="int" resultType="int">
+    <select id="countByBusinessLineId" parameterType="int" resultType="int">
+		select count(*)
+		from  `amf_message_config`
+		where `business_line_id` = #{businessLineId}
+		and `is_deleted` = 0
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="listByBusinessLineId4Paging" resultMap="messageConfigResultMap">
+        select
+        <include refid="messageConfigColumns"></include>
+        from  `amf_message_config`
+        where `business_line_id` = #{businessLineId}
+        and `is_deleted` = 0
+        limit #{startNo}, #{pageSize}
+	</select>
+    
+	<select id="countBySourceSystemId" parameterType="int" resultType="int">
 		select count(*)
 		from  `amf_message_config`
 		where `souce_system_id` = #{sourceSystemId}
@@ -199,7 +216,7 @@
 	</select>
 	
 	<!-- 分页查询 -->
-	<select id="list4Paging" resultMap="messageConfigResultMap">
+	<select id="listBySourceSystemId4Paging" resultMap="messageConfigResultMap">
         select
         <include refid="messageConfigColumns"></include>
         from  `amf_message_config`
