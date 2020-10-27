@@ -17,5 +17,5 @@ public class CacheNameConstant {
 	/**
 	 * 消息配置信息锁命名前缀
 	 */
-	public static final String MESSAGE_CONFIG_LOCK_NAME = "AMF_MESSAGE_CONFIG_LOCK::";
+	public static final String MESSAGE_CONFIG_LOCK_NAME = "AMF_MESSAGE_CONFIG_LOCK";
 }

@@ -80,8 +80,6 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 		LOGGER.info("保存消息配置信息成功，消息名称：{}", messageConfigDO.getMessageName());
 	}
 
-	// @CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key =
-	// "#messageConfigVO.messageId")
 	@Transactional
 	@Override
 	public void update(MessageConfigVO messageConfigVO) {
@@ -149,8 +147,6 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 		}
 	}
 
-	// @CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key =
-	// "#messageId")
 	@Transactional
 	@Override
 	public void remove(Integer messageId, String updatedBy) {
@@ -196,8 +192,6 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	/**
 	 * redis中缓存的key为：cacheNames::key
 	 */
-	// @Cacheable(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key =
-	// "#messageId")
 	@Override
 	public MessageConfigDTO getByMessageId(Integer messageId) {
 		// 优先从缓存里获取
@@ -205,7 +199,7 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 		if (messageConfigDTO != null) {
 			return messageConfigDTO;
 		}
-		String lockKey = CacheNameConstant.MESSAGE_CONFIG_LOCK_NAME + messageId;
+		String lockKey = CacheNameConstant.MESSAGE_CONFIG_LOCK_NAME + "::" + messageId;
 		RLock lock = redissonClient.getLock(lockKey);
 		try {
 			if (lock.tryLock(5, 5, TimeUnit.SECONDS)) {
