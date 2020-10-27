@@ -79,11 +79,10 @@
             <if test="updatedBy != null and updatedBy!=''">
                 `updated_by` = #{updatedBy},
             </if>
-            <if test="updateTime != null">
-                `update_time` = #{updateTime},
-            </if>
         </trim>
         where `id` = #{id}
+        <!-- 更新时间作为乐观锁 -->>
+        and   `update_time` = #{updateTime}
     </update>
     
     <!-- 通用查询语句块 -->

@@ -1,6 +1,7 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import java.time.LocalDateTime;
+import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -69,21 +70,25 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	@Override
 	public void save(MessageConfigVO messageConfigVO) {
 		AmfMessageConfigDO messageConfigDO = toDO(messageConfigVO);
-		messageConfigDO.setDeleted(0);
-		LocalDateTime now = LocalDateTime.now();
-		messageConfigDO.setCreateTime(now);
-		messageConfigDO.setUpdateTime(now);
 		if (StringUtil.isBlank(messageConfigDO.getUpdatedBy())) {
 			messageConfigDO.setUpdatedBy(messageConfigDO.getCreatedBy());
 		}
-		messageConfigDAO.save(messageConfigDO);
-		LOGGER.info("保存消息配置信息成功，消息名称：{}", messageConfigDO.getMessageName());
+		int count = messageConfigDAO.save(messageConfigDO);
+		if (count == 0) {
+			LOGGER.error("保存消息配置信失败，消息名称：{}，创建人：{}", messageConfigDO.getMessageName(), messageConfigDO.getCreatedBy());
+			throw new CustomBusinessException(MF_0301);
+		}
+		LOGGER.info("保存消息配置信成功，消息名称：{}，创建人：{}", messageConfigDO.getMessageName(), messageConfigDO.getCreatedBy());
 	}
 
 	@Transactional
 	@Override
 	public void update(MessageConfigVO messageConfigVO) {
 		AmfMessageConfigDO messageConfigDO = messageConfigDAO.get(messageConfigVO.getId());
+		if (messageConfigDO == null) {
+			LOGGER.error("不存在对应的消息配置信息，消息配置主键：{}", messageConfigVO.getId());
+			throw new CustomBusinessException(MF_0302);
+		}
 		boolean isNotChanged = true;
 		if (StringUtil.isNotBlank(messageConfigVO.getMessageName())
 				&& !messageConfigDO.getMessageName().equals(messageConfigVO.getMessageName())) {
@@ -95,24 +100,29 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 			isNotChanged = false;
 		} else if (StringUtil.isNotBlank(messageConfigVO.getCallbackUrl())
 				&& !messageConfigDO.getCallbackUrl().equals(messageConfigVO.getCallbackUrl())) {
-			messageConfigDO.setMessageStatus(messageConfigVO.getMessageStatus());
+			messageConfigDO.setCallbackUrl(messageConfigVO.getCallbackUrl());
 			isNotChanged = false;
 		}
+		String updatedBy = messageConfigVO.getUpdatedBy();
 		if (isNotChanged) {
-			LOGGER.info("消息配置信息没有变化，不进行更新操作，消息主键：{}", messageConfigVO.getId());
+			LOGGER.info("消息配置信息没有变化，不进行更新操作，消息名称：{}，修改人：{}", messageConfigDO.getMessageName(), updatedBy);
 			return;
 		}
 		messageConfigDO.setUpdatedBy(messageConfigVO.getUpdatedBy());
-		messageConfigDAO.update(messageConfigDO);
-		LOGGER.info("更新消息配置信息成功，消息名称：{}", messageConfigDO.getMessageName());
+		int count = messageConfigDAO.update(messageConfigDO);
+		if (count == 0) {
+			LOGGER.error("更新消息配置信失败，消息ID：{}，修改人：{}", messageConfigDO.getId(), updatedBy);
+			throw new CustomBusinessException(MF_0303);
+		}
 		// 清除缓存
 		evictCache(messageConfigDO);
+		LOGGER.info("更新消息配置信息成功，消息名称：{}，修改人：{}", messageConfigDO.getMessageName(), updatedBy);
 	}
 
 	@Transactional
 	@Override
-	public void updateBusinessLineName(String businessLineId, String businessLineName) {
-		int count = messageConfigDAO.updateBusinessLineName(businessLineId, businessLineName);
+	public void updateBusinessLineName(String businessLineId, String businessLineName, String updatedBy) {
+		int count = messageConfigDAO.updateBusinessLineName(businessLineId, businessLineName, updatedBy);
 		if (count == 0) {
 			return;
 		}
@@ -124,14 +134,18 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 			startNo = pageSize * i;
 			List<AmfMessageConfigDO> messageConfigDOList = messageConfigDAO.listByBusinessLineId4Paging(businessLineId,
 					startNo, pageSize);
+			if (messageConfigDOList == null || messageConfigDOList.isEmpty()) {
+				continue;
+			}
 			messageConfigDOList.parallelStream().forEach(e -> evictCache(e));
 		}
+		LOGGER.info("更新消息配置信息业务线名称成功，业务线名称：{}，更新数量：{}，修改人：{}", businessLineName, count, updatedBy);
 	}
 
 	@Transactional
 	@Override
-	public void updateSourceSystemName(Integer sourceSystemId, String sourceSystemName) {
-		int count = messageConfigDAO.updateSourceSystemName(sourceSystemId, sourceSystemName);
+	public void updateSourceSystemName(Integer sourceSystemId, String sourceSystemName, String updatedBy) {
+		int count = messageConfigDAO.updateSourceSystemName(sourceSystemId, sourceSystemName, updatedBy);
 		if (count == 0) {
 			return;
 		}
@@ -143,8 +157,12 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 			startNo = pageSize * i;
 			List<AmfMessageConfigDO> messageConfigDOList = messageConfigDAO.listBySourceSystemId4Paging(sourceSystemId,
 					startNo, pageSize);
+			if (messageConfigDOList == null || messageConfigDOList.isEmpty()) {
+				continue;
+			}
 			messageConfigDOList.parallelStream().forEach(e -> evictCache(e));
 		}
+		LOGGER.info("更新消息配置信息来源系统名称成功，来源系统名称：{}，更新数量：{}，修改人：{}", sourceSystemName, count, updatedBy);
 	}
 
 	@Transactional
@@ -152,16 +170,24 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	public void remove(Integer messageId, String updatedBy) {
 		AmfMessageConfigDO messageConfigDO = messageConfigDAO.getByMessageId(messageId);
 		if (messageConfigDO == null) {
-			return;
+			LOGGER.error("不存在对应的消息配置信息，消息ID：{}", messageId);
+			throw new CustomBusinessException(MF_0302);
 		}
+		String messageName = messageConfigDO.getMessageName();
 		int messageForwardingConfigCount = messageForwardingConfigService.count(messageId);
 		if (messageForwardingConfigCount > 0) {
-			throw new CustomBusinessException("MF0004", "存在有效的消息转发信息，不能删除");
+			LOGGER.error("存在消息转发信息，不能进行消息配置信息删除操作，消息名称：{}", messageName);
+			throw new CustomBusinessException(MF_0304);
 		}
 		messageConfigDO.setDeleted(1);
 		messageConfigDO.setUpdatedBy(updatedBy);
-		messageConfigDAO.update(messageConfigDO);
+		int count = messageConfigDAO.update(messageConfigDO);
+		if (count == 0) {
+			LOGGER.error("删除消息配置信息失败，消息名称：{}，删除人：{}", messageName, updatedBy);
+			throw new CustomBusinessException(MF_0305);
+		}
 		evictCache(messageConfigDO);
+		LOGGER.info("删除消息配置信息成功，消息名称：{}，删除人：{}", messageName, updatedBy);
 	}
 
 	@Override
@@ -178,7 +204,7 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	@Override
 	public List<MessageConfigVO> listBySourceSystemId4Paging(Integer sourceSystemId, int pageNo, int pageSize) {
 		if (pageNo < 1 || pageSize < 1) {
-			throw new CustomBusinessException("MF0003", "当前页数或每页行数不能小于1");
+			throw new CustomBusinessException(MF_0001);
 		}
 		int startNo = (pageNo - 1) * pageSize;
 		List<AmfMessageConfigDO> messageConfigDOList = messageConfigDAO.listBySourceSystemId4Paging(sourceSystemId,
@@ -226,14 +252,14 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 					return messageConfigDTO;
 				} catch (Exception e) {
 					LOGGER.error("获取消息配置信息异常，消息ID：{}", messageId, e);
-					throw new CustomBusinessException("MF0005", "获取消息配置信息异常", e);
+					throw new CustomBusinessException(MF_0306, e);
 				} finally {
 					lock.unlock();
 				}
 			}
 		} catch (Exception e) {
 			LOGGER.error("锁处理异常，消息ID：{}", messageId, e);
-			throw new CustomBusinessException("MF0005", "获取消息配置信息异常", e);
+			throw new CustomBusinessException(MF_0306, e);
 		}
 		return null;
 	}

@@ -45,7 +45,7 @@ public interface MessageConfigService {
 	 * @param businessLineName 业务线名称
 	 */
 	void updateBusinessLineName(@NotNull(message = "业务线ID不能为空") String businessLineId,
-			@NotNull(message = "业务线名称不能为空") String businessLineName);
+			@NotNull(message = "业务线名称不能为空") String businessLineName, @NotNull(message = "修改人ID不能为空") String updatedBy);
 
 	/**
 	 * 根据来源系统ID更新来源系统名称
@@ -54,7 +54,7 @@ public interface MessageConfigService {
 	 * @param sourceSystemName 来源系统名称
 	 */
 	void updateSourceSystemName(@NotNull(message = "来源系统ID不能为空") Integer sourceSystemId,
-			@NotNull(message = "来源系统名称不能为空") String sourceSystemName);
+			@NotNull(message = "来源系统名称不能为空") String sourceSystemName, @NotNull(message = "修改人ID不能为空") String updatedBy);
 
 	/**
 	 * 根据消息ID删除消息配置信息，逻辑删除。如果有对应的消息转发配置信息，则不允许删除

@@ -120,22 +120,22 @@
             <if test="updatedBy != null and updatedBy != ''">
                 `updated_by` = #{updatedBy},
             </if>
-            <if test="updateTime != null">
-                `update_time` = #{updateTime},
-            </if>
         </trim>
         where `id` = #{id}
+        and   `update_time` = #{updateTime}
     </update>
     
     <update id="updateBusinessLineName">
         update `amf_message_config`
-        set `business_line_name` = #{businessLineName}
+        set `business_line_name` = #{businessLineName},
+            `updated_by` = #{updatedBy}
         where `business_line_id` = #{businessLineId}
     </update>
     
     <update id="updateSourceSystemName">
         update `amf_message_config`
-        set `source_system_name` = #{sourceSystemName}
+        set `source_system_name` = #{sourceSystemName},
+            `updated_by` = #{updatedBy},
         where `source_system_id` = #{sourceSystemId}
     </update>
     

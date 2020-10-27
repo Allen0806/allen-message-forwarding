@@ -36,20 +36,22 @@ public interface MessageConfigDAO {
 	 * 
 	 * @param businessLineId   业务线ID
 	 * @param businessLineName 业务线名称
+	 * @param updatedBy        修改人
 	 * @return 更新的数量
 	 */
 	int updateBusinessLineName(@Param("businessLineId") String businessLineId,
-			@Param("businessLineName") String businessLineName);
+			@Param("businessLineName") String businessLineName, @Param("updatedBy") String updatedBy);
 
 	/**
 	 * 根据来源系统ID更新来源系统名称
 	 * 
 	 * @param sourceSystemId   来源系统ID
 	 * @param sourceSystemName 来源系统名称
+	 * @param updatedBy        修改人
 	 * @return 更新的数量
 	 */
 	int updateSourceSystemName(@Param("sourceSystemId") Integer sourceSystemId,
-			@Param("sourceSystemName") String sourceSystemName);
+			@Param("sourceSystemName") String sourceSystemName, @Param("updatedBy") String updatedBy);
 
 	/**
 	 * 根据主键ID获取消息配置信息

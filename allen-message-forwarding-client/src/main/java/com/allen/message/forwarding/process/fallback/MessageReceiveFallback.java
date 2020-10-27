@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.allen.message.forwarding.process.feign.MessageReceiveClient;
 import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.tool.result.BaseResult;
-import com.allen.tool.result.StatusCode;
+import com.allen.tool.result.ResultStatus;
 
 /**
  * Hystrix限流处理类
@@ -18,7 +18,7 @@ public class MessageReceiveFallback implements MessageReceiveClient {
 
 	@Override
 	public BaseResult<Object> receive(MessageDTO messageDTO) {
-		return new BaseResult<Object>(StatusCode.SYSTEM_ERROR.getCode(), "请求失败");
+		return new BaseResult<Object>(ResultStatus.SYSTEM_ERROR.getCode(), "请求失败");
 	}
 
 }

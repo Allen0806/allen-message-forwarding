@@ -1,6 +1,10 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import java.time.LocalDateTime;
+import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0401;
+import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0402;
+import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0403;
+import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0404;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +24,7 @@ import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
 import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
 import com.allen.message.forwarding.metadata.model.MessageForwardingConfigVO;
 import com.allen.message.forwarding.metadata.service.MessageForwardingConfigService;
+import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.string.StringUtil;
 
 /**
@@ -53,16 +58,15 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 	@Override
 	public void save(MessageForwardingConfigVO messageForwardingConfigVO) {
 		AmfMessageForwardingConfigDO messageForwardingConfigDO = toDO(messageForwardingConfigVO);
-		messageForwardingConfigDO.setDeleted(0);
-		LocalDateTime now = LocalDateTime.now();
-		messageForwardingConfigDO.setCreateTime(now);
-		messageForwardingConfigDO.setUpdateTime(now);
 		if (StringUtil.isBlank(messageForwardingConfigDO.getUpdatedBy())) {
 			messageForwardingConfigDO.setUpdatedBy(messageForwardingConfigDO.getCreatedBy());
 		}
-		forwardingConfigDAO.save(messageForwardingConfigDO);
-		LOGGER.info("保存消息转发配置信息成功，主键：{}，创建人：{}", messageForwardingConfigDO.getId(),
-				messageForwardingConfigDO.getCreatedBy());
+		int count = forwardingConfigDAO.save(messageForwardingConfigDO);
+		if (count == 0) {
+			LOGGER.error("保存消息转发配置信息失败，消息转发配置信息：{}", messageForwardingConfigDO);
+			throw new CustomBusinessException(MF_0401);
+		}
+		LOGGER.info("保存消息转发配置信息失败，消息转发配置信息：{}", messageForwardingConfigDO);
 
 	}
 
@@ -73,8 +77,8 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 		AmfMessageForwardingConfigDO messageForwardingConfigDO = forwardingConfigDAO
 				.get(messageForwardingConfigVO.getId());
 		if (messageForwardingConfigDO == null) {
-			LOGGER.info("未查到对应的转发配置信息，转发配置信息主键：{}", messageForwardingConfigVO.getId());
-			return;
+			LOGGER.error("不存在对应的转发配置信息，消息转发配置信息：{}", messageForwardingConfigVO);
+			throw new CustomBusinessException(MF_0402);
 		}
 		messageForwardingConfigDO.setTargetSystem(messageForwardingConfigVO.getTargetSystem());
 		messageForwardingConfigDO.setForwardingWay(messageForwardingConfigVO.getForwardingWay());
@@ -82,10 +86,12 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 		messageForwardingConfigDO.setRetryTimes(messageForwardingConfigVO.getRetryTimes());
 		messageForwardingConfigDO.setCallbackRequired(messageForwardingConfigVO.getCallbackRequired());
 		messageForwardingConfigDO.setUpdatedBy(messageForwardingConfigVO.getUpdatedBy());
-		messageForwardingConfigDO.setUpdateTime(LocalDateTime.now());
-		forwardingConfigDAO.update(messageForwardingConfigDO);
-		LOGGER.info("更新消息转发配置信息成功，主键：{}，修改人：{}", messageForwardingConfigVO.getId(),
-				messageForwardingConfigVO.getUpdatedBy());
+		int count = forwardingConfigDAO.update(messageForwardingConfigDO);
+		if (count == 0) {
+			LOGGER.error("更新消息转发配置信息失败，消息转发配置信息：{}", messageForwardingConfigDO);
+			throw new CustomBusinessException(MF_0403);
+		}
+		LOGGER.info("更新消息转发配置信息成功，消息转发配置信息：{}", messageForwardingConfigDO);
 	}
 
 	@Transactional
@@ -93,16 +99,19 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 	public void remove(Long id, String updatedBy) {
 		AmfMessageForwardingConfigDO messageForwardingConfigDO = forwardingConfigDAO.get(id);
 		if (messageForwardingConfigDO == null) {
-			return;
+			LOGGER.error("不存在对应的转发配置信息，消息转发配置主键：{}", id);
+			throw new CustomBusinessException(MF_0402);
 		}
 		messageForwardingConfigDO.setDeleted(1);
-		;
 		messageForwardingConfigDO.setUpdatedBy(updatedBy);
-		messageForwardingConfigDO.setUpdateTime(LocalDateTime.now());
-		forwardingConfigDAO.update(messageForwardingConfigDO);
+		int count = forwardingConfigDAO.update(messageForwardingConfigDO);
+		if (count == 0) {
+			LOGGER.error("删除消息转发配置信息失败，消息转发配置主键：{}，删除人：{}", id, updatedBy);
+			throw new CustomBusinessException(MF_0404);
+		}
 		// 清除缓存
 		evictCache(messageForwardingConfigDO.getMessageId());
-		LOGGER.info("删除消息转发配置信息成功，主键：{}，修改人：{}", id, updatedBy);
+		LOGGER.info("删除消息转发配置信息成功，消息转发配置主键：{}，删除人：{}", id, updatedBy);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
+import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.*;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -58,55 +60,76 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	public void save(BusinessLineConfigVO businessLineConfigVO) {
 		AmfBusinessLineConfigDO businessLineConfigDO = toDO(businessLineConfigVO);
 		businessLineConfigDO.setDeleted(0);
+		// 时间可以不设置
 		LocalDateTime now = LocalDateTime.now();
 		businessLineConfigDO.setCreateTime(now);
 		businessLineConfigDO.setUpdateTime(now);
 		if (StringUtil.isBlank(businessLineConfigDO.getUpdatedBy())) {
 			businessLineConfigDO.setUpdatedBy(businessLineConfigDO.getCreatedBy());
 		}
-		businessLineConfigDAO.save(businessLineConfigDO);
-		LOGGER.info("保存消息所属业务线配置信息成功，业务线名称：{}，创建人：{}", businessLineConfigVO.getBusinessLineName(),
-				businessLineConfigVO.getCreatedBy());
+		int count = businessLineConfigDAO.save(businessLineConfigDO);
+		if (count == 0) {
+			LOGGER.error("保存业务线信息失败，业务线名称：{}，创建人：{}", businessLineConfigDO.getBusinessLineName(),
+					businessLineConfigDO.getCreatedBy());
+			throw new CustomBusinessException(MF_0101);
+		}
+		LOGGER.info("保存业务线信息成功，业务线名称：{}，创建人：{}", businessLineConfigDO.getBusinessLineName(),
+				businessLineConfigDO.getCreatedBy());
 	}
 
 	@Transactional
 	@Override
 	public void update(BusinessLineConfigVO businessLineConfigVO) {
-		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(businessLineConfigVO.getId());
+		Long id = businessLineConfigVO.getId();
+		String newBusinessLineName = businessLineConfigVO.getBusinessLineName();
+		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(id);
 		if (businessLineConfigDO == null) {
-			LOGGER.info("未查到对应的业务线信息，业务线主键：{}", businessLineConfigVO.getId());
+			LOGGER.error("不存在对应的业务线信息，业务线主键：{}", id);
+			throw new CustomBusinessException(MF_0102);
+		}
+
+		if (businessLineConfigDO.getBusinessLineName().equals(newBusinessLineName)) {
+			LOGGER.info("业务线名称没有变化，不进行业务线信息更新操作，业务线名称：{}", newBusinessLineName);
 			return;
 		}
-		if (businessLineConfigDO.getBusinessLineName().equals(businessLineConfigVO.getBusinessLineName())) {
-			LOGGER.info("业务线名称没有变化，不进行消息所属业务线配置信息更新操作，业务线名称：{}", businessLineConfigVO.getBusinessLineName());
-			return;
+		String updatedBy = businessLineConfigVO.getUpdatedBy();
+		String businessLineId = businessLineConfigDO.getBusinessLineId();
+		businessLineConfigDO.setBusinessLineName(newBusinessLineName);
+		businessLineConfigDO.setUpdatedBy(updatedBy);
+		// 通过更新时间实现乐观锁
+		int count = businessLineConfigDAO.update(businessLineConfigDO);
+		if (count == 0) {
+			LOGGER.error("更新业务线信息失败，业务线ID：{}，修改人：{}", businessLineId, updatedBy);
+			throw new CustomBusinessException(MF_0103);
 		}
-		businessLineConfigDO.setBusinessLineName(businessLineConfigVO.getBusinessLineName());
-		businessLineConfigDO.setUpdatedBy(businessLineConfigVO.getUpdatedBy());
-		businessLineConfigDO.setUpdateTime(LocalDateTime.now());
-		businessLineConfigDAO.update(businessLineConfigDO);
 		// 更新消息配置信息的业务线名称
-		messageConfigService.updateBusinessLineName(businessLineConfigDO.getBusinessLineId(),
-				businessLineConfigDO.getBusinessLineName());
-		LOGGER.info("更新消息所属业务线配置信息成功，业务线名称：{}，修改人：{}", businessLineConfigVO.getBusinessLineName(),
-				businessLineConfigVO.getUpdatedBy());
+		messageConfigService.updateBusinessLineName(businessLineId, newBusinessLineName, updatedBy);
+		LOGGER.info("更新业务线信息成功，业务线名称：{}，修改人：{}", newBusinessLineName, updatedBy);
 	}
 
 	@Transactional
 	@Override
 	public void remove(Long id, String updatedBy) {
+		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(id);
+		if (businessLineConfigDO == null) {
+			LOGGER.error("不存在对应的业务线信息，业务线主键：{}", id);
+			throw new CustomBusinessException(MF_0102);
+		}
+		String businessLineName = businessLineConfigDO.getBusinessLineName();
 		// 判断是否存在关联的未标记为删除的来源系统信息，如果存在，则不允许删除
 		int sourceSystemAmount = sourceSystemConfigService.count(id);
 		if (sourceSystemAmount > 0) {
-			LOGGER.info("存在未删除的来源系统信息，不能进行业务线配置信息删除操作，业务线主键：{}", id);
-			throw new CustomBusinessException("MF0001", "存在未删除的来源系统信息，不能进行业务线配置信息删除操作");
+			LOGGER.error("存在来源系统信息，不能进行业务线信息删除操作，业务线名称：{}", businessLineName);
+			throw new CustomBusinessException(MF_0104);
 		}
-		AmfBusinessLineConfigDO businessLineConfigDO = new AmfBusinessLineConfigDO();
-		businessLineConfigDO.setId(id);
 		businessLineConfigDO.setDeleted(1);
 		businessLineConfigDO.setUpdatedBy(updatedBy);
-		businessLineConfigDAO.update(businessLineConfigDO);
-		LOGGER.info("删除消息所属业务线配置信息成功，业务线主键：{}，删除人{}", id, updatedBy);
+		int count = businessLineConfigDAO.update(businessLineConfigDO);
+		if (count == 0) {
+			LOGGER.error("删除业务线信息失败，业务线名称：{}，删除人：{}", businessLineName, updatedBy);
+			throw new CustomBusinessException(MF_0105);
+		}
+		LOGGER.info("删除消业务线信息成功，业务线名称：{}，删除人{}", businessLineName, updatedBy);
 	}
 
 	@Override
@@ -124,13 +147,20 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	@Override
 	public List<BusinessLineConfigVO> list4Fuzzy(String businessLineId, String businessLineName) {
 		if (StringUtil.isBlank(businessLineId) && StringUtil.isBlank(businessLineName)) {
-			LOGGER.info("业务线ID和业务线名称不能同时为空");
-			throw new CustomBusinessException("MF0002", "业务线ID和业务线名称不能同时为空");
+			throw new CustomBusinessException(MF_0106);
 		}
 		if (StringUtil.isNotBlank(businessLineId)) {
+			if (businessLineId.contains("%")) {
+				LOGGER.error("业务线ID中不能包含%，业务线ID：{}", businessLineId);
+				throw new CustomBusinessException(MF_0107);
+			}
 			businessLineId = businessLineId.trim() + "%";
 		}
 		if (StringUtil.isNotBlank(businessLineName)) {
+			if (businessLineName.contains("%")) {
+				LOGGER.error("业务线名称中不能包含%，业务线ID：{}", businessLineId);
+				throw new CustomBusinessException(MF_0108);
+			}
 			businessLineName = businessLineName.trim() + "%";
 		}
 		List<AmfBusinessLineConfigDO> businessLineConfigDOList = businessLineConfigDAO.list4Fuzzy(businessLineId,
@@ -146,7 +176,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	@Override
 	public List<BusinessLineConfigVO> list4Paging(int pageNo, int pageSize) {
 		if (pageNo < 1 || pageSize < 1) {
-			throw new CustomBusinessException("MF0003", "当前页数或每页行数不能小于1");
+			throw new CustomBusinessException(MF_0001);
 		}
 		int startNo = (pageNo - 1) * pageSize;
 		List<AmfBusinessLineConfigDO> businessLineConfigDOList = businessLineConfigDAO.list4Paging(startNo, pageSize);
@@ -205,7 +235,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		if (businessLineConfigDOList == null || businessLineConfigDOList.isEmpty()) {
 			return Collections.emptyList();
 		}
-		return businessLineConfigDOList.stream().map(e -> toVO(e)).collect(Collectors.toList());
+		return businessLineConfigDOList.parallelStream().map(e -> toVO(e)).collect(Collectors.toList());
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import java.time.LocalDateTime;
+import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,8 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.allen.message.forwarding.metadata.dao.SourceSystemConfigDAO;
-import com.allen.message.forwarding.metadata.model.BusinessLineConfigVO;
 import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
+import com.allen.message.forwarding.metadata.model.BusinessLineConfigVO;
 import com.allen.message.forwarding.metadata.model.SourceSystemConfigVO;
 import com.allen.message.forwarding.metadata.service.BusinessLineConfigService;
 import com.allen.message.forwarding.metadata.service.MessageConfigService;
@@ -58,39 +59,45 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	@Override
 	public void save(SourceSystemConfigVO sourceSystemConfigVO) {
 		AmfSourceSystemConfigDO sourceSystemConfigDO = toDO(sourceSystemConfigVO);
-		sourceSystemConfigDO.setDeleted(0);
-		LocalDateTime now = LocalDateTime.now();
-		sourceSystemConfigDO.setCreateTime(now);
-		sourceSystemConfigDO.setUpdateTime(now);
 		if (StringUtil.isBlank(sourceSystemConfigDO.getUpdatedBy())) {
 			sourceSystemConfigDO.setUpdatedBy(sourceSystemConfigDO.getCreatedBy());
 		}
-		sourceSystemConfigDAO.save(sourceSystemConfigDO);
-		LOGGER.info("保存消息来源系统配置信息成功，来源系统名称：{}，创建人：{}", sourceSystemConfigDO.getSourceSystemName(),
+		int count = sourceSystemConfigDAO.save(sourceSystemConfigDO);
+		if (count == 0) {
+			LOGGER.error("保存来源系统信息失败，来源系统名称：{}，创建人：{}", sourceSystemConfigDO.getSourceSystemName(),
+					sourceSystemConfigDO.getCreatedBy());
+			throw new CustomBusinessException(MF_0201);
+		}
+		LOGGER.info("保存来源系统信息成功，来源系统名称：{}，创建人：{}", sourceSystemConfigDO.getSourceSystemName(),
 				sourceSystemConfigDO.getCreatedBy());
 	}
 
 	@Transactional
 	@Override
 	public void update(SourceSystemConfigVO sourceSystemConfigVO) {
-		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigDAO.get(sourceSystemConfigVO.getId());
+		Long id = sourceSystemConfigVO.getId();
+		String newSourceSystemName = sourceSystemConfigVO.getSourceSystemName();
+		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigDAO.get(id);
 		if (sourceSystemConfigDO == null) {
-			LOGGER.info("未查到对应的来源系统信息，来源系统主键：{}", sourceSystemConfigVO.getId());
+			LOGGER.error("不存在对应的来源系统信息，来源系统主键：{}", id);
+			throw new CustomBusinessException(MF_0202);
+		}
+		if (sourceSystemConfigDO.getSourceSystemName().equals(newSourceSystemName)) {
+			LOGGER.info("来源系统名称没有变化，不进行更新操作，来源系统名称：{}", newSourceSystemName);
 			return;
 		}
-		if (sourceSystemConfigDO.getSourceSystemName().equals(sourceSystemConfigVO.getSourceSystemName())) {
-			LOGGER.info("来源系统名称没有变化，不进行更新操作，来源系统名称：{}", sourceSystemConfigVO.getSourceSystemName());
-			return;
+		String updatedBy = sourceSystemConfigVO.getUpdatedBy();
+		Integer sourceSystemId = sourceSystemConfigDO.getSourceSystemId();
+		sourceSystemConfigDO.setSourceSystemName(newSourceSystemName);
+		sourceSystemConfigDO.setUpdatedBy(updatedBy);
+		int count = sourceSystemConfigDAO.update(sourceSystemConfigDO);
+		if (count == 0) {
+			LOGGER.error("更新来源系统信息失败，来源系统ID：{}，修改人：{}", sourceSystemId, updatedBy);
+			throw new CustomBusinessException(MF_0203);
 		}
-		sourceSystemConfigDO.setSourceSystemName(sourceSystemConfigVO.getSourceSystemName());
-		sourceSystemConfigDO.setUpdatedBy(sourceSystemConfigVO.getUpdatedBy());
-		sourceSystemConfigDO.setUpdateTime(LocalDateTime.now());
-		sourceSystemConfigDAO.update(sourceSystemConfigDO);
 		// 更新消息信息的来源系统名称
-		messageConfigService.updateSourceSystemName(sourceSystemConfigDO.getSourceSystemId(),
-				sourceSystemConfigDO.getSourceSystemName());
-		LOGGER.info("更新消息来源系统配置信息成功，来源系统名称：{}，修改人：{}", sourceSystemConfigDO.getSourceSystemName(),
-				sourceSystemConfigDO.getUpdatedBy());
+		messageConfigService.updateSourceSystemName(sourceSystemId, newSourceSystemName, updatedBy);
+		LOGGER.info("更新来源系统信息成功，来源系统名称：{}，修改人：{}", newSourceSystemName, updatedBy);
 	}
 
 	@Transactional
@@ -98,19 +105,25 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 	public void remove(Long id, String updatedBy) {
 		AmfSourceSystemConfigDO sourceSystemConfigDO = sourceSystemConfigDAO.get(id);
 		if (sourceSystemConfigDO == null) {
-			return;
+			LOGGER.error("不存在对应的来源系统信息，来源系统主键：{}", id);
+			throw new CustomBusinessException(MF_0202);
 		}
+		Integer sourceSystemId = sourceSystemConfigDO.getSourceSystemId();
+		String sourceSystemName = sourceSystemConfigDO.getSourceSystemName();
 		// 查询该消息来源系统是否有关联的有效的消息配置信息，如果有则不允许更新
-		int messageCount = messageConfigService.countBySourceSystemId(sourceSystemConfigDO.getSourceSystemId());
+		int messageCount = messageConfigService.countBySourceSystemId(sourceSystemId);
 		if (messageCount > 0) {
-			LOGGER.info("存在未删除的消息配置信息，不能进行来源系统配置信息删除操作，来源系统名称：{}", sourceSystemConfigDO.getSourceSystemName());
-			throw new CustomBusinessException("MF0006", "存在未删除的消息配置信息，不能进行来源系统配置信息删除操作");
+			LOGGER.info("存在消息配置信息，不能进行来源系统信息删除操作，来源系统名称：{}", sourceSystemName);
+			throw new CustomBusinessException(MF_0204);
 		}
 		sourceSystemConfigDO.setDeleted(1);
 		sourceSystemConfigDO.setUpdatedBy(updatedBy);
-		sourceSystemConfigDO.setUpdateTime(LocalDateTime.now());
-		sourceSystemConfigDAO.update(sourceSystemConfigDO);
-		LOGGER.info("删除消息来源系统配置信息成功，ID：{}，修改人：{}", id, updatedBy);
+		int count = sourceSystemConfigDAO.update(sourceSystemConfigDO);
+		if (count == 0) {
+			LOGGER.error("删除来源系统信息失败，来源系统名称：{}，修改人：{}", sourceSystemName, updatedBy);
+			throw new CustomBusinessException(MF_0205);
+		}
+		LOGGER.info("删除消息来源系统配置信息成功，来源系统名称：{}，修改人：{}", sourceSystemName, updatedBy);
 	}
 
 	@Override
@@ -140,7 +153,7 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 			return Collections.emptyList();
 		}
 		if (pageNo < 1 || pageSize < 1) {
-			throw new CustomBusinessException("MF0003", "当前页数或每页行数不能小于1");
+			throw new CustomBusinessException(MF_0001);
 		}
 		int startNo = (pageNo - 1) * pageSize;
 		List<AmfSourceSystemConfigDO> sourceSystemConfigDOList = sourceSystemConfigDAO.list4Paging(businessLineConfigId,
@@ -148,7 +161,8 @@ public class SourceSystemConfigServiceImpl implements SourceSystemConfigService 
 		if (sourceSystemConfigDOList == null || sourceSystemConfigDOList.isEmpty()) {
 			return Collections.emptyList();
 		}
-		return sourceSystemConfigDOList.stream().map(e -> toVO(e, businessLineConfigDTO)).collect(Collectors.toList());
+		return sourceSystemConfigDOList.parallelStream().map(e -> toVO(e, businessLineConfigDTO))
+				.collect(Collectors.toList());
 	}
 
 	/**
