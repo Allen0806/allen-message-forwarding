@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,19 +34,19 @@ import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.string.StringUtil;
 
 /**
- * 消息配置管理服务层接口实现类，缓存使用Redisson
+ * 消息配置管理服务层接口实现类，缓存直接使用redis版本
  *
  * @author Allen
  * @date 2020年10月19日
  * @since 1.0.0
  */
-@Service
-public class MessageConfigServiceImpl implements MessageConfigService {
+@Service("messageConfigService3")
+public class MessageConfigServiceImpl3 implements MessageConfigService {
 
 	/**
 	 * 日志纪录器
 	 */
-	private static final Logger LOGGER = LoggerFactory.getLogger(MessageConfigServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MessageConfigServiceImpl3.class);
 
 	/**
 	 * DAO层实例
@@ -59,6 +59,12 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	 */
 	@Autowired
 	private MessageForwardingConfigService messageForwardingConfigService;
+
+	/**
+	 * redisTemplate实例
+	 */
+	@Autowired
+	private RedisTemplate<String, MessageConfigDTO> redisTemplate;
 
 	/**
 	 * Redisson客户端实例
@@ -347,8 +353,9 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	private void evictCache(AmfMessageConfigDO messageConfigDO) {
 		// 清除缓存
 		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageConfigDO.getMessageId();
-		RBucket<MessageConfigDTO> bucket = redissonClient.getBucket(cacheKey);
-		bucket.getAndDelete();
+		if (redisTemplate.hasKey(cacheKey)) {
+			redisTemplate.delete(cacheKey);
+		}
 	}
 
 	/**
@@ -359,8 +366,13 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	 */
 	private MessageConfigDTO getFromCache(Integer messageId) {
 		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageId;
-		RBucket<MessageConfigDTO> bucket = redissonClient.getBucket(cacheKey);
-		return bucket.get();
+		if (redisTemplate.hasKey(cacheKey)) {
+			MessageConfigDTO messageConfigDTO = redisTemplate.opsForValue().get(cacheKey);
+			if (messageConfigDTO != null) {
+				return messageConfigDTO;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -370,8 +382,9 @@ public class MessageConfigServiceImpl implements MessageConfigService {
 	 */
 	private void cacheable(MessageConfigDTO messageConfigDTO) {
 		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageConfigDTO.getMessageId();
-		RBucket<MessageConfigDTO> bucket = redissonClient.getBucket(cacheKey);
-		bucket.set(messageConfigDTO);
+		if (!redisTemplate.hasKey(cacheKey)) {
+			redisTemplate.opsForValue().set(cacheKey, messageConfigDTO);
+		}
 	}
 
 }
