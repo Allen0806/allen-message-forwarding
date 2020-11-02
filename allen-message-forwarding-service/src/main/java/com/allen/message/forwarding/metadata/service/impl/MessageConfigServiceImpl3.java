@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +29,7 @@ import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
 import com.allen.message.forwarding.metadata.service.MessageConfigService;
 import com.allen.message.forwarding.metadata.service.MessageForwardingConfigService;
 import com.allen.tool.exception.CustomBusinessException;
+import com.allen.tool.redis.RedisLock;
 import com.allen.tool.string.StringUtil;
 
 /**
@@ -67,10 +66,10 @@ public class MessageConfigServiceImpl3 implements MessageConfigService {
 	private RedisTemplate<String, MessageConfigDTO> redisTemplate;
 
 	/**
-	 * Redisson客户端实例
+	 * redis锁
 	 */
 	@Autowired
-	private RedissonClient redissonClient;
+	private RedisLock redisLock;
 
 	@Transactional
 	@Override
@@ -232,9 +231,9 @@ public class MessageConfigServiceImpl3 implements MessageConfigService {
 			return messageConfigDTO;
 		}
 		String lockKey = CacheNameConstant.MESSAGE_CONFIG_LOCK_NAME + "::" + messageId;
-		RLock lock = redissonClient.getLock(lockKey);
+		String currentThreadId = String.valueOf(Thread.currentThread().getId());
 		try {
-			if (lock.tryLock(5, 5, TimeUnit.SECONDS)) {
+			if (redisLock.tryLock(lockKey, currentThreadId, 3000, 3000, TimeUnit.MILLISECONDS)) {
 				try {
 					// 再次从缓存里获取，二次检查
 					messageConfigDTO = getFromCache(messageId);
@@ -260,7 +259,7 @@ public class MessageConfigServiceImpl3 implements MessageConfigService {
 					LOGGER.error("获取消息配置信息异常，消息ID：{}", messageId, e);
 					throw new CustomBusinessException(MF_0306, e);
 				} finally {
-					lock.unlock();
+					redisLock.unLock(lockKey, currentThreadId);
 				}
 			}
 		} catch (Exception e) {
