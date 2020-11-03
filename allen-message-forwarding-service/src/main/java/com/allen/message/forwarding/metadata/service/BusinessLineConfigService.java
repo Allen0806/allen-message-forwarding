@@ -62,7 +62,7 @@ public interface BusinessLineConfigService {
 	BusinessLineConfigVO getByBusinessLineId(@NotNull(message = "消息所属业务线配置信息业务线ID不能为空") String businessLineId);
 
 	/**
-	 * 根据业务线ID或（和）业务线名称模糊查询未标记为删除的业务线信息，业务线ID和业务线名称不可同时为空，根据最左匹配规则查询
+	 * 根据业务线ID或（和）业务线名称模糊查询未删除的业务线信息，业务线ID和业务线名称不可同时为空，根据最左匹配规则查询
 	 * 
 	 * @param businessLineId   业务线ID模糊信息，即可以为业务线ID的左侧部分信息
 	 * @param businessLineName 业务线名称模糊信息，即可以为业务线名称的左侧部分信息

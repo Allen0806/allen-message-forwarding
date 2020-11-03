@@ -3,7 +3,10 @@ package com.allen.message.forwarding.metadata.controller;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +28,14 @@ import com.allen.tool.validation.ValidationGroup;
  * @since 1.0.0
  */
 @RestController
-@RequestMapping(path = "/message/forwarding")
+@RequestMapping(path = "/mf/meta/ssc")
 public class SourceSystemConfigController {
+
+	/**
+	 * 日志纪录器
+	 */
+	@SuppressWarnings("unused")
+	private static final Logger LOGGER = LoggerFactory.getLogger(SourceSystemConfigController.class);
 
 	/**
 	 * 消息来源系统服务实例
@@ -40,9 +49,9 @@ public class SourceSystemConfigController {
 	 * @param sourceSystemConfigDO 消息来源系统配置信息
 	 * @return 保存结果
 	 */
-	@PostMapping("/meta/sourcesytemconfig/save")
-	public BaseResult<Object> save(
-			@Validated({ ValidationGroup.Insert.class }) @RequestBody SourceSystemConfigVO sourceSystemConfigVO) {
+	@PostMapping("/save")
+	public BaseResult<Object> save(@NotNull(message = "消息来源系统配置信息不能为空") @Validated({ ValidationGroup.Insert.class,
+			Default.class }) @RequestBody SourceSystemConfigVO sourceSystemConfigVO) {
 		sourceSystemConfigService.save(sourceSystemConfigVO);
 		return BaseResult.success();
 	}
@@ -53,9 +62,9 @@ public class SourceSystemConfigController {
 	 * @param sourceSystemConfigDO
 	 * @return 修改结果
 	 */
-	@PostMapping("/meta/sourcesytemconfig/update")
-	public BaseResult<Object> update(
-			@Validated({ ValidationGroup.Update.class }) @RequestBody SourceSystemConfigVO sourceSystemConfigVO) {
+	@PostMapping("/update")
+	public BaseResult<Object> update(@NotNull(message = "消息来源系统配置信息不能为空") @Validated({ ValidationGroup.Update.class,
+			Default.class }) @RequestBody SourceSystemConfigVO sourceSystemConfigVO) {
 		sourceSystemConfigService.update(sourceSystemConfigVO);
 		return BaseResult.success();
 	}
@@ -67,9 +76,9 @@ public class SourceSystemConfigController {
 	 * @param updatedBy 修改人ID
 	 * @return 删除结果
 	 */
-	@PostMapping("/meta/sourcesytemconfig/remove/{id}/{updateBy}")
+	@PostMapping("/remove/{id}/{updatedBy}")
 	public BaseResult<Object> remove(@NotNull(message = "主键ID不能为空") @PathVariable("id") Long id,
-			@NotNull(message = "修改人ID不能为空") @PathVariable("updateBy") String updatedBy) {
+			@NotNull(message = "修改人ID不能为空") @PathVariable("updatedBy") String updatedBy) {
 		sourceSystemConfigService.remove(id, updatedBy);
 		return BaseResult.success();
 	}
@@ -80,7 +89,7 @@ public class SourceSystemConfigController {
 	 * @param id 主键ID
 	 * @return 消息来源系统配置信息
 	 */
-	@PostMapping("/meta/sourcesytemconfig/get/{id}")
+	@PostMapping("/get/{id}")
 	public BaseResult<SourceSystemConfigVO> get(@NotNull(message = "主键ID不能为空") @PathVariable("id") Long id) {
 		SourceSystemConfigVO sourceSystemConfig = sourceSystemConfigService.get(id);
 		return BaseResult.success(sourceSystemConfig);
@@ -92,9 +101,9 @@ public class SourceSystemConfigController {
 	 * @param businessLineId 业务线ID
 	 * @return 消息来源系统配置信息数量
 	 */
-	@PostMapping("/meta/sourcesytemconfig/count/{businessLineConfigId}")
+	@PostMapping("/count/{businessLineConfigId}")
 	public BaseResult<Integer> count(
-			@NotNull(message = "业务线ID不能为空") @PathVariable("businessLineConfigId") Long businessLineConfigId) {
+			@NotNull(message = "业务线主键不能为空") @PathVariable("businessLineConfigId") Long businessLineConfigId) {
 		Integer count = sourceSystemConfigService.count(businessLineConfigId);
 		return BaseResult.success(count);
 	}
@@ -107,11 +116,11 @@ public class SourceSystemConfigController {
 	 * @param pageSize       每页行数
 	 * @return 分页查询结果
 	 */
-	@PostMapping("/meta/sourcesytemconfig/list4paging/{businessLineConfigId}/{pageNo}/{pageSize}")
+	@PostMapping("/list_for_paging/{businessLineConfigId}/{pageNo}/{pageSize}")
 	public BaseResult<List<SourceSystemConfigVO>> listByBusinessLineId4Paging(
-			@NotNull(message = "业务线ID不能为空") @PathVariable("businessLineConfigId") Long businessLineConfigId,
-			@NotNull(message = "当前页数不能为空") @PathVariable("pageNo") int pageNo,
-			@NotNull(message = "每页行数不能为空") @PathVariable("pageSize") int pageSize) {
+			@NotNull(message = "业务线主键不能为空") @PathVariable("businessLineConfigId") Long businessLineConfigId,
+			@NotNull(message = "当前页数不能为空") @PathVariable("pageNo") Integer pageNo,
+			@NotNull(message = "每页行数不能为空") @PathVariable("pageSize") Integer pageSize) {
 		List<SourceSystemConfigVO> sourceSystemConfigs = sourceSystemConfigService.list4Paging(businessLineConfigId,
 				pageNo, pageSize);
 		return BaseResult.success(sourceSystemConfigs);
