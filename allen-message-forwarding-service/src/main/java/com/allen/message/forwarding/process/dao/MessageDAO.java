@@ -1,8 +1,10 @@
 package com.allen.message.forwarding.process.dao;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.allen.message.forwarding.process.model.AmfMessageDO;
+import com.allen.message.forwarding.process.model.MessageQueryParamDTO;
 
 /**
  * 消息管理DAO层
@@ -52,4 +54,12 @@ public interface MessageDAO {
 	 * @return 消息信息
 	 */
 	AmfMessageDO get(String messageNo);
+
+	/**
+	 * 根据给定参数查询消息信息
+	 * 
+	 * @param queryParam 查询参数
+	 * @return 消息信息
+	 */
+	List<AmfMessageDO> list(MessageQueryParamDTO queryParam);
 }

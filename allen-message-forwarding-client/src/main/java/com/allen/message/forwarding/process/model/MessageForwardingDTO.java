@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * @date 2020年11月3日
  * @since 1.0.0
  */
-public class AmfMessageForwardingDO implements Serializable {
+public class MessageForwardingDTO implements Serializable {
 
 	/**
 	 * 序列化版本
@@ -28,14 +28,14 @@ public class AmfMessageForwardingDO implements Serializable {
 	private String messageNo;
 
 	/**
-	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
-	 */
-	private String messageKeyword;
-
-	/**
 	 * 消息ID，即消息配置信息里的消息ID，固定6位
 	 */
 	private Integer messageId;
+
+	/**
+	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
+	 */
+	private String messageKeyword;
 
 	/**
 	 * 消息转发配置主键
@@ -43,7 +43,7 @@ public class AmfMessageForwardingDO implements Serializable {
 	private Long forwardingId;
 
 	/**
-	 * 转发结果：0-失败，1-成功，2-失败需重试
+	 * 转发结果：0-失败，1-成功
 	 */
 	private Integer forwardingResult;
 
@@ -58,14 +58,9 @@ public class AmfMessageForwardingDO implements Serializable {
 	private Integer retryTimes;
 
 	/**
-	 * 回调结果：0-失败，1-成功，2-失败需重试
+	 * 回调结果：0-失败，1-成功
 	 */
 	private Integer callbackResult;
-
-	/**
-	 * 回调成功时间
-	 */
-	private LocalDateTime callbackSucessTime;
 
 	/**
 	 * 回调重试次数
@@ -98,20 +93,20 @@ public class AmfMessageForwardingDO implements Serializable {
 		this.messageNo = messageNo;
 	}
 
-	public String getMessageKeyword() {
-		return messageKeyword;
-	}
-
-	public void setMessageKeyword(String messageKeyword) {
-		this.messageKeyword = messageKeyword;
-	}
-
 	public Integer getMessageId() {
 		return messageId;
 	}
 
 	public void setMessageId(Integer messageId) {
 		this.messageId = messageId;
+	}
+
+	public String getMessageKeyword() {
+		return messageKeyword;
+	}
+
+	public void setMessageKeyword(String messageKeyword) {
+		this.messageKeyword = messageKeyword;
 	}
 
 	public Long getForwardingId() {
@@ -154,14 +149,6 @@ public class AmfMessageForwardingDO implements Serializable {
 		this.callbackResult = callbackResult;
 	}
 
-	public LocalDateTime getCallbackSucessTime() {
-		return callbackSucessTime;
-	}
-
-	public void setCallbackSucessTime(LocalDateTime callbackSucessTime) {
-		this.callbackSucessTime = callbackSucessTime;
-	}
-
 	public Integer getCallbackRetryTimes() {
 		return callbackRetryTimes;
 	}
@@ -189,12 +176,11 @@ public class AmfMessageForwardingDO implements Serializable {
 	@Override
 	public String toString() {
 		return new StringBuilder().append("AmfMessageForwardingDO[").append("id=").append(id).append("messageNo=")
-				.append(messageNo).append(", messageKeyword=").append(messageKeyword).append(", messageId=")
-				.append(messageId).append(", forwardingId=").append(forwardingId).append(", forwardingResult=")
+				.append(messageNo).append(", messageId=").append(messageId).append(", messageKeyword=")
+				.append(messageKeyword).append(", forwardingId=").append(forwardingId).append(", forwardingResult=")
 				.append(forwardingResult).append(", forwardingSucessTime=").append(forwardingSucessTime)
 				.append(", retryTimes=").append(retryTimes).append(", callbackResult=").append(callbackResult)
-				.append(", callbackSucessTime=").append(callbackSucessTime).append(", callbackRetryTimes=")
-				.append(callbackRetryTimes).append(", createTime=").append(createTime).append(", updateTime=")
-				.append(updateTime).append("]").toString();
+				.append(", callbackRetryTimes=").append(callbackRetryTimes).append(", createTime=").append(createTime)
+				.append(", updateTime=").append(updateTime).append("]").toString();
 	}
 }

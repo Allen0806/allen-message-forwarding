@@ -1,6 +1,5 @@
 package com.allen.message.forwarding.process.model;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
@@ -20,7 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
  *
  */
 @ApiModel("消息对象")
-public class MessageDTO implements java.io.Serializable {
+public class MessageReceiveDTO implements java.io.Serializable {
 
 	/**
 	 * 序列化版本号
@@ -80,11 +79,6 @@ public class MessageDTO implements java.io.Serializable {
 	@NotNull(message = "消息内容不能为空")
 	private String messageContent;
 
-	/**
-	 * 消息转发信息列表
-	 */
-	private List<MessageForwardingDTO> messageForwardings;
-
 	public String getMessageNo() {
 		return messageNo;
 	}
@@ -139,14 +133,6 @@ public class MessageDTO implements java.io.Serializable {
 
 	public void setMessageContent(String messageContent) {
 		this.messageContent = messageContent;
-	}
-	
-	public List<MessageForwardingDTO> getMessageForwardings() {
-		return messageForwardings;
-	}
-
-	public void setMessageForwardings(List<MessageForwardingDTO> messageForwardings) {
-		this.messageForwardings = messageForwardings;
 	}
 
 	@Override
