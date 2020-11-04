@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.allen.message.forwarding.process.model.MessageDTO;
+import com.allen.message.forwarding.process.model.AmfMessageDO;
 import com.allen.tool.result.BaseResult;
 
 /**
@@ -20,7 +20,7 @@ import com.allen.tool.result.BaseResult;
  *
  */
 @RestController
-@RequestMapping(path = "/message/forwarding")
+@RequestMapping(path = "/mf/process/")
 public class MessageReceiveController {
 
 	/**
@@ -29,8 +29,8 @@ public class MessageReceiveController {
 	 * @param messageDTO 消息对象
 	 * @return 响应对象
 	 */
-	@PostMapping(value = "/process/receive")
-	public BaseResult<Object> receive(@RequestBody @Valid MessageDTO messageDTO, BindingResult bindingResult) {
+	@PostMapping(value = "/receive")
+	public BaseResult<Object> receive(@RequestBody @Valid AmfMessageDO messageDTO, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return BaseResult.paramError(bindingResult.getAllErrors());
 		}

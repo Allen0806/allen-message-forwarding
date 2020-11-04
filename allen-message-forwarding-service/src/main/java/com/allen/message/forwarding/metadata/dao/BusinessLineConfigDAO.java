@@ -14,6 +14,7 @@ import com.allen.message.forwarding.metadata.model.AmfBusinessLineConfigDO;
  * @since 1.0.0
  */
 public interface BusinessLineConfigDAO {
+	
 	/**
 	 * 新增所属业务线配置信息
 	 * 
