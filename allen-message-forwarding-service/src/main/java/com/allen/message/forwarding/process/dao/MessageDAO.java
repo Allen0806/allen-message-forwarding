@@ -32,6 +32,14 @@ public interface MessageDAO {
 	int update(AmfMessageDO messageDO);
 
 	/**
+	 * 增加消息转发成功数量，每次加1
+	 * 
+	 * @param messageNo 消息流水号
+	 * @return 修改数量
+	 */
+	int updateSucessAmount(String messageNo);
+
+	/**
 	 * 迁移消息信息，仅限插入到历史表
 	 * 
 	 * @param deadline 截止时间，即只迁移创建时间小于给定时间的数据
@@ -54,6 +62,14 @@ public interface MessageDAO {
 	 * @return 消息信息
 	 */
 	AmfMessageDO get(String messageNo);
+
+	/**
+	 * 根据给定参数查询消息信息数量
+	 * 
+	 * @param queryParam 查询参数
+	 * @return 消息信息数量
+	 */
+	int count(MessageQueryParamDTO queryParam);
 
 	/**
 	 * 根据给定参数查询消息信息

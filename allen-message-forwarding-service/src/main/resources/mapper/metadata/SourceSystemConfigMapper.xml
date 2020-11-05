@@ -9,59 +9,59 @@
 		insert into `amf_source_system_config`
 		(
 		<trim suffixOverrides=",">
-			<if test="id!=null">
+			<if test="id != null">
 				`id`,
 			</if>
-			<if test="businessLineConfigId!=null">
+			<if test="businessLineConfigId != null">
 				`business_line_config_id`,
 			</if>
 				`source_system_id`,
-			<if test="sourceSystemName!=null">
+			<if test="sourceSystemName != null">
 				`source_system_name`,
 			</if>
-			<if test="deleted!=null">
+			<if test="deleted != null">
 				`is_deleted`,
 			</if>
-			<if test="createdBy!=null">
+			<if test="createdBy != null">
 				`created_by`,
 			</if>
-			<if test="createTime!=null">
+			<if test="createTime != null">
 				`create_time`,
 			</if>
-			<if test="updatedBy!=null">
+			<if test="updatedBy != null">
 				`updated_by`,
 			</if>
-			<if test="updateTime!=null">
+			<if test="updateTime != null">
 				`update_time`,
 			</if>
 		</trim>
 		)
 		select 
 		<trim suffixOverrides=",">
-			<if test="id!=null">
+			<if test="id != null">
 				#{id},
 			</if>
-			<if test="businessLineConfigId!=null">
+			<if test="businessLineConfigId != null">
 				#{businessLineConfigId},
 			</if>
 				<!-- 插入时最大值累加，保证唯一性，初始值为1000 -->
 				case when max(source_system_id) is not null then max(source_system_id) + 1 else 1000 end,
-			<if test="sourceSystemName!=null">
+			<if test="sourceSystemName != null">
 				#{sourceSystemName},
 			</if>
-			<if test="deleted!=null">
+			<if test="deleted != null">
 				#{deleted},
 			</if>
-			<if test="createdBy!=null">
+			<if test="createdBy != null">
 				#{createdBy},
 			</if>
-			<if test="createTime!=null">
+			<if test="createTime != null">
 				#{createTime},
 			</if>
-			<if test="updatedBy!=null">
+			<if test="updatedBy != null">
 				#{updatedBy},
 			</if>
-			<if test="updateTime!=null">
+			<if test="updateTime != null">
 				#{updateTime},
 			</if>
 		</trim>

@@ -35,6 +35,22 @@ public class MessageReceiveDTO implements java.io.Serializable {
 	private String messageNo;
 
 	/**
+	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
+	 */
+	@ApiModelProperty(value = "消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位", dataType = "String", required = true)
+	@NotNull(message = "消息关键字不能为空")
+	@Size(max = 32, message = "消息关键字最长32位")
+	private String messageKeyword;
+
+	/**
+	 * 消息ID，即消息配置信息里的消息ID，固定6位
+	 */
+	@ApiModelProperty(value = "消息ID，消息配置信息里的消息ID，固定6位", dataType = "Integer", required = true)
+	@NotNull(message = "消息ID不能为空")
+	@Range(min = 100000, max = 999999, message = "消息ID取值范围为100000~999999")
+	private Integer messageId;
+
+	/**
 	 * 业务线ID，最长20位
 	 */
 	@ApiModelProperty(value = "业务线ID，最长20位", dataType = "String", required = true)
@@ -49,22 +65,6 @@ public class MessageReceiveDTO implements java.io.Serializable {
 	@NotNull(message = "来源系统ID不能为空")
 	@Range(min = 1000, max = 9999, message = "来源系统ID取值范围为1000~9999")
 	private Integer sourceSystemId;
-
-	/**
-	 * 消息ID，即消息配置信息里的消息ID，固定6位
-	 */
-	@ApiModelProperty(value = "消息ID，消息配置信息里的消息ID，固定6位", dataType = "Integer", required = true)
-	@NotNull(message = "消息ID不能为空")
-	@Range(min = 100000, max = 999999, message = "消息ID取值范围为100000~999999")
-	private Integer messageId;
-
-	/**
-	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
-	 */
-	@ApiModelProperty(value = "消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位", dataType = "String", required = true)
-	@NotNull(message = "消息关键字不能为空")
-	@Size(max = 32, message = "消息关键字最长32位")
-	private String messageKeyword;
 
 	/**
 	 * 通过Http接口转发消息时，设置到http header里的参数，比如接口编号等
@@ -87,6 +87,22 @@ public class MessageReceiveDTO implements java.io.Serializable {
 		this.messageNo = messageNo;
 	}
 
+	public String getMessageKeyword() {
+		return messageKeyword;
+	}
+
+	public void setMessageKeyword(String messageKeyword) {
+		this.messageKeyword = messageKeyword;
+	}
+
+	public Integer getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(Integer messageId) {
+		this.messageId = messageId;
+	}
+
 	public String getBusinessLineId() {
 		return businessLineId;
 	}
@@ -101,22 +117,6 @@ public class MessageReceiveDTO implements java.io.Serializable {
 
 	public void setSourceSystemId(Integer sourceSystemId) {
 		this.sourceSystemId = sourceSystemId;
-	}
-
-	public Integer getMessageId() {
-		return messageId;
-	}
-
-	public void setMessageId(Integer messageId) {
-		this.messageId = messageId;
-	}
-
-	public String getMessageKeyword() {
-		return messageKeyword;
-	}
-
-	public void setMessageKeyword(String messageKeyword) {
-		this.messageKeyword = messageKeyword;
 	}
 
 	public Map<String, String> getHttpHeaders() {
@@ -138,8 +138,8 @@ public class MessageReceiveDTO implements java.io.Serializable {
 	@Override
 	public String toString() {
 		return new StringBuilder().append("MessageDTO[").append("messageNo=").append(messageNo)
+				.append(", messageKeyword=").append(messageKeyword).append(", messageId=").append(messageId)
 				.append(", businessLineId=").append(businessLineId).append(", sourceSystemId=").append(sourceSystemId)
-				.append(", messageId=").append(messageId).append(", messageKeyword=").append(messageKeyword)
 				.append(", httpHeaders=").append(httpHeaders).append(", messageContent=").append(messageContent)
 				.append("]").toString();
 	}

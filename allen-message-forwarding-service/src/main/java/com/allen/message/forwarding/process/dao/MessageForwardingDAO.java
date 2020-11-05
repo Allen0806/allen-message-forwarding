@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.allen.message.forwarding.process.model.AmfMessageForwardingDO;
-import com.allen.message.forwarding.process.model.ForwardingQueryParam;
+import com.allen.message.forwarding.process.model.ForwardingQueryParamDTO;
 
 /**
  * 消息管理DAO层
@@ -61,7 +61,7 @@ public interface MessageForwardingDAO {
 	 * @param queryParam 查询参数
 	 * @return 消息转发信息数量
 	 */
-	int count(ForwardingQueryParam queryParam);
+	int count(ForwardingQueryParamDTO queryParam);
 
 	/**
 	 * 根据给定参数查询消息转发信息
@@ -69,5 +69,5 @@ public interface MessageForwardingDAO {
 	 * @param queryParam 查询参数
 	 * @return 消息转发信息
 	 */
-	List<AmfMessageForwardingDO> list(ForwardingQueryParam queryParam);
+	List<AmfMessageForwardingDO> list(ForwardingQueryParamDTO queryParam);
 }

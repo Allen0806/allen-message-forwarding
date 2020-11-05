@@ -1,227 +1,224 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allen.message.forwarding.metadata.dao.MessageConfigDAO">
+<mapper namespace="com.allen.message.forwarding.process.dao.MessageDAO">
 	<!-- 插入 -->
 	<insert id="save"
-		parameterType="com.allen.message.forwarding.metadata.model.AmfMessageConfigDO"
+		parameterType="com.allen.message.forwarding.process.model.AmfMessageDO"
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id" statementType="PREPARED" timeout="10">
-		insert into `amf_message_config`
+		insert into `amf_message`
 		(
 		<trim suffixOverrides=",">
-			<if test="id!=null">
+			<if test="id != null">
 				`id`,
 			</if>
-			<if test="businessLineId != null">
-				`business_line_id`,
+			<if test="messageNo != null">
+				`message_no`,
 			</if>
-			<if test="businessLineName != null">
-				`business_line_name`,
-			</if>
-			<if test="sourceSystemId != null">
-				`souce_system_id`,
-			</if>
-			<if test="sourceSystemName != null">
-				`source_system_name`,
+			<if test="messageKeyword != null">
+				`message_keyword`,
 			</if>
 			<if test="messageId != null">
 				`message_id`,
 			</if>
-			<if test="messageName != null">
-				`message_name`,
+			<if test="businessLineId != null">
+				`business_line_id`,
 			</if>
-			<if test="messageStatus != null">
-				`message_status`,
+			<if test="sourceSystemId != null">
+				`source_system_id`,
 			</if>
-			<if test="callbackUrl != null">
-				`callback_url`,
+			<if test="httpHeaders != null">
+				`http_headers`,
 			</if>
-			<if test="deleted != null">
-				`is_deleted`,
+			<if test="messageContent != null">
+				`message_content`,
 			</if>
-			<if test="createdBy != null">
-				`created_by`,
+			<if test="forwardingTotalAmount != null">
+				`forwarding_total_amount`,
+			</if>
+			<if test="forwardingSuccessAmount != null">
+				`forwarding_success_amount`,
 			</if>
 			<if test="createTime != null">
 				`create_time`,
-			</if>
-			<if test="updatedBy != null">
-				`updated_by`,
 			</if>
 			<if test="updateTime != null">
 				`update_time`,
 			</if>
 		</trim>
 		)
-		select 
+		values ( 
 		<trim suffixOverrides=",">
 			<if test="id != null">
 				#{id},
 			</if>
+			<if test="messageNo != null">
+				#{messageNo},
+			</if>
+			<if test="messageKeyword != null">
+				#{messageKeyword},
+			</if>
+			<if test="messageId != null">
+				#{messageId},
+			</if>
 			<if test="businessLineId != null">
 				#{businessLineId},
-			</if>
-			<if test="businessLineName != null">
-				#{businessLineName},
 			</if>
 			<if test="sourceSystemId != null">
 				#{sourceSystemId},
 			</if>
-			<if test="sourceSystemName != null">
-				#{sourceSystemName},
+			<if test="httpHeaders != null">
+				#{httpHeaders},
 			</if>
-			    <!-- 插入时最大值累加，保证唯一性，初始值为1000 -->
-				case when max(source_system_id) is not null then max(source_system_id) + 1 else 100000 end,
-			<if test="messageName != null">
-				#{messageName},
+			<if test="messageContent != null">
+				#{messageContent},
 			</if>
-			<if test="messageStatus != null">
-				#{messageStatus},
+			<if test="forwardingTotalAmount != null">
+				#{forwardingTotalAmount},
 			</if>
-			<if test="callbackUrl != null">
-				#{callbackUrl},
-			</if>
-			<if test="deleted != null">
-				#{deleted},
-			</if>
-			<if test="createdBy != null">
-				#{createdBy},
+			<if test="forwardingSuccessAmount != null">
+				#{forwardingSuccessAmount},
 			</if>
 			<if test="createTime != null">
 				#{createTime},
-			</if>
-			<if test="updatedBy != null">
-				#{updatedBy},
 			</if>
 			<if test="updateTime != null">
 				#{updateTime},
 			</if>
 		</trim>
-		from amf_message_config
+		)
 	</insert>
     
 	<!-- 根据主键ID更新 -->
-    <update id="update" parameterType="com.allen.message.forwarding.metadata.model.AmfMessageConfigDO">
-        update `amf_message_config`
+    <update id="update" parameterType="com.allen.message.forwarding.process.model.AmfMessageDO">
+        update `amf_message`
         set
         <trim suffixOverrides=",">
-            <if test="messageName != null and messageName != ''">
-                `message_name` = #{messageName},
-            </if>
-            <if test="messageStatus != null">
-                `message_status` = #{messageStatus},
-            </if>
-            <if test="callbackUrl != null and callbackUrl != ''">
-                `callback_url` = #{callbackUrl},
-            </if>
-            <if test="deleted != null">
-                `is_deleted` = #{deleted},
-            </if>
-            <if test="updatedBy != null and updatedBy != ''">
-                `updated_by` = #{updatedBy},
+            <if test="forwardingSuccessAmount != null">
+                `forwarding_success_amount` = #{forwardingSuccessAmount},
             </if>
         </trim>
         where `id` = #{id}
         and   `update_time` = #{updateTime}
     </update>
     
-    <update id="updateBusinessLineName">
-        update `amf_message_config`
-        set `business_line_name` = #{businessLineName},
-            `updated_by` = #{updatedBy}
-        where `business_line_id` = #{businessLineId}
+    <update id="updateSucessAmount" parameterType="string">
+       update `amf_message`
+        set `forwarding_success_amount` = `forwarding_success_amount` + 1
+        where `message_no` = #{messageNo}
     </update>
     
-    <update id="updateSourceSystemName">
-        update `amf_message_config`
-        set `source_system_name` = #{sourceSystemName},
-            `updated_by` = #{updatedBy},
-        where `source_system_id` = #{sourceSystemId}
-    </update>
+    <insert id="migrate" parameterType="java.time.LocalDateTime">
+    	insert into `amf_message_history`
+    	select *
+    	from `amf_message`
+        where `create_time` &lt; #{deadline}
+        and   `forwarding_total_amount` = `forwarding_success_amount`
+    </insert>
     
+    <delete id="remove" parameterType="java.time.LocalDateTime">
+		delete from `amf_message`
+        where `create_time` &lt; #{deadline}
+        and   `forwarding_total_amount` = `forwarding_success_amount`
+	</delete>
+	
     <!-- 通用查询语句块 -->
-	<sql id="messageConfigColumns">
+	<sql id="messageColumns">
 		id,
-		business_line_id,
-		business_line_name,
-		souce_system_id,
-		source_system_name,
+		message_no,
+		message_keyword,
 		message_id,
-		message_name,
-		message_status,
-		callback_url,
-		is_deleted,
-		created_by,
+		business_line_id,
+        source_system_id,
+		http_headers,
+		message_content,
+		forwarding_total_amount,
+		forwarding_success_amount,
 		create_time,
-		updated_by,
 		update_time
 	</sql>
     
-    <resultMap id="messageConfigResultMap" type=com.allen.message.forwarding.metadata.model.AmfMessageConfigDO >
+    <resultMap id="messageResultMap" type="com.allen.message.forwarding.process.model.AmfMessageDO" >
         <result property="id" column="id"/>
-        <result property="businessLineId" column="business_line_id"/>
-        <result property="businessLineName" column="business_line_name"/>
-        <result property="sourceSystemId" column="souce_system_id"/>
-        <result property="sourceSystemName" column="source_system_name"/>
+        <result property="messageNo" column="message_no"/>
+        <result property="messageKeyword" column="message_keyword"/>
         <result property="messageId" column="message_id"/>
-        <result property="messageName" column="message_name"/>
-        <result property="messageStatus" column="message_status"/>
-         <result property="callbackUrl" column="callback_url"/>
-        <result property="deleted" column="is_deleted"/>
-        <result property="createdBy" column="created_by"/>
+        <result property="businessLineId" column="business_line_id"/>
+        <result property="sourceSystemId" column="source_system_id"/>
+        <result property="httpHeaders" column="http_headers"/>
+        <result property="messageContent" column="message_content"/>
+        <result property="forwardingTotalAmount" column="forwarding_total_amount"/>
+        <result property="forwardingSuccessAmount" column="forwarding_success_amount"/>
         <result property="createTime" column="create_time"/>
-        <result property="updatedBy" column="updated_by"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
     
-    <select id="get" parameterType="long" resultMap="messageConfigResultMap">
+    <select id="get" parameterType="string" resultMap="messageResultMap">
         select
-        <include refid="messageConfigColumns"></include>
-        from  `amf_message_config`
-        where `id` = #{id}
-        and   `is_deleted` = 0
+        <include refid="messageColumns"></include>
+        from  `amf_message`
+        where `message_no` = #{messageNo}
     </select>
     
-    <select id="getByMessageId" parameterType="int" resultMap="messageConfigResultMap">
-        select
-        <include refid="messageConfigColumns"></include>
-        from  `amf_message_config`
-        where `message_id` = #{messageId}
-        and   `message_status` = 1
-        and   `is_deleted` = 0
-    </select>
-    
-    <select id="countByBusinessLineId" parameterType="int" resultType="int">
+    <select id="count" parameterType="com.allen.message.forwarding.process.model.MessageQueryParamDTO" resultType="int">
 		select count(*)
-		from  `amf_message_config`
-		where `business_line_id` = #{businessLineId}
-		and `is_deleted` = 0
+		from  `amf_message`
+		<where>
+			<if test="messageNo != null">
+				message_no = #{messageNo}
+			</if>
+			<if test="messageKeyword != null">
+				and message_keyword = #{messageKeyword}
+			</if>
+			<if test="messageId != null">
+				and message_id = #{messageId}
+			</if>
+			<if test="businessLineId != null">
+				and business_line_id = #{businessLineId}
+			</if>
+			<if test="sourceSystemId != null">
+				and source_system_id = #{sourceSystemId}
+			</if>
+			<if test="beginDate != null">
+				and create_time &gt;= unix_timestamp(#{beginDate})
+			</if>
+			<if test="endDate != null">
+				and create_time &lt;= unix_timestamp(#{endDate})
+			</if>
+		</where>
 	</select>
 	
 	<!-- 分页查询 -->
-	<select id="listByBusinessLineId4Paging" resultMap="messageConfigResultMap">
+	<select id="list" parameterType="com.allen.message.forwarding.process.model.MessageQueryParamDTO" resultMap="messageResultMap">
         select
-        <include refid="messageConfigColumns"></include>
-        from  `amf_message_config`
-        where `business_line_id` = #{businessLineId}
-        and `is_deleted` = 0
-        limit #{startNo}, #{pageSize}
-	</select>
-    
-	<select id="countBySourceSystemId" parameterType="int" resultType="int">
-		select count(*)
-		from  `amf_message_config`
-		where `souce_system_id` = #{sourceSystemId}
-		and `is_deleted` = 0
-	</select>
-	
-	<!-- 分页查询 -->
-	<select id="listBySourceSystemId4Paging" resultMap="messageConfigResultMap">
-        select
-        <include refid="messageConfigColumns"></include>
-        from  `amf_message_config`
-        where `souce_system_id` = #{sourceSystemId}
-        and `is_deleted` = 0
-        limit #{startNo}, #{pageSize}
+        <include refid="messageColumns"></include>
+        from  `amf_message`
+		<where>
+			<if test="messageNo != null">
+				message_no = #{messageNo}
+			</if>
+			<if test="messageKeyword != null">
+				and message_keyword = #{messageKeyword}
+			</if>
+			<if test="messageId != null">
+				and message_id = #{messageId}
+			</if>
+			<if test="businessLineId != null">
+				and business_line_id = #{businessLineId}
+			</if>
+			<if test="sourceSystemId != null">
+				and source_system_id = #{sourceSystemId}
+			</if>
+			<if test="beginDate != null">
+				and create_time &gt;= unix_timestamp(#{beginDate})
+			</if>
+			<if test="endDate != null">
+				and create_time &lt;= unix_timestamp(#{endDate})
+			</if>
+				order by create_time desc
+			<if test="startNo != null and pageSize != null">
+				limit #{startNo}, #{pageSize}
+			</if>
+		</where>
 	</select>
 </mapper>

@@ -9,7 +9,7 @@
 		insert into `amf_message_config`
 		(
 		<trim suffixOverrides=",">
-			<if test="id!=null">
+			<if test="id != null">
 				`id`,
 			</if>
 			<if test="businessLineId != null">
@@ -157,7 +157,7 @@
 		update_time
 	</sql>
     
-    <resultMap id="messageConfigResultMap" type=com.allen.message.forwarding.metadata.model.AmfMessageConfigDO >
+    <resultMap id="messageConfigResultMap" type="com.allen.message.forwarding.metadata.model.AmfMessageConfigDO" >
         <result property="id" column="id"/>
         <result property="businessLineId" column="business_line_id"/>
         <result property="businessLineName" column="business_line_name"/>

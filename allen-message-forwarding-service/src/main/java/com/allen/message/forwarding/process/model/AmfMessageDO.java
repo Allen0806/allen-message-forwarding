@@ -28,14 +28,24 @@ public class AmfMessageDO implements java.io.Serializable {
 	private String messageNo;
 
 	/**
+	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
+	 */
+	private String messageKeyword;
+
+	/**
 	 * 消息ID，即消息配置信息里的消息ID，固定6位
 	 */
 	private Integer messageId;
 
 	/**
-	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
+	 * 业务线ID，最长20位
 	 */
-	private String messageKeyword;
+	private String businessLineId;
+
+	/**
+	 * 来源系统ID，固定4位
+	 */
+	private Integer sourceSystemId;
 
 	/**
 	 * 通过Http接口转发消息时，设置到http header里的参数，比如接口编号等，Map的json格式
@@ -83,6 +93,14 @@ public class AmfMessageDO implements java.io.Serializable {
 		this.messageNo = messageNo;
 	}
 
+	public String getMessageKeyword() {
+		return messageKeyword;
+	}
+
+	public void setMessageKeyword(String messageKeyword) {
+		this.messageKeyword = messageKeyword;
+	}
+
 	public Integer getMessageId() {
 		return messageId;
 	}
@@ -91,12 +109,20 @@ public class AmfMessageDO implements java.io.Serializable {
 		this.messageId = messageId;
 	}
 
-	public String getMessageKeyword() {
-		return messageKeyword;
+	public String getBusinessLineId() {
+		return businessLineId;
 	}
 
-	public void setMessageKeyword(String messageKeyword) {
-		this.messageKeyword = messageKeyword;
+	public void setBusinessLineId(String businessLineId) {
+		this.businessLineId = businessLineId;
+	}
+
+	public Integer getSourceSystemId() {
+		return sourceSystemId;
+	}
+
+	public void setSourceSystemId(Integer sourceSystemId) {
+		this.sourceSystemId = sourceSystemId;
 	}
 
 	public String getHttpHeaders() {
@@ -150,8 +176,9 @@ public class AmfMessageDO implements java.io.Serializable {
 	@Override
 	public String toString() {
 		return new StringBuilder().append("AmfMessageDO[").append("id=").append(id).append("messageNo=")
-				.append(messageNo).append(", messageId=").append(messageId).append(", messageKeyword=")
-				.append(messageKeyword).append(", httpHeaders=").append(httpHeaders).append(", messageContent=")
+				.append(messageNo).append(", messageKeyword=").append(messageKeyword).append(", messageId=")
+				.append(messageId).append(", businessLineId=").append(businessLineId).append(", sourceSystemId=")
+				.append(sourceSystemId).append(", httpHeaders=").append(httpHeaders).append(", messageContent=")
 				.append(messageContent).append(", forwardingTotalAmount=").append(forwardingTotalAmount)
 				.append(", forwardingSuccessAmount=").append(forwardingSuccessAmount).append(", createTime=")
 				.append(createTime).append(", updateTime=").append(updateTime).append("]").toString();

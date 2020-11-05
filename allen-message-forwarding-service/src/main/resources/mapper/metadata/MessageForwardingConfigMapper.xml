@@ -9,7 +9,7 @@
 		insert into `amf_message_forwarding_config`
 		(
 		<trim suffixOverrides=",">
-			<if test="id!=null">
+			<if test="id != null">
 				`id`,
 			</if>
 			<if test="messageConfigId != null">
@@ -136,7 +136,7 @@
 		update_time
 	</sql>
     
-    <resultMap id="messageForwardingConfigResultMap" type=com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO >
+    <resultMap id="messageForwardingConfigResultMap" type="com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO" >
         <result property="id" column="id"/>
         <result property="messageId" column="message_id"/>
         <result property="targetSystem" column="target_system"/>

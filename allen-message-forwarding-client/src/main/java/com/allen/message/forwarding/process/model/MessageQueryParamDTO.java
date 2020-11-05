@@ -31,6 +31,20 @@ public class MessageQueryParamDTO implements java.io.Serializable {
 	private String messageNo;
 
 	/**
+	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
+	 */
+	@ApiModelProperty(value = "消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位", dataType = "String", required = false)
+	@Size(max = 32, message = "消息关键字最长32位")
+	private String messageKeyword;
+
+	/**
+	 * 消息ID，即消息配置信息里的消息ID，固定6位
+	 */
+	@ApiModelProperty(value = "消息ID，消息配置信息里的消息ID，固定6位", dataType = "Integer", required = false)
+	@Range(min = 100000, max = 999999, message = "消息ID取值范围为100000~999999")
+	private Integer messageId;
+
+	/**
 	 * 业务线ID，最长20位
 	 */
 	@ApiModelProperty(value = "业务线ID，最长20位", dataType = "String", required = false)
@@ -45,20 +59,6 @@ public class MessageQueryParamDTO implements java.io.Serializable {
 	private Integer sourceSystemId;
 
 	/**
-	 * 消息ID，即消息配置信息里的消息ID，固定6位
-	 */
-	@ApiModelProperty(value = "消息ID，消息配置信息里的消息ID，固定6位", dataType = "Integer", required = false)
-	@Range(min = 100000, max = 999999, message = "消息ID取值范围为100000~999999")
-	private Integer messageId;
-
-	/**
-	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
-	 */
-	@ApiModelProperty(value = "消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位", dataType = "String", required = false)
-	@Size(max = 32, message = "消息关键字最长32位")
-	private String messageKeyword;
-
-	/**
 	 * 通过Http接口转发消息时，设置到http header里的参数，比如接口编号等
 	 */
 	@ApiModelProperty(value = "起始日期，格式：yyyy-MM-dd", dataType = "String", required = false)
@@ -71,15 +71,21 @@ public class MessageQueryParamDTO implements java.io.Serializable {
 	private String endDate;
 
 	/**
-	 * 分页查询时起始行号，从0开始。当messageNo为空时必须给定
+	 * 分页查询时的页数，当messageNo为空时startNo和pageNo必须给定其一，如果都给定，以startNo为准
 	 */
-	@ApiModelProperty(value = "分页查询时起始行号，从0开始。当messageNo为空时必须给定", dataType = "Integer", required = false)
+	@ApiModelProperty(value = "分页查询时的页数，当messageNo为空时startNo和pageNo必须给定其一，如果都给定，以startNo为准", dataType = "Integer", required = false)
+	private Integer pageNo;
+
+	/**
+	 * 分页查询时起始行号，从0开始。当messageNo为空时startNo和pageNo必须给定其一
+	 */
+	@ApiModelProperty(value = "分页查询时起始行号，从0开始。当messageNo为空时startNo和pageNo必须给定其一，如果都给定，以startNo为准", dataType = "Integer", required = false)
 	private Integer startNo;
 
 	/**
 	 * 分页查询时每页行数，最小值为1，最大值为1000。当startNo不为空时必须给定
 	 */
-	@ApiModelProperty(value = "分页查询时每页行数，最小值为1，最大值为1000。当startNo不为空时必须给定", dataType = "Integer", required = false)
+	@ApiModelProperty(value = "分页查询时每页行数，最小值为1，最大值为1000。当messageNo为空时必须给定", dataType = "Integer", required = false)
 	@Range(min = 1, max = 1000, message = "每页行数取值范围为1～1000")
 	private Integer pageSize;
 
@@ -89,6 +95,22 @@ public class MessageQueryParamDTO implements java.io.Serializable {
 
 	public void setMessageNo(String messageNo) {
 		this.messageNo = messageNo;
+	}
+
+	public String getMessageKeyword() {
+		return messageKeyword;
+	}
+
+	public void setMessageKeyword(String messageKeyword) {
+		this.messageKeyword = messageKeyword;
+	}
+
+	public Integer getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(Integer messageId) {
+		this.messageId = messageId;
 	}
 
 	public String getBusinessLineId() {
@@ -105,22 +127,6 @@ public class MessageQueryParamDTO implements java.io.Serializable {
 
 	public void setSourceSystemId(Integer sourceSystemId) {
 		this.sourceSystemId = sourceSystemId;
-	}
-
-	public Integer getMessageId() {
-		return messageId;
-	}
-
-	public void setMessageId(Integer messageId) {
-		this.messageId = messageId;
-	}
-
-	public String getMessageKeyword() {
-		return messageKeyword;
-	}
-
-	public void setMessageKeyword(String messageKeyword) {
-		this.messageKeyword = messageKeyword;
 	}
 
 	public String getBeginDate() {
@@ -158,8 +164,8 @@ public class MessageQueryParamDTO implements java.io.Serializable {
 	@Override
 	public String toString() {
 		return new StringBuilder().append("MessageQueryParamDTO[").append("messageNo=").append(messageNo)
+				.append(", messageKeyword=").append(messageKeyword).append(", messageId=").append(messageId)
 				.append(", businessLineId=").append(businessLineId).append(", sourceSystemId=").append(sourceSystemId)
-				.append(", messageId=").append(messageId).append(", messageKeyword=").append(messageKeyword)
 				.append(", beginDate=").append(beginDate).append(", endDate=").append(endDate).append(", startNo=")
 				.append(startNo).append(", pageSize=").append(pageSize).append("]").toString();
 	}
