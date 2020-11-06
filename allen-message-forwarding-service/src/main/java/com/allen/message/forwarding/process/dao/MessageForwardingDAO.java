@@ -3,6 +3,8 @@ package com.allen.message.forwarding.process.dao;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.allen.message.forwarding.process.model.AmfMessageForwardingDO;
 import com.allen.message.forwarding.process.model.ForwardingQueryParamDTO;
 
@@ -53,7 +55,16 @@ public interface MessageForwardingDAO {
 	 * @param id 主键
 	 * @return 消息转发信息
 	 */
-	AmfMessageForwardingDO get(Long id);
+	AmfMessageForwardingDO getById(Long id);
+
+	/**
+	 * 获取消息转发信息
+	 * 
+	 * @param messageNo    消息流水号
+	 * @param forwardingId 消息转发配置主键
+	 * @return 消息转发信息
+	 */
+	AmfMessageForwardingDO get(@Param("messageNo") String messageNo, @Param("forwardingId") Long forwardingId);
 
 	/**
 	 * 根据给定参数查询消息转发信息数量

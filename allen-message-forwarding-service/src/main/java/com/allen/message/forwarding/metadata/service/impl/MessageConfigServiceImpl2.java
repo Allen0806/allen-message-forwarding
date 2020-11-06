@@ -1,11 +1,11 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0001;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0301;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0302;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0303;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0304;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0305;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0001;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0301;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0302;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0303;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0304;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0305;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +19,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.allen.message.forwarding.metadata.constant.CacheNameConstant;
+import com.allen.message.forwarding.constant.MessageConstant;
 import com.allen.message.forwarding.metadata.dao.MessageConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfMessageConfigDO;
 import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
@@ -72,7 +72,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 		LOGGER.info("保存消息配置信成功，消息名称：{}，创建人：{}", messageConfigDO.getMessageName(), messageConfigDO.getCreatedBy());
 	}
 
-	@CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageConfigVO.messageId")
+	@CacheEvict(cacheNames = MessageConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageConfigVO.messageId")
 	@Transactional
 	@Override
 	public void update(MessageConfigVO messageConfigVO) {
@@ -110,7 +110,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 	}
 
 	// 清除全部缓存
-	@CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, allEntries = true)
+	@CacheEvict(cacheNames = MessageConstant.MESSAGE_CONFIG_CACHE_NAME, allEntries = true)
 	@Transactional
 	@Override
 	public void updateBusinessLineName(String businessLineId, String businessLineName, String updatedBy) {
@@ -119,7 +119,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 	}
 
 	// 清除全部缓存
-	@CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, allEntries = true)
+	@CacheEvict(cacheNames = MessageConstant.MESSAGE_CONFIG_CACHE_NAME, allEntries = true)
 	@Transactional
 	@Override
 	public void updateSourceSystemName(Integer sourceSystemId, String sourceSystemName, String updatedBy) {
@@ -127,7 +127,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 		LOGGER.info("更新消息配置信息来源系统名称成功，来源系统名称：{}，更新数量：{}，修改人：{}", sourceSystemName, count, updatedBy);
 	}
 
-	@CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageId")
+	@CacheEvict(cacheNames = MessageConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageId")
 	@Transactional
 	@Override
 	public void remove(Integer messageId, String updatedBy) {
@@ -178,7 +178,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 	}
 
 	// redis中缓存的key为：cacheNames::key
-	@Cacheable(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageId", sync = true)
+	@Cacheable(cacheNames = MessageConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageId", sync = true)
 	@Override
 	public MessageConfigDTO getByMessageId(Integer messageId) {
 		AmfMessageConfigDO messageConfigDO = messageConfigDAO.getByMessageId(messageId);

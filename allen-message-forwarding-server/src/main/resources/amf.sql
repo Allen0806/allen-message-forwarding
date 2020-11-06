@@ -25,7 +25,7 @@ CREATE TABLE `amf_source_system_config` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间，默认值为系统当前时间，数据修改时自动更新',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_source_system_config` (`source_system_id`) COMMENT '来源系统编号唯一索引',
-  KEY `idx_source_system_config` (`business_line_id`) COMMENT '来源系统普通索引'
+  KEY `idx_source_system_config` (`business_line_config_id`) COMMENT '来源系统普通索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息来源系统配置表';
 
 -- 消息配置表

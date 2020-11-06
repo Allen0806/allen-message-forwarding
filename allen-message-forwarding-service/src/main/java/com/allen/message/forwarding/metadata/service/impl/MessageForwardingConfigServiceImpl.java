@@ -1,9 +1,9 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0401;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0402;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0403;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0404;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0401;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0402;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0403;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0404;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.allen.message.forwarding.metadata.constant.CacheNameConstant;
+import com.allen.message.forwarding.constant.MessageConstant;
 import com.allen.message.forwarding.metadata.dao.MessageForwardingConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO;
 import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
@@ -70,7 +70,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 
 	}
 
-	@CacheEvict(cacheNames = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageForwardingConfigVO.messageId")
+	@CacheEvict(cacheNames = MessageConstant.MESSAGE_CONFIG_CACHE_NAME, key = "#messageForwardingConfigVO.messageId")
 	@Transactional
 	@Override
 	public void update(MessageForwardingConfigVO messageForwardingConfigVO) {
@@ -204,6 +204,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 			return null;
 		}
 		MessageForwardingConfigDTO messageForwardingConfigDTO = new MessageForwardingConfigDTO();
+		messageForwardingConfigDTO.setId(messageForwardingConfigDO.getId());
 		messageForwardingConfigDTO.setMessageId(messageForwardingConfigDO.getMessageId());
 		messageForwardingConfigDTO.setTargetSystem(messageForwardingConfigDO.getTargetSystem());
 		messageForwardingConfigDTO.setForwardingWay(messageForwardingConfigDO.getForwardingWay());
@@ -220,7 +221,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 	 */
 	private void evictCache(Integer messageId) {
 		// 清除缓存
-		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageId;
+		String cacheKey = MessageConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageId;
 		if (redisTemplate.hasKey(cacheKey)) {
 			redisTemplate.delete(cacheKey);
 		}

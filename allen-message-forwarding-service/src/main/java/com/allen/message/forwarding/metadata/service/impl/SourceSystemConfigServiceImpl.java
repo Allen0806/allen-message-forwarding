@@ -1,6 +1,6 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.*;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.*;
 
 import java.util.Collections;
 import java.util.List;

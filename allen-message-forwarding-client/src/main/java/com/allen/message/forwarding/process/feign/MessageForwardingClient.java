@@ -24,6 +24,6 @@ public interface MessageForwardingClient {
 	 * @return 接收结果
 	 */
 	@PostMapping(value = "/process/receive", headers = { "Content-Type=application/json" })
-	public BaseResult<Object> receive(@RequestBody MessageReceiveDTO messageDTO);
+	public BaseResult<Object> receive(@RequestBody MessageReceiveDTO messageReceiveDTO);
 
 }

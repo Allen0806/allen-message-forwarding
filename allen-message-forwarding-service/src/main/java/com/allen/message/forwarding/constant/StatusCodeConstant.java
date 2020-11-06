@@ -1,4 +1,4 @@
-package com.allen.message.forwarding.metadata.constant;
+package com.allen.message.forwarding.constant;
 
 import com.allen.tool.result.ResultStatus;
 
@@ -44,4 +44,20 @@ public class StatusCodeConstant {
 	public static final ResultStatus MF_0402 = new ResultStatus("MF0402", "不存在对应的消息转发配置信息");
 	public static final ResultStatus MF_0403 = new ResultStatus("MF0403", "更新消息转发配置信失败");
 	public static final ResultStatus MF_0404 = new ResultStatus("MF0404", "删除消息转发配置信息失败");
+	
+	/*************** 消息转发处理状态码定义 ***************/
+	public static final ResultStatus MF_1001 = new ResultStatus("MF1001", "未获取到消息配置信息或消息配置信息有误");
+	public static final ResultStatus MF_1002 = new ResultStatus("MF1002", "传入的业务线ID及来源系统ID与消息配置信息中的不匹配");
+	public static final ResultStatus MF_1003 = new ResultStatus("MF1003", "保存消息信息失败");
+	public static final ResultStatus MF_1004 = new ResultStatus("MF1004", "未生成消息转发明细信息");
+	public static final ResultStatus MF_1005 = new ResultStatus("MF1005", "保存消息转发明细信息失败");
+	
+	public static final ResultStatus MF_1006 = new ResultStatus("MF1006", "传入的业务线ID及来源系统ID与消息配置信息中的不匹配");
+	public static final ResultStatus MF_1007 = new ResultStatus("MF1007", "保存消息信息失败");
+	public static final ResultStatus MF_1008 = new ResultStatus("MF1008", "未生成消息转发明细信息");
+	public static final ResultStatus MF_1009 = new ResultStatus("MF1009", "未获取到消息配置信息");
+	public static final ResultStatus MF_1010 = new ResultStatus("MF1010", "传入的业务线ID及来源系统ID与消息配置信息中的不匹配");
+	public static final ResultStatus MF_1011 = new ResultStatus("MF1011", "保存消息信息失败");
+	public static final ResultStatus MF_1012 = new ResultStatus("MF1012", "未生成消息转发明细信息");
+	
 }

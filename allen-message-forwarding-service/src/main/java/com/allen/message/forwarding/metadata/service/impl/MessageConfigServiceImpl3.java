@@ -1,12 +1,12 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0001;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0301;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0302;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0303;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0304;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0305;
-import static com.allen.message.forwarding.metadata.constant.StatusCodeConstant.MF_0306;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0001;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0301;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0302;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0303;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0304;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0305;
+import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0306;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.allen.message.forwarding.metadata.constant.CacheNameConstant;
+import com.allen.message.forwarding.constant.MessageConstant;
 import com.allen.message.forwarding.metadata.dao.MessageConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfMessageConfigDO;
 import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
@@ -230,7 +230,7 @@ public class MessageConfigServiceImpl3 implements MessageConfigService {
 		if (messageConfigDTO != null) {
 			return messageConfigDTO;
 		}
-		String lockKey = CacheNameConstant.MESSAGE_CONFIG_LOCK_NAME + "::" + messageId;
+		String lockKey = MessageConstant.MESSAGE_CONFIG_LOCK_NAME + "::" + messageId;
 		String currentThreadId = String.valueOf(Thread.currentThread().getId());
 		try {
 			if (redisLock.tryLock(lockKey, currentThreadId, 3000, 3000, TimeUnit.MILLISECONDS)) {
@@ -351,7 +351,7 @@ public class MessageConfigServiceImpl3 implements MessageConfigService {
 	 */
 	private void evictCache(AmfMessageConfigDO messageConfigDO) {
 		// 清除缓存
-		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageConfigDO.getMessageId();
+		String cacheKey = MessageConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageConfigDO.getMessageId();
 		if (redisTemplate.hasKey(cacheKey)) {
 			redisTemplate.delete(cacheKey);
 		}
@@ -364,7 +364,7 @@ public class MessageConfigServiceImpl3 implements MessageConfigService {
 	 * @return
 	 */
 	private MessageConfigDTO getFromCache(Integer messageId) {
-		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageId;
+		String cacheKey = MessageConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageId;
 		if (redisTemplate.hasKey(cacheKey)) {
 			MessageConfigDTO messageConfigDTO = redisTemplate.opsForValue().get(cacheKey);
 			if (messageConfigDTO != null) {
@@ -380,7 +380,7 @@ public class MessageConfigServiceImpl3 implements MessageConfigService {
 	 * @param messageConfigDTO
 	 */
 	private void cacheable(MessageConfigDTO messageConfigDTO) {
-		String cacheKey = CacheNameConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageConfigDTO.getMessageId();
+		String cacheKey = MessageConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageConfigDTO.getMessageId();
 		if (!redisTemplate.hasKey(cacheKey)) {
 			redisTemplate.opsForValue().set(cacheKey, messageConfigDTO);
 		}

@@ -116,11 +116,19 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
     
-    <select id="get" parameterType="string" resultMap="forwardingResultMap">
+    <select id="getById" parameterType="string" resultMap="forwardingResultMap">
         select
         <include refid="forwardingColumns"></include>
         from  `amf_message_forwarding`
         where `id` = #{id}
+    </select>
+    
+     <select id="get" resultMap="forwardingResultMap">
+        select
+        <include refid="forwardingColumns"></include>
+         from `amf_message_forwarding`
+        where `message_no` = #{messageNo}
+          and `forwarding_id` = #{forwardingId}
     </select>
     
     <select id="count" parameterType="com.allen.message.forwarding.process.model.ForwardingQueryParamDTO" resultType="int">

@@ -21,6 +21,11 @@ public class MessageForwardingConfigDTO implements Serializable {
 	private static final long serialVersionUID = 2334563804173313153L;
 
 	/**
+	 * 主键ID，修改时不可为空
+	 */
+	private Long id;
+
+	/**
 	 * 消息ID
 	 */
 	@ApiModelProperty(value = "消息ID", dataType = "Integer")
@@ -55,6 +60,14 @@ public class MessageForwardingConfigDTO implements Serializable {
 	 */
 	@ApiModelProperty(value = "是否需要回调，0-否，1-是，默认为0", dataType = "Integer")
 	private Integer callbackRequired;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public Integer getMessageId() {
 		return messageId;
@@ -107,10 +120,10 @@ public class MessageForwardingConfigDTO implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sbuilder = new StringBuilder();
-		sbuilder.append("MessageForwardingConfigDTO[").append(", messageId=").append(messageId)
-				.append(", targetSystem=").append(targetSystem).append(", forwardingWay=").append(forwardingWay)
-				.append(", targetAddress=").append(targetAddress).append(", retryTimes=").append(retryTimes)
-				.append(", callbackRequired=").append(callbackRequired).append("]");
+		sbuilder.append("MessageForwardingConfigDTO[").append(", id=").append(id).append(", messageId=")
+				.append(messageId).append(", targetSystem=").append(targetSystem).append(", forwardingWay=")
+				.append(forwardingWay).append(", targetAddress=").append(targetAddress).append(", retryTimes=")
+				.append(retryTimes).append(", callbackRequired=").append(callbackRequired).append("]");
 		return sbuilder.toString();
 	}
 }

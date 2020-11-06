@@ -1,15 +1,7 @@
 package com.allen.message.forwarding.process.model;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Range;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 消息传入对象
@@ -19,7 +11,6 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 1.0.0
  *
  */
-@ApiModel("消息对象")
 public class MessageDTO implements java.io.Serializable {
 
 	/**
@@ -28,62 +19,72 @@ public class MessageDTO implements java.io.Serializable {
 	private static final long serialVersionUID = 3413492938377456162L;
 
 	/**
+	 * 主键ID，修改时不可为空
+	 */
+	private Long id;
+
+	/**
 	 * 消息流水号，固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复
 	 */
-	@ApiModelProperty(value = "消息流水号，固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复", dataType = "String", required = true)
-	@NotNull(message = "消息流水号不能为空")
-	@Size(min = 32, max = 32, message = "消息流水号固定32位")
 	private String messageNo;
+
+	/**
+	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
+	 */
+	private String messageKeyword;
 
 	/**
 	 * 业务线ID，最长20位
 	 */
-	@ApiModelProperty(value = "业务线ID，最长20位", dataType = "String", required = true)
-	@NotNull(message = "业务线ID不能为空")
-	@Size(max = 20, message = "业务线ID最长20位")
 	private String businessLineId;
 
 	/**
 	 * 来源系统ID，固定4位
 	 */
-	@ApiModelProperty(value = "来源系统ID，固定4位", dataType = "Integer", required = true)
-	@NotNull(message = "来源系统ID不能为空")
-	@Range(min = 1000, max = 9999, message = "来源系统ID取值范围为1000~9999")
 	private Integer sourceSystemId;
 
 	/**
 	 * 消息ID，即消息配置信息里的消息ID，固定6位
 	 */
-	@ApiModelProperty(value = "消息ID，消息配置信息里的消息ID，固定6位", dataType = "Integer", required = true)
-	@NotNull(message = "消息ID不能为空")
-	@Range(min = 100000, max = 999999, message = "消息ID取值范围为100000~999999")
 	private Integer messageId;
-
-	/**
-	 * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
-	 */
-	@ApiModelProperty(value = "消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位", dataType = "String", required = true)
-	@NotNull(message = "消息关键字不能为空")
-	@Size(max = 32, message = "消息关键字最长32位")
-	private String messageKeyword;
 
 	/**
 	 * 通过Http接口转发消息时，设置到http header里的参数，比如接口编号等
 	 */
-	@ApiModelProperty(value = "Http Header 参数，通过Http接口转发消息时，设置到http header里的参数，比如接口编号等", dataType = "Map<String, String>", required = false)
 	private Map<String, String> httpHeaders;
 
 	/**
 	 * 要转发的消息内容
 	 */
-	@ApiModelProperty(value = "消息内容", dataType = "String", required = true)
-	@NotNull(message = "消息内容不能为空")
 	private String messageContent;
 
 	/**
-	 * 消息转发信息列表
+	 * 应转发的总数量，即为消息转发配置的数量
 	 */
-	private List<MessageForwardingDTO> messageForwardings;
+	private Integer forwardingTotalAmount;
+
+	/**
+	 * 实际转发成功数量
+	 */
+	private Integer forwardingSuccessAmount;
+
+	/**
+	 * 创建时间，默认值为系统当前时间，不可修改
+	 */
+	private LocalDateTime createTime;
+
+	/**
+	 * 最后修改时间，默认值为系统当前时间，数据修改时自动更新
+	 */
+	private LocalDateTime updateTime;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public String getMessageNo() {
 		return messageNo;
@@ -91,6 +92,22 @@ public class MessageDTO implements java.io.Serializable {
 
 	public void setMessageNo(String messageNo) {
 		this.messageNo = messageNo;
+	}
+
+	public String getMessageKeyword() {
+		return messageKeyword;
+	}
+
+	public void setMessageKeyword(String messageKeyword) {
+		this.messageKeyword = messageKeyword;
+	}
+
+	public Integer getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(Integer messageId) {
+		this.messageId = messageId;
 	}
 
 	public String getBusinessLineId() {
@@ -109,22 +126,6 @@ public class MessageDTO implements java.io.Serializable {
 		this.sourceSystemId = sourceSystemId;
 	}
 
-	public Integer getMessageId() {
-		return messageId;
-	}
-
-	public void setMessageId(Integer messageId) {
-		this.messageId = messageId;
-	}
-
-	public String getMessageKeyword() {
-		return messageKeyword;
-	}
-
-	public void setMessageKeyword(String messageKeyword) {
-		this.messageKeyword = messageKeyword;
-	}
-
 	public Map<String, String> getHttpHeaders() {
 		return httpHeaders;
 	}
@@ -140,22 +141,48 @@ public class MessageDTO implements java.io.Serializable {
 	public void setMessageContent(String messageContent) {
 		this.messageContent = messageContent;
 	}
-	
-	public List<MessageForwardingDTO> getMessageForwardings() {
-		return messageForwardings;
+
+	public Integer getForwardingTotalAmount() {
+		return forwardingTotalAmount;
 	}
 
-	public void setMessageForwardings(List<MessageForwardingDTO> messageForwardings) {
-		this.messageForwardings = messageForwardings;
+	public void setForwardingTotalAmount(Integer forwardingTotalAmount) {
+		this.forwardingTotalAmount = forwardingTotalAmount;
+	}
+
+	public Integer getForwardingSuccessAmount() {
+		return forwardingSuccessAmount;
+	}
+
+	public void setForwardingSuccessAmount(Integer forwardingSuccessAmount) {
+		this.forwardingSuccessAmount = forwardingSuccessAmount;
+	}
+
+	public LocalDateTime getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(LocalDateTime createTime) {
+		this.createTime = createTime;
+	}
+
+	public LocalDateTime getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(LocalDateTime updateTime) {
+		this.updateTime = updateTime;
 	}
 
 	@Override
 	public String toString() {
-		return new StringBuilder().append("MessageDTO[").append("messageNo=").append(messageNo)
-				.append(", businessLineId=").append(businessLineId).append(", sourceSystemId=").append(sourceSystemId)
-				.append(", messageId=").append(messageId).append(", messageKeyword=").append(messageKeyword)
-				.append(", httpHeaders=").append(httpHeaders).append(", messageContent=").append(messageContent)
-				.append("]").toString();
+		return new StringBuilder().append("MessageDTO[").append("id=").append(id).append("messageNo=")
+				.append(messageNo).append(", messageKeyword=").append(messageKeyword).append(", messageId=")
+				.append(messageId).append(", businessLineId=").append(businessLineId).append(", sourceSystemId=")
+				.append(sourceSystemId).append(", httpHeaders=").append(httpHeaders).append(", messageContent=")
+				.append(messageContent).append(", forwardingTotalAmount=").append(forwardingTotalAmount)
+				.append(", forwardingSuccessAmount=").append(forwardingSuccessAmount).append(", createTime=")
+				.append(createTime).append(", updateTime=").append(updateTime).append("]").toString();
 	}
 
 }
