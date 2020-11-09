@@ -35,6 +35,10 @@
 			<artifactId>spring-boot-starter-cache</artifactId>
 		</dependency>
 		<dependency>
+    		<groupId>org.apache.rocketmq</groupId>
+    		<artifactId>rocketmq-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.allen</groupId>
 			<artifactId>allen-message-forwarding-client</artifactId>
 			<version>${allen-message-forwarding.version}</version>

@@ -1,12 +1,12 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0001;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0301;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0302;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0303;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0304;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0305;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0306;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0001;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0301;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0302;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0303;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0304;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0305;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0306;
 
 import java.util.Collections;
 import java.util.List;

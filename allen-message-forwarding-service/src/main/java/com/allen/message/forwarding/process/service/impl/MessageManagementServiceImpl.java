@@ -1,8 +1,8 @@
 package com.allen.message.forwarding.process.service.impl;
 
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_1003;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_1004;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_1005;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_1003;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_1004;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_1005;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,20 +58,20 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		if (messageCount < 1) {
 			LOGGER.error("保存消息信息失败，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(),
 					messageReceiveDTO.getMessageId());
-			throw new CustomBusinessException(MF_1003.getCode(), MF_1003.getMessage());
+			throw new CustomBusinessException(MF_1003);
 		}
 		List<AmfMessageForwardingDO> messageForwardingDOList = toMessageForwardingDO(messageReceiveDTO,
 				messageConfigDTO);
 		if (messageForwardingDOList.isEmpty()) {
 			LOGGER.error("未生成消息转发明细信息，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(),
 					messageReceiveDTO.getMessageId());
-			throw new CustomBusinessException(MF_1004.getCode(), MF_1004.getMessage());
+			throw new CustomBusinessException(MF_1004);
 		}
 		int forwardingCount = messageForwardingDAO.save(messageForwardingDOList);
 		if (forwardingCount != messageForwardingDOList.size()) {
 			LOGGER.error("保存消息转发明细信息失败，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(),
 					messageReceiveDTO.getMessageId());
-			throw new CustomBusinessException(MF_1005.getCode(), MF_1005.getMessage());
+			throw new CustomBusinessException(MF_1005);
 		}
 	}
 

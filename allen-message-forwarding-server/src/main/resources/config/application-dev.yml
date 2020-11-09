@@ -115,6 +115,18 @@ server:
         max-idle: 10
         max-active: 8
         max-wait: 5000ms
+        
+rocketmq:
+  name-server: localhost:9876
+  producer:    group: message-forwarding-producermessage:
+  rocketmq:
+    receive:
+      topic: amf-message-receiving:receiving
+    forward:
+      topic: amf-message-forwarding:forwarding
+    callback:
+      topic: amf-message-callback:callback
+    
 eureka:
   instance:
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}

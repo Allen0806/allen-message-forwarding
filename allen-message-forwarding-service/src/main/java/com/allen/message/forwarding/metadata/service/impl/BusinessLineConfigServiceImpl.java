@@ -1,6 +1,6 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.constant.StatusCodeConstant.*;
+import static com.allen.message.forwarding.constant.ResultStatuses.*;
 
 import java.time.LocalDateTime;
 import java.util.Collections;

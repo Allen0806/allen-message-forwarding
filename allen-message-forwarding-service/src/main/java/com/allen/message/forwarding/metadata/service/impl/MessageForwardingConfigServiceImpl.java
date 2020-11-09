@@ -1,9 +1,9 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0401;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0402;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0403;
-import static com.allen.message.forwarding.constant.StatusCodeConstant.MF_0404;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0401;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0402;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0403;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0404;
 
 import java.util.Collections;
 import java.util.List;
