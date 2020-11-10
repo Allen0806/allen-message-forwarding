@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.annotation.Resource;
-
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +16,8 @@ import com.allen.message.forwarding.constant.MessageConstant;
 import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
 import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
 import com.allen.message.forwarding.metadata.service.MessageConfigService;
-import com.allen.message.forwarding.process.model.MessageForwardingDTO;
-import com.allen.message.forwarding.process.model.MessageReceiveDTO;
+import com.allen.message.forwarding.process.model.MessageForwarding4MQ;
+import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.message.forwarding.process.service.MessageManagementService;
 import com.allen.message.forwarding.process.service.MessageProcessService;
 import com.allen.tool.exception.CustomBusinessException;
@@ -54,7 +51,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	private MessageManagementService messageManagementService;
 
 	@Override
-	public void receive(MessageReceiveDTO messageReceiveDTO) {
+	public void receive(MessageSendingDTO messageReceiveDTO) {
 		Integer messageId = messageReceiveDTO.getMessageId();
 		MessageConfigDTO messageConfig = messageConfigService.getByMessageId(messageReceiveDTO.getMessageId());
 		if (messageConfig == null || messageConfig.getForwardingConfigs() == null
@@ -71,12 +68,21 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 		messageManagementService.save(messageReceiveDTO, messageConfig);
 
 		// 异步发送消息到MQ
-		List<MessageForwardingDTO> messageForwardings = toMessageForwardingDTO(messageReceiveDTO, messageConfig);
+		List<MessageForwarding4MQ> messageForwardings = toMessageForwardingDTO(messageReceiveDTO, messageConfig);
 		ThreadPoolExecutor executor = ThreadPoolExecutorUtil
 				.getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
 		executor.execute(() -> {
-			sendToMQ(messageForwardings);
+			messageForwardings.stream().forEach(e -> forward(e));
 		});
+	}
+
+	/**
+	 * 转发消息
+	 * 
+	 * @param messageForwardings
+	 */
+	public void forward(MessageForwarding4MQ messageForwarding) {
+
 	}
 
 	/**
@@ -86,29 +92,17 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * @param messageConfig
 	 * @return
 	 */
-	private List<MessageForwardingDTO> toMessageForwardingDTO(MessageReceiveDTO messageReceive,
+	private List<MessageForwarding4MQ> toMessageForwardingDTO(MessageSendingDTO messageReceive,
 			MessageConfigDTO messageConfig) {
-		List<MessageForwardingDTO> messageForwardings = new ArrayList<>();
+		List<MessageForwarding4MQ> messageForwardings = new ArrayList<>();
 		List<MessageForwardingConfigDTO> forwardingConfigs = messageConfig.getForwardingConfigs();
 		for (MessageForwardingConfigDTO forwardingConfig : forwardingConfigs) {
-			MessageForwardingDTO messageForwarding = new MessageForwardingDTO();
+			MessageForwarding4MQ messageForwarding = new MessageForwarding4MQ();
 			messageForwarding.setMessageNo(messageReceive.getMessageNo());
-			messageForwarding.setMessageKeyword(messageReceive.getMessageKeyword());
 			messageForwarding.setMessageId(messageReceive.getMessageId());
 			messageForwarding.setForwardingId(forwardingConfig.getId());
-			messageForwarding.setRetryTimes(0);
 			messageForwardings.add(messageForwarding);
 		}
 		return messageForwardings;
 	}
-
-	/**
-	 * 将转发明细发送到MQ
-	 * 
-	 * @param messageForwardings
-	 */
-	private void sendToMQ(List<MessageForwardingDTO> messageForwardings) {
-
-	}
-
 }

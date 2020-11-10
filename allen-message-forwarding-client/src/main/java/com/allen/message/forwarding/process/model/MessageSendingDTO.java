@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
  *
  */
 @ApiModel("消息对象")
-public class MessageReceiveDTO implements java.io.Serializable {
+public class MessageSendingDTO implements java.io.Serializable {
 
 	/**
 	 * 序列化版本号

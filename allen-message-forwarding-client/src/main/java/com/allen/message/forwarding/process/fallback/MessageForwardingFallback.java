@@ -3,7 +3,7 @@ package com.allen.message.forwarding.process.fallback;
 import org.springframework.stereotype.Component;
 
 import com.allen.message.forwarding.process.feign.MessageForwardingClient;
-import com.allen.message.forwarding.process.model.MessageReceiveDTO;
+import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.tool.result.BaseResult;
 import com.allen.tool.result.ResultStatus;
 
@@ -17,7 +17,7 @@ import com.allen.tool.result.ResultStatus;
 public class MessageForwardingFallback implements MessageForwardingClient {
 
 	@Override
-	public BaseResult<Object> receive(MessageReceiveDTO messageDTO) {
+	public BaseResult<Object> send(MessageSendingDTO messageDTO) {
 		return new BaseResult<Object>(ResultStatus.SYSTEM_ERROR.getCode(), "请求失败");
 	}
 

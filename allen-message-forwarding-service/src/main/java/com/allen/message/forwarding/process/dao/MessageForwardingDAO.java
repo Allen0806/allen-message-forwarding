@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.allen.message.forwarding.process.model.AmfMessageForwardingDO;
-import com.allen.message.forwarding.process.model.ForwardingQueryParamDTO;
+import com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO;
 
 /**
  * 消息管理DAO层
@@ -72,7 +72,7 @@ public interface MessageForwardingDAO {
 	 * @param queryParam 查询参数
 	 * @return 消息转发信息数量
 	 */
-	int count(ForwardingQueryParamDTO queryParam);
+	int count(MessageForwardingQueryParamDTO queryParam);
 
 	/**
 	 * 根据给定参数查询消息转发信息
@@ -80,5 +80,5 @@ public interface MessageForwardingDAO {
 	 * @param queryParam 查询参数
 	 * @return 消息转发信息
 	 */
-	List<AmfMessageForwardingDO> list(ForwardingQueryParamDTO queryParam);
+	List<AmfMessageForwardingDO> list(MessageForwardingQueryParamDTO queryParam);
 }

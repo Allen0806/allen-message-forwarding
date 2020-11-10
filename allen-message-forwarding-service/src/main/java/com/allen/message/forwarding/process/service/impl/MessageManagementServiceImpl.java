@@ -19,7 +19,7 @@ import com.allen.message.forwarding.process.dao.MessageDAO;
 import com.allen.message.forwarding.process.dao.MessageForwardingDAO;
 import com.allen.message.forwarding.process.model.AmfMessageDO;
 import com.allen.message.forwarding.process.model.AmfMessageForwardingDO;
-import com.allen.message.forwarding.process.model.MessageReceiveDTO;
+import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.message.forwarding.process.service.MessageManagementService;
 import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.json.JsonUtil;
@@ -52,7 +52,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
 	@Transactional
 	@Override
-	public void save(MessageReceiveDTO messageReceiveDTO, MessageConfigDTO messageConfigDTO) {
+	public void save(MessageSendingDTO messageReceiveDTO, MessageConfigDTO messageConfigDTO) {
 		AmfMessageDO messageDO = toMessageDO(messageReceiveDTO, messageConfigDTO);
 		int messageCount = messageDAO.save(messageDO);
 		if (messageCount < 1) {
@@ -82,7 +82,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 	 * @param messageConfig
 	 * @return
 	 */
-	private AmfMessageDO toMessageDO(MessageReceiveDTO messageReceiveDTO, MessageConfigDTO messageConfig) {
+	private AmfMessageDO toMessageDO(MessageSendingDTO messageReceiveDTO, MessageConfigDTO messageConfig) {
 		String httpHeaderJson = null;
 		Map<String, String> httpHeaders = messageReceiveDTO.getHttpHeaders();
 		if (httpHeaders != null && !httpHeaders.isEmpty()) {
@@ -109,7 +109,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 	 * @param messageConfig
 	 * @return
 	 */
-	private List<AmfMessageForwardingDO> toMessageForwardingDO(MessageReceiveDTO messageReceiveDTO,
+	private List<AmfMessageForwardingDO> toMessageForwardingDO(MessageSendingDTO messageReceiveDTO,
 			MessageConfigDTO messageConfig) {
 		List<AmfMessageForwardingDO> messageForwardingDOList = new ArrayList<>();
 		List<MessageForwardingConfigDTO> forwardingConfigs = messageConfig.getForwardingConfigs();

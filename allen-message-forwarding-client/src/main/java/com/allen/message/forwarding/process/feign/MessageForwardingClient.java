@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.allen.message.forwarding.process.fallback.MessageForwardingFallback;
-import com.allen.message.forwarding.process.model.MessageReceiveDTO;
+import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.tool.result.BaseResult;
 
 /**
@@ -18,12 +18,12 @@ import com.allen.tool.result.BaseResult;
 public interface MessageForwardingClient {
 
 	/**
-	 * 消息接收Feign Client接口
+	 * 消息发送Feign Client接口
 	 * 
-	 * @param messageDTO 消息对象
+	 * @param message 消息对象
 	 * @return 接收结果
 	 */
 	@PostMapping(value = "/process/receive", headers = { "Content-Type=application/json" })
-	public BaseResult<Object> receive(@RequestBody MessageReceiveDTO messageReceiveDTO);
+	public BaseResult<Object> send(@RequestBody MessageSendingDTO message);
 
 }

@@ -16,7 +16,7 @@ import io.swagger.annotations.ApiModelProperty;
  *
  */
 @ApiModel("消息查询参数封装对象")
-public class ForwardingQueryParamDTO implements java.io.Serializable {
+public class MessageForwardingQueryParamDTO implements java.io.Serializable {
 
 	/**
 	 * 序列化版本号

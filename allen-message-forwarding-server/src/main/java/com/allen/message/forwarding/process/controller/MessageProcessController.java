@@ -1,14 +1,14 @@
 package com.allen.message.forwarding.process.controller;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.allen.message.forwarding.process.model.AmfMessageDO;
+import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.tool.result.BaseResult;
 
 /**
@@ -21,19 +21,17 @@ import com.allen.tool.result.BaseResult;
  */
 @RestController
 @RequestMapping(path = "/mf/process/")
-public class MessageReceiveController {
+public class MessageProcessController {
 
 	/**
 	 * 接收消息
 	 * 
-	 * @param messageDTO 消息对象
+	 * @param message 消息对象
 	 * @return 响应对象
 	 */
 	@PostMapping(value = "/receive")
-	public BaseResult<Object> receive(@RequestBody @Valid AmfMessageDO messageDTO, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return BaseResult.paramError(bindingResult.getAllErrors());
-		}
+	public BaseResult<Object> send(@NotNull(message = "消息不能为空") @Valid @RequestBody MessageSendingDTO message) {
+
 		return BaseResult.success();
 	}
 }
