@@ -20,6 +20,16 @@ public class MessageConstant {
 	public static final String MESSAGE_CONFIG_LOCK_NAME = "AMF_MESSAGE_CONFIG_LOCK";
 
 	/**
+	 * 消息转发明细信息锁命名前缀
+	 */
+	public static final String MESSAGE_FORWARDING_LOCK_NAME = "AMF_MESSAGE_FORWARDING_LOCK";
+
+	/**
+	 * 消息转发结果回调锁命名前缀
+	 */
+	public static final String MESSAGE_CALLBACK_LOCK_NAME = "AMF_MESSAGE_CALLBACK_LOCK";
+
+	/**
 	 * 消息处理线程池名称
 	 */
 	public static final String MESSAGE_FORWARDING_THREAD_POOL_NAME = "message-forwarding";
@@ -27,12 +37,12 @@ public class MessageConstant {
 	/**
 	 * 是对应的字符串
 	 */
-	public static final String YES = "1";
+	public static final Integer YES = 1;
 
 	/**
 	 * 否对应的字符串
 	 */
-	public static final String NO = "0";
+	public static final Integer NO = 0;
 
 	/**
 	 * 最大回调重试次数，固定为3

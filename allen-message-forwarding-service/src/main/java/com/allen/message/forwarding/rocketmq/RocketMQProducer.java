@@ -41,10 +41,22 @@ public class RocketMQProducer {
 	private String forwardingTopic;
 
 	/**
+	 * 消息转发tag
+	 */
+	@Value("${message.rocketmq.forward.tag}")
+	private String forwardingTag;
+
+	/**
 	 * 消息转发结果回调topic
 	 */
 	@Value("${message.rocketmq.callback.topic}")
 	private String callbackTopic;
+
+	/**
+	 * 消息 转发结果回调tag
+	 */
+	@Value("${message.rocketmq.callback.tag}")
+	private String callbackTag;
 
 	/**
 	 * 将消息发送的待转发队列，主要用于转发失败重试
@@ -53,7 +65,8 @@ public class RocketMQProducer {
 	 * @return 发送结果：true|false
 	 */
 	public boolean send4Fowarding(String message) {
-		return send(forwardingTopic, message);
+		String destination = forwardingTopic + ":" + forwardingTag;
+		return send(destination, message);
 	}
 
 	/**
@@ -63,7 +76,8 @@ public class RocketMQProducer {
 	 * @return 发送结果：true|false
 	 */
 	public boolean send4Callback(String message) {
-		return send(callbackTopic, message);
+		String destination = callbackTopic + ":" + callbackTag;
+		return send(destination, message);
 	}
 
 	/**
@@ -80,7 +94,6 @@ public class RocketMQProducer {
 			LOGGER.info("消息发送结果：{}", sendResult);
 			return true;
 		} catch (Exception e) {
-			LOGGER.error("消息发送异常", e);
 			throw new CustomBusinessException(ResultStatuses.MF_1008, e);
 		}
 	}
@@ -93,11 +106,9 @@ public class RocketMQProducer {
 	 */
 	private void check(String destination, String message) {
 		if (StringUtil.isBlank(destination)) {
-			LOGGER.error("消息topic为空");
 			throw new CustomBusinessException(ResultStatuses.MF_1006);
 		}
 		if (StringUtil.isBlank(message)) {
-			LOGGER.error("消息为空");
 			throw new CustomBusinessException(ResultStatuses.MF_1007);
 		}
 	}

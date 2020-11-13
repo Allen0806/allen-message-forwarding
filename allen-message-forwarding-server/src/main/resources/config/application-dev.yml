@@ -120,12 +120,21 @@ rocketmq:
   name-server: localhost:9876
   producer:    group: message-forwarding-producermessage:
   rocketmq:
-    receive:
-      topic: amf-message-receiving:receiving
+    send:
+      topic: amf-message-sending
+      tag: sending
+      consumer:
+        group: amf-message-sending-consumer
     forward:
-      topic: amf-message-forwarding:forwarding
+      topic: amf-message-forwarding
+      tag: forwarding
+      consumer:
+        group: amf-message-forwarding-consumer
     callback:
-      topic: amf-message-callback:callback
+      topic: amf-message-callback
+      tag: callback
+      consumer:
+        group: amf-message-callback-consumer
     
 eureka:
   instance:

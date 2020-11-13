@@ -10,7 +10,7 @@ import com.allen.tool.result.ResultStatus;
  * @since 1.0.0
  */
 public class ResultStatuses {
-	
+
 	/*************** 公共状态码定义 ***************/
 	public static final ResultStatus MF_0001 = new ResultStatus("MF0001", "当前页数或每页行数不能小于1");
 
@@ -30,7 +30,7 @@ public class ResultStatuses {
 	public static final ResultStatus MF_0203 = new ResultStatus("MF0203", "更新来源系统信息失败");
 	public static final ResultStatus MF_0204 = new ResultStatus("MF0204", "存在消息配置信息，不能进删除来源系统信息");
 	public static final ResultStatus MF_0205 = new ResultStatus("MF0205", "删除来源系统信息失败");
-	
+
 	/*************** 消息配置管理状态码定义 ***************/
 	public static final ResultStatus MF_0301 = new ResultStatus("MF0301", "保存消息配置信失败");
 	public static final ResultStatus MF_0302 = new ResultStatus("MF0302", "不存在对应的消息配置信息");
@@ -38,13 +38,13 @@ public class ResultStatuses {
 	public static final ResultStatus MF_0304 = new ResultStatus("MF0304", "存在消息转发信息，不能删除消息配置信息");
 	public static final ResultStatus MF_0305 = new ResultStatus("MF0305", "删除消息配置信息失败");
 	public static final ResultStatus MF_0306 = new ResultStatus("MF0306", "获取消息配置信息异常");
-	
+
 	/*************** 消息转发配置管理状态码定义 ***************/
 	public static final ResultStatus MF_0401 = new ResultStatus("MF0401", "保存消息转发配置信息失败");
 	public static final ResultStatus MF_0402 = new ResultStatus("MF0402", "不存在对应的消息转发配置信息");
 	public static final ResultStatus MF_0403 = new ResultStatus("MF0403", "更新消息转发配置信失败");
 	public static final ResultStatus MF_0404 = new ResultStatus("MF0404", "删除消息转发配置信息失败");
-	
+
 	/*************** 消息转发处理状态码定义 ***************/
 	public static final ResultStatus MF_1001 = new ResultStatus("MF1001", "未获取到消息配置信息或消息配置信息有误");
 	public static final ResultStatus MF_1002 = new ResultStatus("MF1002", "传入的业务线ID及来源系统ID与消息配置信息中的不匹配");
@@ -54,10 +54,18 @@ public class ResultStatuses {
 	public static final ResultStatus MF_1006 = new ResultStatus("MF1006", "消息topic为空");
 	public static final ResultStatus MF_1007 = new ResultStatus("MF1007", "消息为空");
 	public static final ResultStatus MF_1008 = new ResultStatus("MF1008", "消息发送异常");
+	public static final ResultStatus MF_1009 = new ResultStatus("MF1009", "更新消息转发明细失败");
+	public static final ResultStatus MF_1010 = new ResultStatus("MF1010", "消息转发锁异常");
 	
-	public static final ResultStatus MF_1009 = new ResultStatus("MF1009", "未获取到消息配置信息");
-	public static final ResultStatus MF_1010 = new ResultStatus("MF1010", "传入的业务线ID及来源系统ID与消息配置信息中的不匹配");
-	public static final ResultStatus MF_1011 = new ResultStatus("MF1011", "保存消息信息失败");
-	public static final ResultStatus MF_1012 = new ResultStatus("MF1012", "未生成消息转发明细信息");
+	public static final ResultStatus MF_1011 = new ResultStatus("MF1011", "");
+	public static final ResultStatus MF_1012 = new ResultStatus("MF1012", "");
+	public static final ResultStatus MF_1013 = new ResultStatus("MF1013", "");
+	public static final ResultStatus MF_1014 = new ResultStatus("MF1014", "");
+	public static final ResultStatus MF_1015 = new ResultStatus("MF1015", "");
+	public static final ResultStatus MF_1016 = new ResultStatus("MF1016", "");
+	public static final ResultStatus MF_1017 = new ResultStatus("MF1017", "");
+	public static final ResultStatus MF_1018 = new ResultStatus("MF1018", "");
+	public static final ResultStatus MF_1019 = new ResultStatus("MF1019", "");
 	
+
 }

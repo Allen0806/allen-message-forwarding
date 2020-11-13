@@ -10,7 +10,7 @@ import java.util.Objects;
  * @since 1.0.0
  */
 public enum ForwardingResult {
-	FAILURE(0), SUCCESS(1), RETRY(2);
+	FAILURE(0), SUCCESS(1), PROCESSING(2);
 
 	/**
 	 * 枚举转换值
@@ -52,7 +52,7 @@ public enum ForwardingResult {
 			return SUCCESS;
 		}
 		if (value == 2) {
-			return RETRY;
+			return PROCESSING;
 		}
 		return null;
 	}

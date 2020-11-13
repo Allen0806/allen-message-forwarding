@@ -1,12 +1,5 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0001;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0301;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0302;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0303;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0304;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0305;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.allen.message.forwarding.constant.MessageConstant;
+import com.allen.message.forwarding.constant.ResultStatuses;
 import com.allen.message.forwarding.metadata.dao.MessageConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfMessageConfigDO;
 import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
@@ -67,7 +61,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 		int count = messageConfigDAO.save(messageConfigDO);
 		if (count == 0) {
 			LOGGER.error("保存消息配置信失败，消息名称：{}，创建人：{}", messageConfigDO.getMessageName(), messageConfigDO.getCreatedBy());
-			throw new CustomBusinessException(MF_0301);
+			throw new CustomBusinessException(ResultStatuses.MF_0301);
 		}
 		LOGGER.info("保存消息配置信成功，消息名称：{}，创建人：{}", messageConfigDO.getMessageName(), messageConfigDO.getCreatedBy());
 	}
@@ -79,7 +73,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 		AmfMessageConfigDO messageConfigDO = messageConfigDAO.get(messageConfigVO.getId());
 		if (messageConfigDO == null) {
 			LOGGER.error("不存在对应的消息配置信息，消息配置主键：{}", messageConfigVO.getId());
-			throw new CustomBusinessException(MF_0302);
+			throw new CustomBusinessException(ResultStatuses.MF_0302);
 		}
 		boolean isNotChanged = true;
 		if (StringUtil.isNotBlank(messageConfigVO.getMessageName())
@@ -104,7 +98,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 		int count = messageConfigDAO.update(messageConfigDO);
 		if (count == 0) {
 			LOGGER.error("更新消息配置信失败，消息ID：{}，修改人：{}", messageConfigDO.getId(), updatedBy);
-			throw new CustomBusinessException(MF_0303);
+			throw new CustomBusinessException(ResultStatuses.MF_0303);
 		}
 		LOGGER.info("更新消息配置信息成功，消息名称：{}，修改人：{}", messageConfigDO.getMessageName(), updatedBy);
 	}
@@ -134,20 +128,20 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 		AmfMessageConfigDO messageConfigDO = messageConfigDAO.getByMessageId(messageId);
 		if (messageConfigDO == null) {
 			LOGGER.error("不存在对应的消息配置信息，消息ID：{}", messageId);
-			throw new CustomBusinessException(MF_0302);
+			throw new CustomBusinessException(ResultStatuses.MF_0302);
 		}
 		String messageName = messageConfigDO.getMessageName();
 		int messageForwardingConfigCount = messageForwardingConfigService.count(messageId);
 		if (messageForwardingConfigCount > 0) {
 			LOGGER.error("存在消息转发信息，不能进行消息配置信息删除操作，消息名称：{}", messageName);
-			throw new CustomBusinessException(MF_0304);
+			throw new CustomBusinessException(ResultStatuses.MF_0304);
 		}
 		messageConfigDO.setDeleted(1);
 		messageConfigDO.setUpdatedBy(updatedBy);
 		int count = messageConfigDAO.update(messageConfigDO);
 		if (count == 0) {
 			LOGGER.error("删除消息配置信息失败，消息名称：{}，删除人：{}", messageName, updatedBy);
-			throw new CustomBusinessException(MF_0305);
+			throw new CustomBusinessException(ResultStatuses.MF_0305);
 		}
 		LOGGER.info("删除消息配置信息成功，消息名称：{}，删除人：{}", messageName, updatedBy);
 	}
@@ -166,7 +160,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
 	@Override
 	public List<MessageConfigVO> listBySourceSystemId4Paging(Integer sourceSystemId, int pageNo, int pageSize) {
 		if (pageNo < 1 || pageSize < 1) {
-			throw new CustomBusinessException(MF_0001);
+			throw new CustomBusinessException(ResultStatuses.MF_0001);
 		}
 		int startNo = (pageNo - 1) * pageSize;
 		List<AmfMessageConfigDO> messageConfigDOList = messageConfigDAO.listBySourceSystemId4Paging(sourceSystemId,
