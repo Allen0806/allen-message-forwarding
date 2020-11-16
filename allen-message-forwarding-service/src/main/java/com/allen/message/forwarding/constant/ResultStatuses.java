@@ -49,7 +49,7 @@ public class ResultStatuses {
 	public static final ResultStatus MF_1001 = new ResultStatus("MF1001", "未获取到消息配置信息或消息配置信息有误");
 	public static final ResultStatus MF_1002 = new ResultStatus("MF1002", "传入的业务线ID及来源系统ID与消息配置信息中的不匹配");
 	public static final ResultStatus MF_1003 = new ResultStatus("MF1003", "保存消息信息失败");
-	public static final ResultStatus MF_1004 = new ResultStatus("MF1004", "未生成消息转发明细信息");
+	public static final ResultStatus MF_1004 = new ResultStatus("MF1004", "消息转发明细信息为空");
 	public static final ResultStatus MF_1005 = new ResultStatus("MF1005", "保存消息转发明细信息失败");
 	public static final ResultStatus MF_1006 = new ResultStatus("MF1006", "消息topic为空");
 	public static final ResultStatus MF_1007 = new ResultStatus("MF1007", "消息为空");

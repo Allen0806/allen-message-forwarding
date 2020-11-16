@@ -1,6 +1,7 @@
 package com.allen.message.forwarding.process.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,6 +78,11 @@ public class MessageDTO implements java.io.Serializable {
 	 * 最后修改时间，默认值为系统当前时间，数据修改时自动更新
 	 */
 	private LocalDateTime updateTime;
+
+	/**
+	 * 转发明细信息
+	 */
+	private List<MessageForwardingDTO> messageForwardings;
 
 	public Long getId() {
 		return id;
@@ -174,15 +180,23 @@ public class MessageDTO implements java.io.Serializable {
 		this.updateTime = updateTime;
 	}
 
+	public List<MessageForwardingDTO> getMessageForwardings() {
+		return messageForwardings;
+	}
+
+	public void setMessageForwardings(List<MessageForwardingDTO> messageForwardings) {
+		this.messageForwardings = messageForwardings;
+	}
+
 	@Override
 	public String toString() {
-		return new StringBuilder().append("MessageDTO[").append("id=").append(id).append("messageNo=")
-				.append(messageNo).append(", messageKeyword=").append(messageKeyword).append(", messageId=")
-				.append(messageId).append(", businessLineId=").append(businessLineId).append(", sourceSystemId=")
-				.append(sourceSystemId).append(", httpHeaders=").append(httpHeaders).append(", messageContent=")
-				.append(messageContent).append(", forwardingTotalAmount=").append(forwardingTotalAmount)
-				.append(", forwardingSuccessAmount=").append(forwardingSuccessAmount).append(", createTime=")
-				.append(createTime).append(", updateTime=").append(updateTime).append("]").toString();
+		return new StringBuilder().append("MessageDTO[").append("id=").append(id).append("messageNo=").append(messageNo)
+				.append(", messageKeyword=").append(messageKeyword).append(", messageId=").append(messageId)
+				.append(", businessLineId=").append(businessLineId).append(", sourceSystemId=").append(sourceSystemId)
+				.append(", httpHeaders=").append(httpHeaders).append(", messageContent=").append(messageContent)
+				.append(", forwardingTotalAmount=").append(forwardingTotalAmount).append(", forwardingSuccessAmount=")
+				.append(forwardingSuccessAmount).append(", createTime=").append(createTime).append(", updateTime=")
+				.append(updateTime).append(", messageForwardings=").append(messageForwardings).append("]").toString();
 	}
 
 }

@@ -1,9 +1,7 @@
 package com.allen.message.forwarding.process.service;
 
-import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
 import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
-import com.allen.message.forwarding.process.model.MessageSendingDTO;
 
 /**
  * 消息管理服务，封装对数据库层的操作
@@ -17,28 +15,12 @@ public interface MessageManagementService {
 	/**
 	 * 保存消息信息，包含消息明细信息
 	 * 
-	 * @param messageReceiveDTO 消息传入对象
-	 * @param messageConfigDTO  消息配置信息
+	 * @param messageDTO 消息传入对象
 	 */
-	void save(MessageSendingDTO messageReceiveDTO, MessageConfigDTO messageConfigDTO);
-	
-	/**
-	 * 更新消息信息
-	 * 
-	 * @param messageDTO 消息信息
-	 */
-	void updateMessage(MessageDTO messageDTO);
+	void save(MessageDTO messageDTO);
 
 	/**
-	 * 同时更新消息及转发明细信息
-	 * 
-	 * @param messageDTO           消息信息
-	 * @param messageForwardingDTO 消息转发明细信息
-	 */
-	void updateForwardingResult(MessageDTO messageDTO, MessageForwardingDTO messageForwardingDTO);
-
-	/**
-	 * 更新消息转发明细，更新时只给定主键、上次更新时间及需要更新的属性即可，不更新的属性不要给定
+	 * 更新消息转发明细，更新时只给定主键、上次更新时间及需要更新的属性即可，不更新的属性不要给定。 如果转发成功，则同步更新消息的转发成功次数
 	 * 
 	 * @param messageForwardingDTO 消息转发明细信息
 	 */

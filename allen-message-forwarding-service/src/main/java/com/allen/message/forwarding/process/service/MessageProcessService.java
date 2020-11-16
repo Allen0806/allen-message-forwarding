@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
 
-import com.allen.message.forwarding.process.model.MessageForwarding4MQ;
+import com.allen.message.forwarding.process.model.ForwardingMessage4MQ;
 import com.allen.message.forwarding.process.model.MessageSendingDTO;
 
 /**
@@ -30,12 +30,12 @@ public interface MessageProcessService {
 	 * 
 	 * @param messageForwarding 消息转发明细
 	 */
-	void forward(@NotNull(message = "消息转发明细不能为空") @Valid MessageForwarding4MQ messageForwarding);
+	void forward(@NotNull(message = "消息转发明细不能为空") @Valid ForwardingMessage4MQ messageForwarding);
 
 	/**
 	 * 转发结果回调
 	 * 
 	 * @param messageForwarding 消息转发明细
 	 */
-	void callback(@NotNull(message = "消息转发明细不能为空") @Valid MessageForwarding4MQ messageForwarding);
+	void callback(@NotNull(message = "消息转发明细不能为空") @Valid ForwardingMessage4MQ messageForwarding);
 }

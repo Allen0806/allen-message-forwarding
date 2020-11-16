@@ -14,15 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.allen.message.forwarding.constant.CallbackResult;
 import com.allen.message.forwarding.constant.ForwardingResult;
 import com.allen.message.forwarding.constant.ResultStatuses;
-import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
-import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
 import com.allen.message.forwarding.process.dao.MessageDAO;
 import com.allen.message.forwarding.process.dao.MessageForwardingDAO;
 import com.allen.message.forwarding.process.model.AmfMessageDO;
 import com.allen.message.forwarding.process.model.AmfMessageForwardingDO;
 import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
-import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.message.forwarding.process.service.MessageManagementService;
 import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.json.JsonUtil;
@@ -57,41 +54,33 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
 	@Transactional
 	@Override
-	public void save(MessageSendingDTO messageReceiveDTO, MessageConfigDTO messageConfigDTO) {
-		AmfMessageDO messageDO = toMessageDO(messageReceiveDTO, messageConfigDTO);
-		int messageCount = messageDAO.save(messageDO);
-		if (messageCount < 1) {
-			LOGGER.error("保存消息信息失败，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(),
-					messageReceiveDTO.getMessageId());
+	public void save(MessageDTO messageDTO) {
+		if (messageDTO == null) {
+			LOGGER.error("消息对象为空，保存消息信息失败");
 			throw new CustomBusinessException(ResultStatuses.MF_1003);
 		}
-		List<AmfMessageForwardingDO> messageForwardingDOList = toMessageForwardingDO(messageReceiveDTO,
-				messageConfigDTO);
-		if (messageForwardingDOList.isEmpty()) {
-			LOGGER.error("未生成消息转发明细信息，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(),
-					messageReceiveDTO.getMessageId());
+		List<MessageForwardingDTO> messageForwardings = messageDTO.getMessageForwardings();
+		if (Objects.isNull(messageForwardings) || messageForwardings.isEmpty()) {
+			LOGGER.error("消息转发明细信息为空，消息流水号：{}，消息ID：{}", messageDTO.getMessageNo(), messageDTO.getMessageId());
 			throw new CustomBusinessException(ResultStatuses.MF_1004);
 		}
+		AmfMessageDO messageDO = toMessageDO(messageDTO);
+		int messageCount = messageDAO.save(messageDO);
+		if (messageCount < 1) {
+			LOGGER.error("保存消息信息失败，消息流水号：{}，消息ID：{}", messageDTO.getMessageNo(), messageDTO.getMessageId());
+			throw new CustomBusinessException(ResultStatuses.MF_1003);
+		}
+		List<AmfMessageForwardingDO> messageForwardingDOList = toMessageForwardingDO(messageForwardings);
 		int forwardingCount = messageForwardingDAO.save(messageForwardingDOList);
 		if (forwardingCount != messageForwardingDOList.size()) {
-			LOGGER.error("保存消息转发明细信息失败，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(),
-					messageReceiveDTO.getMessageId());
+			LOGGER.error("保存消息转发明细信息失败，消息流水号：{}，消息ID：{}", messageDTO.getMessageNo(), messageDTO.getMessageId());
 			throw new CustomBusinessException(ResultStatuses.MF_1005);
 		}
 	}
 
-	@Transactional
-	@Override
 	public void updateMessage(MessageDTO messageDTO) {
 		// TODO Auto-generated method stub
-		
-	}
-	
-	@Transactional
-	@Override
-	public void updateForwardingResult(MessageDTO messageDTO, MessageForwardingDTO messageForwardingDTO) {
-		updateForwardingResult(messageForwardingDTO);
-		updateMessage(messageDTO);
+
 	}
 
 	@Transactional
@@ -147,8 +136,6 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 			updateRetryTimes++;
 		}
 	}
-	
-	
 
 	@Override
 	public void updateCallbackResult(MessageForwardingDTO messageForwardingDTO) {
@@ -202,7 +189,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 			count = messageForwardingDAO.update(newMessageForwardingDO);
 			updateRetryTimes++;
 		}
-		
+
 	}
 
 	@Override
@@ -221,52 +208,47 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 	}
 
 	/**
-	 * 转换未消息DO对象
+	 * 转换为消息DO对象
 	 * 
-	 * @param messageReceiveDTO
-	 * @param messageConfig
+	 * @param messageDTO
 	 * @return
 	 */
-	private AmfMessageDO toMessageDO(MessageSendingDTO messageReceiveDTO, MessageConfigDTO messageConfig) {
+	private AmfMessageDO toMessageDO(MessageDTO messageDTO) {
 		String httpHeaderJson = null;
-		Map<String, String> httpHeaders = messageReceiveDTO.getHttpHeaders();
+		Map<String, String> httpHeaders = messageDTO.getHttpHeaders();
 		if (httpHeaders != null && !httpHeaders.isEmpty()) {
 			httpHeaderJson = JsonUtil.object2Json(httpHeaders);
 		}
 
 		AmfMessageDO messageDO = new AmfMessageDO();
-		messageDO.setMessageNo(messageReceiveDTO.getMessageNo());
-		messageDO.setMessageKeyword(messageReceiveDTO.getMessageKeyword());
-		messageDO.setMessageId(messageReceiveDTO.getMessageId());
-		messageDO.setBusinessLineId(messageReceiveDTO.getBusinessLineId());
-		messageDO.setSourceSystemId(messageReceiveDTO.getSourceSystemId());
+		messageDO.setMessageNo(messageDTO.getMessageNo());
+		messageDO.setMessageKeyword(messageDTO.getMessageKeyword());
+		messageDO.setMessageId(messageDTO.getMessageId());
+		messageDO.setBusinessLineId(messageDTO.getBusinessLineId());
+		messageDO.setSourceSystemId(messageDTO.getSourceSystemId());
 		messageDO.setHttpHeaders(httpHeaderJson);
-		messageDO.setMessageContent(messageReceiveDTO.getMessageContent());
-		messageDO.setForwardingTotalAmount(messageConfig.getForwardingConfigs().size());
-		messageDO.setForwardingSuccessAmount(0);
+		messageDO.setMessageContent(messageDTO.getMessageContent());
+		messageDO.setForwardingTotalAmount(messageDTO.getForwardingTotalAmount());
+		messageDO.setForwardingSuccessAmount(messageDTO.getForwardingSuccessAmount());
 		return messageDO;
 	}
 
 	/**
 	 * 转换为转发明细DO对象列表
 	 * 
-	 * @param messageReceiveDTO
-	 * @param messageConfig
+	 * @param messageForwardings
 	 * @return
 	 */
-	private List<AmfMessageForwardingDO> toMessageForwardingDO(MessageSendingDTO messageReceiveDTO,
-			MessageConfigDTO messageConfig) {
+	private List<AmfMessageForwardingDO> toMessageForwardingDO(List<MessageForwardingDTO> messageForwardings) {
 		List<AmfMessageForwardingDO> messageForwardingDOList = new ArrayList<>();
-		List<MessageForwardingConfigDTO> forwardingConfigs = messageConfig.getForwardingConfigs();
-		for (MessageForwardingConfigDTO forwardingConfig : forwardingConfigs) {
+		for (MessageForwardingDTO forwardingConfigDTO : messageForwardings) {
 			AmfMessageForwardingDO messageForwardingDO = new AmfMessageForwardingDO();
-			messageForwardingDO.setMessageNo(messageReceiveDTO.getMessageNo());
-			messageForwardingDO.setMessageKeyword(messageReceiveDTO.getMessageKeyword());
-			messageForwardingDO.setMessageId(messageReceiveDTO.getMessageId());
-			messageForwardingDO.setForwardingId(forwardingConfig.getId());
-			messageForwardingDO.setForwardingResult(ForwardingResult.PROCESSING.value());
-			// 设置为-1的目的是保证第1次正常转发后重试次数为0
-			messageForwardingDO.setRetryTimes(-1);
+			messageForwardingDO.setMessageNo(forwardingConfigDTO.getMessageNo());
+			messageForwardingDO.setMessageKeyword(forwardingConfigDTO.getMessageKeyword());
+			messageForwardingDO.setMessageId(forwardingConfigDTO.getMessageId());
+			messageForwardingDO.setForwardingId(forwardingConfigDTO.getForwardingId());
+			messageForwardingDO.setForwardingResult(forwardingConfigDTO.getForwardingResult());
+			messageForwardingDO.setRetryTimes(forwardingConfigDTO.getRetryTimes());
 			messageForwardingDOList.add(messageForwardingDO);
 		}
 		return messageForwardingDOList;

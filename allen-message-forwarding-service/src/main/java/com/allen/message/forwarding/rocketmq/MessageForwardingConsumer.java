@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.allen.message.forwarding.process.model.MessageForwarding4MQ;
+import com.allen.message.forwarding.process.model.ForwardingMessage4MQ;
 import com.allen.message.forwarding.process.service.MessageProcessService;
 import com.allen.tool.json.JsonUtil;
 import com.allen.tool.string.StringUtil;
@@ -40,7 +40,7 @@ public class MessageForwardingConsumer implements RocketMQListener<String> {
 		}
 		LOGGER.info("消息转发明细信息：{}", message);
 		try {
-			MessageForwarding4MQ messageForwarding4MQ = JsonUtil.json2Object(message, MessageForwarding4MQ.class);
+			ForwardingMessage4MQ messageForwarding4MQ = JsonUtil.json2Object(message, ForwardingMessage4MQ.class);
 			messageProcessService.forward(messageForwarding4MQ);
 		} catch (Exception e) {
 			LOGGER.info("消费消息转发明细信息出错，消息转发明细信息：" + message, e);

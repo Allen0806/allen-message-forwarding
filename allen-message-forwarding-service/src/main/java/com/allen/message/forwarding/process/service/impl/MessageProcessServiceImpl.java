@@ -24,7 +24,7 @@ import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
 import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
 import com.allen.message.forwarding.metadata.service.MessageConfigService;
 import com.allen.message.forwarding.process.model.MessageDTO;
-import com.allen.message.forwarding.process.model.MessageForwarding4MQ;
+import com.allen.message.forwarding.process.model.ForwardingMessage4MQ;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.message.forwarding.process.service.MessageManagementService;
@@ -92,15 +92,13 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 			LOGGER.error("传入的业务线ID及来源系统ID与消息配置信息中的不匹配，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(), messageId);
 			throw new CustomBusinessException(ResultStatuses.MF_1002);
 		}
-		messageManagementService.save(messageReceiveDTO, messageConfig);
+		MessageDTO messageDTO = toMessageDTO(messageReceiveDTO, messageConfig);
+		messageManagementService.save(messageDTO);
 
 		// 异步发送消息到MQ
-		List<MessageForwarding4MQ> messageForwardings = toMessageForwarding4MQ(messageReceiveDTO, messageConfig);
 		ThreadPoolExecutor executor = ThreadPoolExecutorUtil
 				.getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
-		executor.execute(() -> {
-			messageForwardings.stream().forEach(e -> sendToMQ(e));
-		});
+		executor.execute(() -> sendToMQ(messageReceiveDTO, messageConfig));
 	}
 
 	/**
@@ -109,7 +107,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * @param messageForwardings
 	 */
 	@Override
-	public void forward(MessageForwarding4MQ messageForwarding) {
+	public void forward(ForwardingMessage4MQ messageForwarding) {
 		// 1.获取锁，如果失败则返回，key：messageNo+forwardingId，
 		// 2.从数据库中获取转发明细，判断是否转发成功或失败
 		// 3.转发消息
@@ -142,6 +140,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 						messageManagementService.updateForwardingResult(newMessageForwardingDTO);
 						return;
 					}
+					// 根据不同的转发方式转发消息
 					MessageDTO messageDTO = messageManagementService.getMessage(messageNo);
 					ForwardingWay forwardingWay = messageForwarding.getForwardingWay();
 					boolean forwardingResult = false;
@@ -152,43 +151,45 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 					} else if (forwardingWay == ForwardingWay.KAFKA) {
 						forwardingResult = forwardByKafka(messageDTO, messageForwarding);
 					}
-					if (forwardingResult) {
-						MessageDTO newMessageDTO = new MessageDTO();
-						newMessageDTO.setId(messageDTO.getId());
-						newMessageDTO.setMessageNo(messageDTO.getMessageNo());
-						newMessageDTO.setForwardingSuccessAmount(messageDTO.getForwardingSuccessAmount() + 1);
-						newMessageDTO.setUpdateTime(messageDTO.getUpdateTime());
 
-						MessageForwardingDTO newMessageForwardingDTO = new MessageForwardingDTO();
-						newMessageForwardingDTO.setId(messageFowardingDTO.getId());
+					// 更新消息转发结果
+					MessageForwardingDTO newMessageForwardingDTO = new MessageForwardingDTO();
+					newMessageForwardingDTO.setId(messageFowardingDTO.getId());
+					Integer retryTimes = messageFowardingDTO.getRetryTimes() + 1;
+					boolean needCallback = false;
+					if (forwardingResult) {
+						LOGGER.info("消息转发成功，消息转发明细信息：{}", messageForwarding);
 						newMessageForwardingDTO.setForwardingResult(ForwardingResult.SUCCESS.value());
 						newMessageForwardingDTO.setForwardingSucessTime(LocalDateTime.now());
-						newMessageForwardingDTO.setRetryTimes(messageFowardingDTO.getRetryTimes() + 1);
 						if (messageForwarding.getCallbackRequired() == MessageConstant.YES) {
-							newMessageForwardingDTO.setCallbackResult(CallbackResult.PROCESSING.value());
-							newMessageForwardingDTO.setCallbackRetryTimes(-1);
+							needCallback = true;
 						}
-						newMessageForwardingDTO.setUpdateTime(messageFowardingDTO.getUpdateTime());
-
-						messageManagementService.updateForwardingResult(newMessageDTO, newMessageForwardingDTO);
 					} else {
 						LOGGER.error("消息转发失败，消息转发明细信息：{}", messageForwarding);
-						MessageForwardingDTO newMessageForwardingDTO = new MessageForwardingDTO();
-						newMessageForwardingDTO.setId(messageFowardingDTO.getId());
-						int retryTimes = messageFowardingDTO.getRetryTimes() + 1;
 						if (retryTimes >= messageForwarding.getMaxRetryTimes()) {
 							newMessageForwardingDTO.setForwardingResult(ForwardingResult.FAILURE.value());
 							if (messageForwarding.getCallbackRequired() == MessageConstant.YES) {
-								newMessageForwardingDTO.setCallbackResult(CallbackResult.PROCESSING.value());
-								newMessageForwardingDTO.setCallbackRetryTimes(-1);
+								needCallback = true;
 							}
 						} else {
 							newMessageForwardingDTO.setForwardingResult(ForwardingResult.PROCESSING.value());
 						}
-						newMessageForwardingDTO.setRetryTimes(messageFowardingDTO.getRetryTimes() + 1);
-						newMessageForwardingDTO.setUpdateTime(messageFowardingDTO.getUpdateTime());
-						messageManagementService.updateForwardingResult(newMessageForwardingDTO);
 					}
+					newMessageForwardingDTO.setRetryTimes(retryTimes);
+					if (needCallback) {
+						if (messageFowardingDTO.getCallbackResult() == null) {
+							newMessageForwardingDTO.setCallbackResult(CallbackResult.PROCESSING.value());
+						}
+						if (messageFowardingDTO.getCallbackRetryTimes() == null) {
+							newMessageForwardingDTO.setCallbackRetryTimes(-1);
+						}
+					}
+					newMessageForwardingDTO.setUpdateTime(messageFowardingDTO.getUpdateTime());
+					messageManagementService.updateForwardingResult(newMessageForwardingDTO);
+					// 异步发送回调消息到MQ 
+					ThreadPoolExecutor executor = ThreadPoolExecutorUtil
+							.getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
+					// executor.execute(() -> sendToMQ(messageReceiveDTO, messageConfig));
 				} catch (Exception e) {
 					LOGGER.error("消息转发处理异常，消息转发明细：" + messageForwarding, e);
 					throw new CustomBusinessException(ResultStatuses.MF_1010, e);
@@ -203,24 +204,57 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	}
 
 	@Override
-	public void callback(MessageForwarding4MQ messageForwarding) {
+	public void callback(ForwardingMessage4MQ messageForwarding) {
 		// TODO Auto-generated method stub
 
 	}
 
 	/**
-	 * 转换为转发明细DO对象列表
+	 * 转换为消息DTO对象
 	 * 
-	 * @param messageReceive
+	 * @param messageReceiveDTO
 	 * @param messageConfig
 	 * @return
 	 */
-	private List<MessageForwarding4MQ> toMessageForwarding4MQ(MessageSendingDTO messageReceive,
-			MessageConfigDTO messageConfig) {
-		List<MessageForwarding4MQ> messageForwardings = new ArrayList<>();
+	private MessageDTO toMessageDTO(MessageSendingDTO messageReceiveDTO, MessageConfigDTO messageConfig) {
+		MessageDTO messageDTO = new MessageDTO();
+		messageDTO.setMessageNo(messageReceiveDTO.getMessageNo());
+		messageDTO.setMessageKeyword(messageReceiveDTO.getMessageKeyword());
+		messageDTO.setMessageId(messageReceiveDTO.getMessageId());
+		messageDTO.setBusinessLineId(messageReceiveDTO.getBusinessLineId());
+		messageDTO.setSourceSystemId(messageReceiveDTO.getSourceSystemId());
+		messageDTO.setHttpHeaders(messageReceiveDTO.getHttpHeaders());
+		messageDTO.setMessageContent(messageReceiveDTO.getMessageContent());
+		messageDTO.setForwardingTotalAmount(messageConfig.getForwardingConfigs().size());
+		messageDTO.setForwardingSuccessAmount(0);
+
+		List<MessageForwardingDTO> messageForwardings = new ArrayList<>();
 		List<MessageForwardingConfigDTO> forwardingConfigs = messageConfig.getForwardingConfigs();
 		for (MessageForwardingConfigDTO forwardingConfig : forwardingConfigs) {
-			MessageForwarding4MQ messageForwarding = new MessageForwarding4MQ();
+			MessageForwardingDTO messageForwardingDTO = new MessageForwardingDTO();
+			messageForwardingDTO.setMessageNo(messageReceiveDTO.getMessageNo());
+			messageForwardingDTO.setMessageKeyword(messageReceiveDTO.getMessageKeyword());
+			messageForwardingDTO.setMessageId(messageReceiveDTO.getMessageId());
+			messageForwardingDTO.setForwardingId(forwardingConfig.getId());
+			messageForwardingDTO.setForwardingResult(ForwardingResult.PROCESSING.value());
+			// 设置为-1的目的是保证第1次正常转发后重试次数为0
+			messageForwardingDTO.setRetryTimes(-1);
+			messageForwardings.add(messageForwardingDTO);
+		}
+		messageDTO.setMessageForwardings(messageForwardings);
+		return messageDTO;
+	}
+
+	/**
+	 * 将转发明细发送到MQ
+	 * 
+	 * @param messageReceive
+	 * @param messageConfig
+	 */
+	private void sendToMQ(MessageSendingDTO messageReceive, MessageConfigDTO messageConfig) {
+		List<MessageForwardingConfigDTO> forwardingConfigs = messageConfig.getForwardingConfigs();
+		for (MessageForwardingConfigDTO forwardingConfig : forwardingConfigs) {
+			ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
 			messageForwarding.setMessageNo(messageReceive.getMessageNo());
 			messageForwarding.setMessageId(messageReceive.getMessageId());
 			messageForwarding.setForwardingId(forwardingConfig.getId());
@@ -231,21 +265,11 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 			messageForwarding.setMaxRetryTimes(forwardingConfig.getRetryTimes());
 			messageForwarding.setCallbackRequired(forwardingConfig.getCallbackRequired());
 			messageForwarding.setCallbackUrl(messageConfig.getCallbackUrl());
-			messageForwardings.add(messageForwarding);
-		}
-		return messageForwardings;
-	}
-
-	/**
-	 * 将转发明细发送到MQ
-	 * 
-	 * @param messageForwarding
-	 */
-	private void sendToMQ(MessageForwarding4MQ messageForwarding) {
-		try {
-			rocketMQProducer.send4Fowarding(JsonUtil.object2Json(messageForwarding));
-		} catch (CustomBusinessException e) {
-			LOGGER.error("发送转发明细到MQ异常，转发明细：" + messageForwarding, e);
+			try {
+				rocketMQProducer.send4Fowarding(JsonUtil.object2Json(messageForwarding));
+			} catch (CustomBusinessException e) {
+				LOGGER.error("发送转发明细到MQ异常，转发明细：" + messageForwarding, e);
+			}
 		}
 	}
 
@@ -256,7 +280,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * @param messageForwarding4MQ 通过MQ接收的消息转发信息
 	 * @return 转发结果
 	 */
-	private boolean forwardByHttp(MessageDTO messageDTO, MessageForwarding4MQ messageForwarding4MQ) {
+	private boolean forwardByHttp(MessageDTO messageDTO, ForwardingMessage4MQ messageForwarding4MQ) {
 		String messageContent = messageDTO.getMessageContent();
 		Map<String, String> httpHeaders = messageDTO.getHttpHeaders();
 		String targetAddress = messageForwarding4MQ.getTargetAddress();
@@ -281,7 +305,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * @param messageForwarding4MQ 通过MQ接收的消息转发信息
 	 * @return 转发结果
 	 */
-	private boolean forwardByRocketMQ(MessageDTO messageDTO, MessageForwarding4MQ messageForwarding4MQ) {
+	private boolean forwardByRocketMQ(MessageDTO messageDTO, ForwardingMessage4MQ messageForwarding4MQ) {
 		return false;
 	}
 
@@ -292,7 +316,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * @param messageForwarding4MQ 通过MQ接收的消息转发信息
 	 * @return 转发结果
 	 */
-	private boolean forwardByKafka(MessageDTO messageDTO, MessageForwarding4MQ messageForwarding4MQ) {
+	private boolean forwardByKafka(MessageDTO messageDTO, ForwardingMessage4MQ messageForwarding4MQ) {
 		return false;
 	}
 

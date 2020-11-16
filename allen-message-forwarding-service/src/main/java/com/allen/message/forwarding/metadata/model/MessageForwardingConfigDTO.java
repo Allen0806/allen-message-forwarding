@@ -56,7 +56,7 @@ public class MessageForwardingConfigDTO implements Serializable {
 	private Integer retryTimes;
 
 	/**
-	 * 是否需要回调，0-否，1-是，默认为0，回调重试次数固定为3
+	 * 是否需要回调，0-否，1-是
 	 */
 	@ApiModelProperty(value = "是否需要回调，0-否，1-是，默认为0", dataType = "Integer")
 	private Integer callbackRequired;
