@@ -43,7 +43,37 @@ public class MessageForwardingDTO implements Serializable {
 	private Long forwardingId;
 
 	/**
-	 * 转发结果：0-失败，1-成功，2-失败需重试
+	 * 转发到目标系统的方式，固定2位长度：01-Http，02-Kafka，03-RocketMQ，新增时不能为空
+	 */
+	private String forwardingWay;
+
+	/**
+	 * 目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔），新增时不可为空
+	 */
+	private String targetAddress;
+
+	/**
+	 * 最大重试次数，同时适用于转发重试及回调重试，默认值为3，最大值为10次
+	 */
+	private Integer maxRetryTimes;
+
+	/**
+	 * 是否需要回调，0-否，1-是
+	 */
+	private Integer callbackRequired;
+
+	/**
+	 * 消息发送结果回调地址，最长200位
+	 */
+	private String callbackUrl;
+
+	/**
+	 * 转发处理状态：0-处理中，1-重试中，2-已完成
+	 */
+	private Integer forwardingStatus;
+
+	/**
+	 * 转发结果：0-失败，1-成功
 	 */
 	private Integer forwardingResult;
 
@@ -53,12 +83,17 @@ public class MessageForwardingDTO implements Serializable {
 	private LocalDateTime forwardingSucessTime;
 
 	/**
-	 * 重试次数
+	 * 转发重试次数
 	 */
-	private Integer retryTimes;
+	private Integer forwardingRetryTimes;
 
 	/**
-	 * 回调结果：0-失败，1-成功，2-失败需重试
+	 * 回调处理状态：0-处理中，1-重试中，2-已完成
+	 */
+	private Integer callbackStatus;
+
+	/**
+	 * 回调结果：0-失败，1-成功
 	 */
 	private Integer callbackResult;
 
@@ -122,6 +157,54 @@ public class MessageForwardingDTO implements Serializable {
 		this.forwardingId = forwardingId;
 	}
 
+	public String getForwardingWay() {
+		return forwardingWay;
+	}
+
+	public void setForwardingWay(String forwardingWay) {
+		this.forwardingWay = forwardingWay;
+	}
+
+	public String getTargetAddress() {
+		return targetAddress;
+	}
+
+	public void setTargetAddress(String targetAddress) {
+		this.targetAddress = targetAddress;
+	}
+
+	public Integer getMaxRetryTimes() {
+		return maxRetryTimes;
+	}
+
+	public void setMaxRetryTimes(Integer maxRetryTimes) {
+		this.maxRetryTimes = maxRetryTimes;
+	}
+
+	public Integer getCallbackRequired() {
+		return callbackRequired;
+	}
+
+	public void setCallbackRequired(Integer callbackRequired) {
+		this.callbackRequired = callbackRequired;
+	}
+
+	public String getCallbackUrl() {
+		return callbackUrl;
+	}
+
+	public void setCallbackUrl(String callbackUrl) {
+		this.callbackUrl = callbackUrl;
+	}
+
+	public Integer getForwardingStatus() {
+		return forwardingStatus;
+	}
+
+	public void setForwardingStatus(Integer forwardingStatus) {
+		this.forwardingStatus = forwardingStatus;
+	}
+
 	public Integer getForwardingResult() {
 		return forwardingResult;
 	}
@@ -138,12 +221,20 @@ public class MessageForwardingDTO implements Serializable {
 		this.forwardingSucessTime = forwardingSucessTime;
 	}
 
-	public Integer getRetryTimes() {
-		return retryTimes;
+	public Integer getForwardingRetryTimes() {
+		return forwardingRetryTimes;
 	}
 
-	public void setRetryTimes(Integer retryTimes) {
-		this.retryTimes = retryTimes;
+	public void setForwardingRetryTimes(Integer forwardingRetryTimes) {
+		this.forwardingRetryTimes = forwardingRetryTimes;
+	}
+
+	public Integer getCallbackStatus() {
+		return callbackStatus;
+	}
+
+	public void setCallbackStatus(Integer callbackStatus) {
+		this.callbackStatus = callbackStatus;
 	}
 
 	public Integer getCallbackResult() {
@@ -188,13 +279,17 @@ public class MessageForwardingDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return new StringBuilder().append("MessageForwardingDTO[").append("id=").append(id).append("messageNo=")
+		return new StringBuilder().append("AmfMessageForwardingDO[").append("id=").append(id).append("messageNo=")
 				.append(messageNo).append(", messageKeyword=").append(messageKeyword).append(", messageId=")
-				.append(messageId).append(", forwardingId=").append(forwardingId).append(", forwardingResult=")
-				.append(forwardingResult).append(", forwardingSucessTime=").append(forwardingSucessTime)
-				.append(", retryTimes=").append(retryTimes).append(", callbackResult=").append(callbackResult)
-				.append(", callbackSucessTime=").append(callbackSucessTime).append(", callbackRetryTimes=")
-				.append(callbackRetryTimes).append(", createTime=").append(createTime).append(", updateTime=")
-				.append(updateTime).append("]").toString();
+				.append(messageId).append(", forwardingId=").append(forwardingId).append(", forwardingWay=")
+				.append(forwardingWay).append(", targetAddress=").append(targetAddress).append(", maxRetryTimes=")
+				.append(maxRetryTimes).append(", callbackRequired=").append(callbackRequired).append(", callbackUrl=")
+				.append(callbackUrl).append(", forwardingStatus=").append(forwardingStatus)
+				.append(", forwardingResult=").append(forwardingResult).append(", forwardingSucessTime=")
+				.append(forwardingSucessTime).append(", forwardingRetryTimes=").append(forwardingRetryTimes)
+				.append(", callbackStatus=").append(callbackStatus).append(", callbackSucessTime=")
+				.append(callbackSucessTime).append(", callbackRetryTimes=").append(callbackRetryTimes)
+				.append(", createTime=").append(createTime).append(", updateTime=").append(updateTime).append("]")
+				.toString();
 	}
 }

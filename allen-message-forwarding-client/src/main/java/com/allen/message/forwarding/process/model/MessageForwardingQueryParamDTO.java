@@ -51,13 +51,25 @@ public class MessageForwardingQueryParamDTO implements java.io.Serializable {
 	private Long forwardingId;
 
 	/**
-	 * 转发结果：0-失败，1-成功，2-失败需重试
+	 * 转发处理状态：0-处理中，1-重试中，2-已完成
+	 */
+	@ApiModelProperty(value = "转发处理状态", dataType = "Integer", required = false)
+	private Integer forwardingStatus;
+
+	/**
+	 * 转发结果：0-失败，1-成功
 	 */
 	@ApiModelProperty(value = "转发结果", dataType = "Integer", required = false)
 	private Integer forwardingResult;
 
 	/**
-	 * 回调结果：0-失败，1-成功，2-失败需重试
+	 * 回调处理状态：0-处理中，1-重试中，2-已完成
+	 */
+	@ApiModelProperty(value = "回调处理状态", dataType = "Integer", required = false)
+	private Integer callbackStatus;
+
+	/**
+	 * 回调结果：0-失败，1-成功
 	 */
 	@ApiModelProperty(value = "回调结果", dataType = "Integer", required = false)
 	private Integer callbackResult;
@@ -119,12 +131,28 @@ public class MessageForwardingQueryParamDTO implements java.io.Serializable {
 		this.forwardingId = forwardingId;
 	}
 
+	public Integer getForwardingStatus() {
+		return forwardingStatus;
+	}
+
+	public void setForwardingStatus(Integer forwardingStatus) {
+		this.forwardingStatus = forwardingStatus;
+	}
+
 	public Integer getForwardingResult() {
 		return forwardingResult;
 	}
 
 	public void setForwardingResult(Integer forwardingResult) {
 		this.forwardingResult = forwardingResult;
+	}
+
+	public Integer getCallbackStatus() {
+		return callbackStatus;
+	}
+
+	public void setCallbackStatus(Integer callbackStatus) {
+		this.callbackStatus = callbackStatus;
 	}
 
 	public Integer getCallbackResult() {
@@ -171,9 +199,10 @@ public class MessageForwardingQueryParamDTO implements java.io.Serializable {
 	public String toString() {
 		return new StringBuilder().append("ForwardingQueryParam[").append("messageNo=").append(messageNo)
 				.append(", messageKeyword=").append(messageKeyword).append(", messageId=").append(messageId)
-				.append(", forwardingId=").append(forwardingId).append(", forwardingResult=").append(forwardingResult)
-				.append(", callbackResult=").append(callbackResult).append(", beginDate=").append(beginDate)
-				.append(", endDate=").append(endDate).append(", startNo=").append(startNo).append(", pageSize=")
-				.append(pageSize).append("]").toString();
+				.append(", forwardingId=").append(forwardingId).append(", forwardingStatus=").append(forwardingStatus)
+				.append(", forwardingResult=").append(forwardingResult).append(", callbackStatus=")
+				.append(callbackStatus).append(", callbackResult=").append(callbackResult).append(", beginDate=")
+				.append(beginDate).append(", endDate=").append(endDate).append(", startNo=").append(startNo)
+				.append(", pageSize=").append(pageSize).append("]").toString();
 	}
 }

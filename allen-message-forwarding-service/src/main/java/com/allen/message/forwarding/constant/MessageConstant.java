@@ -45,7 +45,7 @@ public class MessageConstant {
 	public static final Integer NO = 0;
 
 	/**
-	 * 最大回调重试次数，固定为3
+	 * 默认最大回调重试次数，固定为3
 	 */
 	public static final Integer MAX_CALLBACK_RETRY_TIMES = 3;
 }

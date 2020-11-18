@@ -55,9 +55,9 @@ public class ResultStatuses {
 	public static final ResultStatus MF_1007 = new ResultStatus("MF1007", "消息为空");
 	public static final ResultStatus MF_1008 = new ResultStatus("MF1008", "消息发送异常");
 	public static final ResultStatus MF_1009 = new ResultStatus("MF1009", "更新消息转发明细失败");
-	public static final ResultStatus MF_1010 = new ResultStatus("MF1010", "消息转发锁异常");
+	public static final ResultStatus MF_1010 = new ResultStatus("MF1010", "消息转发异常");
+	public static final ResultStatus MF_1011 = new ResultStatus("MF1011", "消息转发方式不正确");
 	
-	public static final ResultStatus MF_1011 = new ResultStatus("MF1011", "");
 	public static final ResultStatus MF_1012 = new ResultStatus("MF1012", "");
 	public static final ResultStatus MF_1013 = new ResultStatus("MF1013", "");
 	public static final ResultStatus MF_1014 = new ResultStatus("MF1014", "");

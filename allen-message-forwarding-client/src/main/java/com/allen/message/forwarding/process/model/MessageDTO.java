@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 消息传入对象
+ * 消息对象
  *
  * @author Allen
  * @date 2020年5月8日

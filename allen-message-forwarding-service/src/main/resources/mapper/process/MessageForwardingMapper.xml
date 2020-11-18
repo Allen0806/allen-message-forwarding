@@ -12,9 +12,16 @@
 			`message_keyword`,
 			`message_id`,
 			`forwarding_id`,
+			`forwarding_way`,
+			`target_address`,
+			`max_retry_times`,
+			`callback_required`,
+			`callback_url`,
+			`forwarding_status`,
 			`forwarding_result`,
 			`forwarding_success_time`,
-			`retry_times`,
+			`forwarding_retry_times`,
+			`callback_status`,
 			`callback_result`,
 			`callback_success_time`,
 			`callback_retry_times`
@@ -26,9 +33,16 @@
 			#{item.messageKeyword},
 			#{item.messageId},
 			#{item.forwardingId},
+			#{item.forwardingWay},
+			#{item.targetAddress},
+			#{item.maxRetryTimes},
+			#{item.callbackRequired},
+			#{item.callbackUrl},
+			#{item.forwardingStatus},
 			#{item.forwardingResult},
 			#{item.forwardingSucessTime},
-			#{item.retryTimes},
+			#{item.forwardingRetryTimes},
+			#{item.callbackStatus},
 			#{item.callbackResult},
 			#{item.callbackSucessTime}
 			#{item.callbackRetryTimes}
@@ -41,14 +55,20 @@
         update `amf_message_forwarding`
         set
         <trim suffixOverrides=",">
+        	<if test="forwardingStatus != null">
+                `forwarding_status` = #{forwardingStatus},
+            </if>
             <if test="forwardingResult != null">
                 `forwarding_result` = #{forwardingResult},
             </if>
             <if test="forwardingSucessTime != null">
                 `forwarding_success_time` = #{forwardingSucessTime},
             </if>
-            <if test="retryTimes != null">
-                `retry_times` = #{retryTimes},
+            <if test="forwardingRetryTimes != null">
+                `forwarding_retry_times` = #{forwardingRetryTimes},
+            </if>
+            <if test="callbackStatus != null">
+                `callback_status` = #{callbackStatus},
             </if>
             <if test="callbackResult != null">
                 `callback_result` = #{callbackResult},
@@ -65,19 +85,19 @@
     </update>
     
     <insert id="migrate" parameterType="java.time.LocalDateTime">
-    	insert into `amf_message_forwarding_history`
+    	insert into amf_message_forwarding_history
     	select t1.*
-    	  from `amf_message_forwarding` as t1, `amf_message` as t2 
+    	  from amf_message_forwarding as t1, amf_message as t2 
          where t1.message_no = t2.message_no
     	   and t2.`create_time` &lt; #{deadline} 
     	   and t2.`forwarding_total_amount` = t2.`forwarding_success_amount`
     </insert>
     
     <delete id="remove" parameterType="java.time.LocalDateTime">
-		delete from `amf_message_forwarding` as t1
+		delete from amf_message_forwarding as t1
         where t1.message_no in 
         	  ( select t2.message_no 
-        	      from `amf_message` as t2 
+        	      from amf_message as t2 
         	     where t2.`create_time` &lt; #{deadline} 
     	  		   and t2.`forwarding_total_amount` = t2.`forwarding_success_amount`
     	  	  )
@@ -85,19 +105,26 @@
 	
     <!-- 通用查询语句块 -->
 	<sql id="forwardingColumns">
-		id,
-		message_no,
-		message_keyword,
-		message_id,
-		forwarding_id,
-        forwarding_result,
-		forwarding_success_time,
-		retry_times,
-		callback_result,
-		callback_success_time,
-		callback_retry_times,
-		create_time,
-		update_time
+		`id`,
+		`message_no`,
+		`message_keyword`,
+		`message_id`,
+		`forwarding_id`,
+		`forwarding_way`,
+		`target_address`,
+		`max_retry_times`,
+		`callback_required`,
+		`callback_url`,
+		`forwarding_status`,
+		`forwarding_result`,
+		`forwarding_success_time`,
+		`forwarding_retry_times`,
+		`callback_status`,
+		`callback_result`,
+		`callback_success_time`,
+		`callback_retry_times`
+		`create_time`,
+		`update_time`
 	</sql>
     
     <resultMap id="forwardingResultMap" type="com.allen.message.forwarding.process.model.AmfMessageForwardingDO" >
@@ -106,9 +133,16 @@
         <result property="messageKeyword" column="message_keyword"/>
         <result property="messageId" column="message_id"/>
         <result property="forwardingId" column="forwarding_id"/>
+        <result property="forwardingWay" column="forwarding_way"/>
+        <result property="targetAddress" column="target_address"/>
+        <result property="maxRetryTimes" column="max_retry_times"/>
+        <result property="callbackRequired" column="callback_required"/>
+        <result property="callbackUrl" column="callback_url"/>
+        <result property="forwardingStatus" column="forwarding_status"/>
         <result property="forwardingResult" column="forwarding_result"/>
         <result property="forwardingSucessTime" column="forwarding_success_time"/>
-        <result property="retryTimes" column="retry_times"/>
+        <result property="forwardingRetryTimes" column="forwarding_retry_times"/>
+        <result property="callbackStatus" column="callback_status"/>
         <result property="callbackResult" column="callback_result"/>
         <result property="callbackSucessTime" column="callback_success_time"/>
         <result property="callbackRetryTimes" column="callback_retry_times"/>
@@ -133,7 +167,7 @@
     
     <select id="count" parameterType="com.allen.message.forwarding.process.model.ForwardingQueryParamDTO" resultType="int">
 		select count(*)
-		from  `amf_message_forwarding`
+		from   amf_message_forwarding
 		<where>
 			<if test="messageNo != null">
 				message_no = #{messageNo}
@@ -147,8 +181,14 @@
 			<if test="forwardingId != null">
 				and forwarding_id = #{forwardingId}
 			</if>
+			<if test="forwardingStatus != null">
+				and forwarding_status = #{forwardingStatus}
+			</if>
 			<if test="forwardingResult != null">
 				and forwarding_result = #{forwardingResult}
+			</if>
+			<if test="callbackStatus != null">
+				and callback_status = #{callbackStatus}
 			</if>
 			<if test="callbackResult != null">
 				and callback_result = #{callbackResult}
@@ -166,7 +206,7 @@
 	<select id="list" parameterType="com.allen.message.forwarding.process.model.ForwardingQueryParamDTO" resultMap="forwardingResultMap">
         select
         <include refid="forwardingColumns"></include>
-        from  `amf_message_forwarding`
+        from  amf_message_forwarding
 		<where>
 			<if test="messageNo != null">
 				message_no = #{messageNo}
@@ -180,8 +220,14 @@
 			<if test="forwardingId != null">
 				and forwarding_id = #{forwardingId}
 			</if>
+			<if test="forwardingStatus != null">
+				and forwarding_status = #{forwardingStatus}
+			</if>
 			<if test="forwardingResult != null">
 				and forwarding_result = #{forwardingResult}
+			</if>
+			<if test="callbackStatus != null">
+				and callback_status = #{callbackStatus}
 			</if>
 			<if test="callbackResult != null">
 				and callback_result = #{callbackResult}

@@ -11,14 +11,14 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * 消息传入对象
+ * 消息发送对象
  *
  * @author Allen
  * @date 2020年5月8日
  * @since 1.0.0
  *
  */
-@ApiModel("消息对象")
+@ApiModel("消息发送对象")
 public class MessageSendingDTO implements java.io.Serializable {
 
 	/**

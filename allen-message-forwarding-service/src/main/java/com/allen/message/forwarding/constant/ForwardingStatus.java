@@ -3,14 +3,14 @@ package com.allen.message.forwarding.constant;
 import java.util.Objects;
 
 /**
- * 回调结果枚举类
- * 
+ * 转发状态枚举类
+ *
  * @author Allen
  * @date 2020年11月10日
  * @since 1.0.0
  */
-public enum CallbackResult {
-	FAILURE(0), SUCCESS(1), PROCESSING(2);
+public enum ForwardingStatus {
+	PROCESSING(0), RETRYING(1), FINISH(2);
 
 	/**
 	 * 枚举转换值
@@ -22,7 +22,7 @@ public enum CallbackResult {
 	 * 
 	 * @param value
 	 */
-	private CallbackResult(Integer value) {
+	private ForwardingStatus(Integer value) {
 		this.value = value;
 	}
 
@@ -41,18 +41,18 @@ public enum CallbackResult {
 	 * @param value 枚举转换值
 	 * @return 枚举对象
 	 */
-	public static CallbackResult instanceOf(Integer value) {
+	public static ForwardingStatus instanceOf(Integer value) {
 		if (Objects.isNull(value)) {
 			return null;
 		}
 		if (value == 0) {
-			return FAILURE;
+			return PROCESSING;
 		}
 		if (value == 1) {
-			return SUCCESS;
+			return RETRYING;
 		}
 		if (value == 2) {
-			return PROCESSING;
+			return FINISH;
 		}
 		return null;
 	}

@@ -24,14 +24,6 @@ public interface MessageDAO {
 	int save(AmfMessageDO messageDO);
 
 	/**
-	 * 修改消息信息
-	 * 
-	 * @param messageDO 消息信息
-	 * @return 修改数量
-	 */
-	int update(AmfMessageDO messageDO);
-
-	/**
 	 * 增加消息转发成功数量，每次加1
 	 * 
 	 * @param messageNo 消息流水号

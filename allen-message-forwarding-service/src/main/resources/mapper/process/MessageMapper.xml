@@ -89,19 +89,6 @@
 		)
 	</insert>
     
-	<!-- 根据主键ID更新 -->
-    <update id="update" parameterType="com.allen.message.forwarding.process.model.AmfMessageDO">
-        update `amf_message`
-        set
-        <trim suffixOverrides=",">
-            <if test="forwardingSuccessAmount != null">
-                `forwarding_success_amount` = #{forwardingSuccessAmount},
-            </if>
-        </trim>
-        where `id` = #{id}
-        and   `update_time` = #{updateTime}
-    </update>
-    
     <update id="updateSucessAmount" parameterType="string">
        update `amf_message`
         set `forwarding_success_amount` = `forwarding_success_amount` + 1

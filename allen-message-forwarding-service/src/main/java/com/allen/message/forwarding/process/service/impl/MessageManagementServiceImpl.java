@@ -1,6 +1,5 @@
 package com.allen.message.forwarding.process.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.allen.message.forwarding.constant.CallbackResult;
-import com.allen.message.forwarding.constant.ForwardingResult;
+import com.allen.message.forwarding.constant.CallbackStatus;
+import com.allen.message.forwarding.constant.ForwardingStatus;
+import com.allen.message.forwarding.constant.MessageConstant;
 import com.allen.message.forwarding.constant.ResultStatuses;
 import com.allen.message.forwarding.process.dao.MessageDAO;
 import com.allen.message.forwarding.process.dao.MessageForwardingDAO;
@@ -78,11 +78,6 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		}
 	}
 
-	public void updateMessage(MessageDTO messageDTO) {
-		// TODO Auto-generated method stub
-
-	}
-
 	@Transactional
 	@Override
 	public void updateForwardingResult(MessageForwardingDTO messageForwardingDTO) {
@@ -96,6 +91,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		int updateRetryTimes = 0;
 		// 更新时使用更新时间戳做为乐观锁，如果更新失败，则循环重试3次
 		while (count == 0) {
+			// 可以加延时处理 Thread.sleep(100);
 			if (updateRetryTimes == 3) {
 				LOGGER.error("更新消息转发明细失败，转发明细信息：{}", newMessageForwardingDO);
 				throw new CustomBusinessException(ResultStatuses.MF_1009);
@@ -103,43 +99,87 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 			AmfMessageForwardingDO oldMessageForwardingDO = messageForwardingDAO.getById(messageForwardingDTO.getId());
 			newMessageForwardingDO = new AmfMessageForwardingDO();
 			newMessageForwardingDO.setId(messageForwardingDTO.getId());
-			boolean isNotChanged = true;
-			if (messageForwardingDTO.getForwardingResult() == ForwardingResult.SUCCESS.value()) {
-				if (oldMessageForwardingDO.getForwardingResult() != ForwardingResult.SUCCESS.value()) {
-					newMessageForwardingDO.setForwardingResult(ForwardingResult.SUCCESS.value());
-					newMessageForwardingDO.setForwardingSucessTime(LocalDateTime.now());
-					newMessageForwardingDO.setRetryTimes(oldMessageForwardingDO.getRetryTimes() + 1);
-					isNotChanged = false;
-				} else {
-					LOGGER.error("消息可能已被重复转发，转发明细信息", oldMessageForwardingDO);
+			newMessageForwardingDO.setUpdateTime(oldMessageForwardingDO.getUpdateTime());
+			boolean isChanged = false;
+			boolean isFinished = false;
+			if (messageForwardingDTO.getForwardingStatus() == ForwardingStatus.RETRYING.value()) {
+				if (oldMessageForwardingDO.getForwardingResult() == ForwardingStatus.PROCESSING.value()) {
+					newMessageForwardingDO.setForwardingStatus(ForwardingStatus.RETRYING.value());
+					newMessageForwardingDO.setForwardingRetryTimes(messageForwardingDTO.getForwardingRetryTimes());
+					isChanged = true;
+				} else if (oldMessageForwardingDO.getForwardingResult() == ForwardingStatus.RETRYING.value()) {
+					Integer oldRetryTimes = oldMessageForwardingDO.getForwardingRetryTimes() + 1;
+					Integer newRetryTimes = messageForwardingDTO.getForwardingRetryTimes();
+					Integer forwardingRetryTimes = !Objects.isNull(newRetryTimes) && (newRetryTimes > oldRetryTimes)
+							? newRetryTimes
+							: oldRetryTimes;
+					if (forwardingRetryTimes >= oldMessageForwardingDO.getMaxRetryTimes()) {
+						// 如果重试次数超过最大重试次数，则状态设置为已完成，结果为失败
+						newMessageForwardingDO.setForwardingStatus(ForwardingStatus.FINISH.value());
+						newMessageForwardingDO.setForwardingResult(MessageConstant.NO);
+						isFinished = true;
+					}
+					newMessageForwardingDO.setForwardingRetryTimes(forwardingRetryTimes);
+					isChanged = true;
 				}
-			} else if (messageForwardingDTO.getForwardingResult() == ForwardingResult.PROCESSING.value()) {
-				if (oldMessageForwardingDO.getForwardingResult() != ForwardingResult.SUCCESS.value()) {
-					newMessageForwardingDO.setRetryTimes(oldMessageForwardingDO.getRetryTimes() + 1);
-					isNotChanged = false;
+			} else if (messageForwardingDTO.getForwardingStatus() == ForwardingStatus.FINISH.value()) {
+				if (oldMessageForwardingDO.getForwardingResult() == ForwardingStatus.PROCESSING.value()) {
+					newMessageForwardingDO.setForwardingStatus(ForwardingStatus.FINISH.value());
+					newMessageForwardingDO.setForwardingResult(messageForwardingDTO.getForwardingResult());
+					newMessageForwardingDO.setForwardingRetryTimes(messageForwardingDTO.getForwardingRetryTimes());
+					isChanged = true;
+				} else if (oldMessageForwardingDO.getForwardingResult() == ForwardingStatus.RETRYING.value()) {
+					newMessageForwardingDO.setForwardingStatus(ForwardingStatus.FINISH.value());
+					newMessageForwardingDO.setForwardingResult(messageForwardingDTO.getForwardingResult());
+					Integer oldRetryTimes = oldMessageForwardingDO.getForwardingRetryTimes() + 1;
+					Integer newRetryTimes = messageForwardingDTO.getForwardingRetryTimes();
+					Integer forwardingRetryTimes = !Objects.isNull(newRetryTimes) && (newRetryTimes > oldRetryTimes)
+							? newRetryTimes
+							: oldRetryTimes;
+					newMessageForwardingDO.setForwardingRetryTimes(forwardingRetryTimes);
+					isChanged = true;
+				} else if (oldMessageForwardingDO.getForwardingResult() == ForwardingStatus.FINISH.value()) {
+					Integer oldRetryTimes = oldMessageForwardingDO.getForwardingRetryTimes() + 1;
+					Integer newRetryTimes = messageForwardingDTO.getForwardingRetryTimes();
+					Integer forwardingRetryTimes = !Objects.isNull(newRetryTimes) && (newRetryTimes > oldRetryTimes)
+							? newRetryTimes
+							: oldRetryTimes;
+					newMessageForwardingDO.setForwardingRetryTimes(forwardingRetryTimes);
+					if (messageForwardingDTO.getForwardingResult() == MessageConstant.YES && oldMessageForwardingDO
+							.getForwardingResult() != messageForwardingDTO.getForwardingResult()) {
+						newMessageForwardingDO.setForwardingResult(messageForwardingDTO.getForwardingResult());
+						newMessageForwardingDO.setForwardingSucessTime(messageForwardingDTO.getForwardingSucessTime());
+					}
+					isChanged = true;
 				}
-			} else if (messageForwardingDTO.getForwardingResult() == ForwardingResult.FAILURE.value()) {
-				if (oldMessageForwardingDO.getForwardingResult() == ForwardingResult.PROCESSING.value()) {
-					newMessageForwardingDO.setForwardingResult(ForwardingResult.FAILURE.value());
-					newMessageForwardingDO.setRetryTimes(oldMessageForwardingDO.getRetryTimes() + 1);
-					isNotChanged = false;
-				} else if (oldMessageForwardingDO.getForwardingResult() == ForwardingResult.FAILURE.value()) {
-					newMessageForwardingDO.setRetryTimes(oldMessageForwardingDO.getRetryTimes() + 1);
-					isNotChanged = false;
-				}
+				isFinished = true;
 			}
-			// TODO 设置callback信息
-			if (isNotChanged) {
+			if (!isChanged) {
 				break;
+			}
+			// 设置回调信息
+			if (isFinished && oldMessageForwardingDO.getCallbackRequired() == MessageConstant.YES
+					&& oldMessageForwardingDO.getCallbackStatus() == null) {
+				if (messageForwardingDTO.getCallbackStatus() != null) {
+					newMessageForwardingDO.setCallbackStatus(messageForwardingDTO.getCallbackStatus());
+					newMessageForwardingDO.setCallbackRetryTimes(messageForwardingDTO.getCallbackRetryTimes());
+				} else {
+					// 此步非必须，如果转发为已完成状态，并且需要回调，则messageForwardingDTO.getCallbackStatus()不能为空
+					newMessageForwardingDO.setCallbackStatus(CallbackStatus.PROCESSING.value());
+					newMessageForwardingDO.setCallbackRetryTimes(0);
+				}
 			}
 			count = messageForwardingDAO.update(newMessageForwardingDO);
 			updateRetryTimes++;
+		}
+		// 如果转发成功，则更新消息信息的转发成功数量
+		if (messageForwardingDTO.getForwardingResult() == MessageConstant.YES) {
+			messageDAO.updateSucessAmount(messageForwardingDTO.getMessageNo());
 		}
 	}
 
 	@Override
 	public void updateCallbackResult(MessageForwardingDTO messageForwardingDTO) {
-		// TODO Auto-generated method stub
 		if (Objects.isNull(messageForwardingDTO) || messageForwardingDTO.getId() == null) {
 			LOGGER.error("消息转发明细为空或主键为空，转发明细信息：{}", messageForwardingDTO);
 			throw new CustomBusinessException(ResultStatuses.MF_1009);
@@ -150,6 +190,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		int updateRetryTimes = 0;
 		// 更新时使用更新时间戳做为乐观锁，如果更新失败，则循环重试3次
 		while (count == 0) {
+			// 可以加延时处理 Thread.sleep(100);
 			if (updateRetryTimes == 3) {
 				LOGGER.error("更新消息转发明细失败，转发明细信息：{}", newMessageForwardingDO);
 				throw new CustomBusinessException(ResultStatuses.MF_1009);
@@ -157,33 +198,59 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 			AmfMessageForwardingDO oldMessageForwardingDO = messageForwardingDAO.getById(messageForwardingDTO.getId());
 			newMessageForwardingDO = new AmfMessageForwardingDO();
 			newMessageForwardingDO.setId(messageForwardingDTO.getId());
-			boolean isNotChanged = true;
-			if (messageForwardingDTO.getCallbackResult() == CallbackResult.SUCCESS.value()) {
-				if (oldMessageForwardingDO.getCallbackResult() != CallbackResult.SUCCESS.value()) {
-					newMessageForwardingDO.setCallbackResult(CallbackResult.SUCCESS.value());
-					newMessageForwardingDO.setCallbackSucessTime(LocalDateTime.now());
-					newMessageForwardingDO.setCallbackRetryTimes(oldMessageForwardingDO.getCallbackRetryTimes() + 1);
-					isNotChanged = false;
-				} else {
-					LOGGER.error("消息可能已被重复回调，转发明细信息", oldMessageForwardingDO);
+			newMessageForwardingDO.setUpdateTime(oldMessageForwardingDO.getUpdateTime());
+			boolean isChanged = false;
+			if (messageForwardingDTO.getCallbackStatus() == CallbackStatus.RETRYING.value()) {
+				if (oldMessageForwardingDO.getCallbackResult() == CallbackStatus.PROCESSING.value()) {
+					newMessageForwardingDO.setCallbackStatus(CallbackStatus.RETRYING.value());
+					newMessageForwardingDO.setCallbackRetryTimes(messageForwardingDTO.getCallbackRetryTimes());
+					isChanged = true;
+				} else if (oldMessageForwardingDO.getCallbackResult() == CallbackStatus.RETRYING.value()) {
+					Integer oldRetryTimes = oldMessageForwardingDO.getCallbackRetryTimes() + 1;
+					Integer newRetryTimes = messageForwardingDTO.getCallbackRetryTimes();
+					Integer callbackRetryTimes = !Objects.isNull(newRetryTimes) && (newRetryTimes > oldRetryTimes)
+							? newRetryTimes
+							: oldRetryTimes;
+					if (callbackRetryTimes >= oldMessageForwardingDO.getMaxRetryTimes()) {
+						// 如果重试次数超过最大重试次数，则状态设置为已完成，结果为失败
+						newMessageForwardingDO.setCallbackStatus(CallbackStatus.FINISH.value());
+						newMessageForwardingDO.setCallbackResult(MessageConstant.NO);
+					}
+					newMessageForwardingDO.setCallbackRetryTimes(callbackRetryTimes);
+					isChanged = true;
 				}
-			} else if (messageForwardingDTO.getCallbackResult() == CallbackResult.PROCESSING.value()) {
-				if (oldMessageForwardingDO.getCallbackResult() != CallbackResult.SUCCESS.value()) {
-					newMessageForwardingDO.setCallbackRetryTimes(oldMessageForwardingDO.getCallbackRetryTimes() + 1);
-					isNotChanged = false;
-				}
-			} else if (messageForwardingDTO.getCallbackResult() == CallbackResult.FAILURE.value()) {
-				if (oldMessageForwardingDO.getCallbackResult() == CallbackResult.PROCESSING.value()) {
-					newMessageForwardingDO.setCallbackResult(CallbackResult.FAILURE.value());
-					newMessageForwardingDO.setCallbackRetryTimes(oldMessageForwardingDO.getCallbackRetryTimes() + 1);
-					isNotChanged = false;
-				} else if (oldMessageForwardingDO.getCallbackResult() == CallbackResult.FAILURE.value()) {
-					newMessageForwardingDO.setCallbackRetryTimes(oldMessageForwardingDO.getCallbackRetryTimes() + 1);
-					isNotChanged = false;
+			} else if (messageForwardingDTO.getCallbackStatus() == CallbackStatus.FINISH.value()) {
+				if (oldMessageForwardingDO.getCallbackResult() == CallbackStatus.PROCESSING.value()) {
+					newMessageForwardingDO.setCallbackStatus(CallbackStatus.FINISH.value());
+					newMessageForwardingDO.setCallbackResult(messageForwardingDTO.getCallbackResult());
+					newMessageForwardingDO.setCallbackRetryTimes(messageForwardingDTO.getCallbackRetryTimes());
+					isChanged = true;
+				} else if (oldMessageForwardingDO.getCallbackResult() == CallbackStatus.RETRYING.value()) {
+					newMessageForwardingDO.setCallbackStatus(CallbackStatus.FINISH.value());
+					newMessageForwardingDO.setCallbackResult(messageForwardingDTO.getCallbackResult());
+					Integer oldRetryTimes = oldMessageForwardingDO.getCallbackRetryTimes() + 1;
+					Integer newRetryTimes = messageForwardingDTO.getCallbackRetryTimes();
+					Integer callbackRetryTimes = !Objects.isNull(newRetryTimes) && (newRetryTimes > oldRetryTimes)
+							? newRetryTimes
+							: oldRetryTimes;
+					newMessageForwardingDO.setCallbackRetryTimes(callbackRetryTimes);
+					isChanged = true;
+				} else if (oldMessageForwardingDO.getCallbackResult() == CallbackStatus.FINISH.value()) {
+					Integer oldRetryTimes = oldMessageForwardingDO.getCallbackRetryTimes() + 1;
+					Integer newRetryTimes = messageForwardingDTO.getCallbackRetryTimes();
+					Integer callbackRetryTimes = !Objects.isNull(newRetryTimes) && (newRetryTimes > oldRetryTimes)
+							? newRetryTimes
+							: oldRetryTimes;
+					newMessageForwardingDO.setCallbackRetryTimes(callbackRetryTimes);
+					if (messageForwardingDTO.getCallbackResult() == MessageConstant.YES
+							&& oldMessageForwardingDO.getCallbackResult() != messageForwardingDTO.getCallbackResult()) {
+						newMessageForwardingDO.setCallbackResult(messageForwardingDTO.getCallbackResult());
+						newMessageForwardingDO.setCallbackSucessTime(messageForwardingDTO.getCallbackSucessTime());
+					}
+					isChanged = true;
 				}
 			}
-
-			if (isNotChanged) {
+			if (!isChanged) {
 				break;
 			}
 			count = messageForwardingDAO.update(newMessageForwardingDO);
@@ -241,17 +308,47 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 	 */
 	private List<AmfMessageForwardingDO> toMessageForwardingDO(List<MessageForwardingDTO> messageForwardings) {
 		List<AmfMessageForwardingDO> messageForwardingDOList = new ArrayList<>();
-		for (MessageForwardingDTO forwardingConfigDTO : messageForwardings) {
-			AmfMessageForwardingDO messageForwardingDO = new AmfMessageForwardingDO();
-			messageForwardingDO.setMessageNo(forwardingConfigDTO.getMessageNo());
-			messageForwardingDO.setMessageKeyword(forwardingConfigDTO.getMessageKeyword());
-			messageForwardingDO.setMessageId(forwardingConfigDTO.getMessageId());
-			messageForwardingDO.setForwardingId(forwardingConfigDTO.getForwardingId());
-			messageForwardingDO.setForwardingResult(forwardingConfigDTO.getForwardingResult());
-			messageForwardingDO.setRetryTimes(forwardingConfigDTO.getRetryTimes());
-			messageForwardingDOList.add(messageForwardingDO);
+		for (MessageForwardingDTO messageForwardingDTO : messageForwardings) {
+			AmfMessageForwardingDO messageForwardingDO = toMessageForwardingDO(messageForwardingDTO);
+			if (!Objects.isNull(messageForwardingDO)) {
+				messageForwardingDOList.add(messageForwardingDO);
+			}
 		}
 		return messageForwardingDOList;
+	}
+
+	/**
+	 * 转发明细DTO转换为DO
+	 * 
+	 * @param messageForwardingDTO
+	 * @return
+	 */
+	private AmfMessageForwardingDO toMessageForwardingDO(MessageForwardingDTO messageForwardingDTO) {
+		if (Objects.isNull(messageForwardingDTO)) {
+			return null;
+		}
+		AmfMessageForwardingDO messageForwardingDO = new AmfMessageForwardingDO();
+		messageForwardingDO.setId(messageForwardingDTO.getId());
+		messageForwardingDO.setMessageNo(messageForwardingDTO.getMessageNo());
+		messageForwardingDO.setMessageKeyword(messageForwardingDTO.getMessageKeyword());
+		messageForwardingDO.setMessageId(messageForwardingDTO.getMessageId());
+		messageForwardingDO.setForwardingId(messageForwardingDTO.getForwardingId());
+		messageForwardingDO.setForwardingWay(messageForwardingDTO.getForwardingWay());
+		messageForwardingDO.setTargetAddress(messageForwardingDTO.getTargetAddress());
+		messageForwardingDO.setMaxRetryTimes(messageForwardingDTO.getMaxRetryTimes());
+		messageForwardingDO.setCallbackRequired(messageForwardingDTO.getCallbackRequired());
+		messageForwardingDO.setCallbackUrl(messageForwardingDTO.getCallbackUrl());
+		messageForwardingDO.setForwardingStatus(messageForwardingDTO.getForwardingStatus());
+		messageForwardingDO.setForwardingResult(messageForwardingDTO.getForwardingResult());
+		messageForwardingDO.setForwardingSucessTime(messageForwardingDTO.getForwardingSucessTime());
+		messageForwardingDO.setForwardingRetryTimes(messageForwardingDTO.getForwardingRetryTimes());
+		messageForwardingDO.setCallbackStatus(messageForwardingDTO.getCallbackStatus());
+		messageForwardingDO.setCallbackResult(messageForwardingDTO.getCallbackResult());
+		messageForwardingDO.setCallbackSucessTime(messageForwardingDTO.getCallbackSucessTime());
+		messageForwardingDO.setCallbackRetryTimes(messageForwardingDTO.getCallbackRetryTimes());
+		messageForwardingDO.setCreateTime(messageForwardingDTO.getCreateTime());
+		messageForwardingDO.setUpdateTime(messageForwardingDTO.getUpdateTime());
+		return messageForwardingDO;
 	}
 
 	/**
@@ -286,36 +383,9 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 	}
 
 	/**
-	 * 转发明细DTO转换为DO
-	 * 
-	 * @param messageForwardingDTO
-	 * @return
-	 */
-	private AmfMessageForwardingDO toMessageForwardingDO(MessageForwardingDTO messageForwardingDTO) {
-		if (Objects.isNull(messageForwardingDTO)) {
-			return null;
-		}
-		AmfMessageForwardingDO messageForwardingDO = new AmfMessageForwardingDO();
-		messageForwardingDO.setId(messageForwardingDTO.getId());
-//		messageForwardingDO.setMessageNo(messageForwardingDTO.getMessageNo());
-//		messageForwardingDO.setMessageKeyword(messageForwardingDTO.getMessageKeyword());
-//		messageForwardingDO.setMessageId(messageForwardingDTO.getMessageId());
-//		messageForwardingDO.setForwardingId(messageForwardingDTO.getForwardingId());
-		messageForwardingDO.setForwardingResult(messageForwardingDTO.getForwardingResult());
-		messageForwardingDO.setForwardingSucessTime(messageForwardingDTO.getForwardingSucessTime());
-		messageForwardingDO.setRetryTimes(messageForwardingDTO.getRetryTimes());
-		messageForwardingDO.setCallbackResult(messageForwardingDTO.getCallbackResult());
-		messageForwardingDO.setCallbackSucessTime(messageForwardingDTO.getCallbackSucessTime());
-		messageForwardingDO.setCallbackRetryTimes(messageForwardingDTO.getCallbackRetryTimes());
-//		messageForwardingDO.setCreateTime(messageForwardingDTO.getCreateTime());
-		messageForwardingDO.setUpdateTime(messageForwardingDTO.getUpdateTime());
-		return messageForwardingDO;
-	}
-
-	/**
 	 * 转发明细DO转换为DTO
 	 * 
-	 * @param messageForwardingDO
+	 * @param messageForwardingDTO
 	 * @return
 	 */
 	private MessageForwardingDTO toMessageForwardingDTO(AmfMessageForwardingDO messageForwardingDO) {
@@ -328,9 +398,16 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		messageForwardingDTO.setMessageKeyword(messageForwardingDO.getMessageKeyword());
 		messageForwardingDTO.setMessageId(messageForwardingDO.getMessageId());
 		messageForwardingDTO.setForwardingId(messageForwardingDO.getForwardingId());
+		messageForwardingDTO.setForwardingWay(messageForwardingDO.getForwardingWay());
+		messageForwardingDTO.setTargetAddress(messageForwardingDO.getTargetAddress());
+		messageForwardingDTO.setMaxRetryTimes(messageForwardingDO.getMaxRetryTimes());
+		messageForwardingDTO.setCallbackRequired(messageForwardingDO.getCallbackRequired());
+		messageForwardingDTO.setCallbackUrl(messageForwardingDO.getCallbackUrl());
+		messageForwardingDTO.setForwardingStatus(messageForwardingDO.getForwardingStatus());
 		messageForwardingDTO.setForwardingResult(messageForwardingDO.getForwardingResult());
 		messageForwardingDTO.setForwardingSucessTime(messageForwardingDO.getForwardingSucessTime());
-		messageForwardingDTO.setRetryTimes(messageForwardingDO.getRetryTimes());
+		messageForwardingDTO.setForwardingRetryTimes(messageForwardingDO.getForwardingRetryTimes());
+		messageForwardingDTO.setCallbackStatus(messageForwardingDO.getCallbackStatus());
 		messageForwardingDTO.setCallbackResult(messageForwardingDO.getCallbackResult());
 		messageForwardingDTO.setCallbackSucessTime(messageForwardingDO.getCallbackSucessTime());
 		messageForwardingDTO.setCallbackRetryTimes(messageForwardingDO.getCallbackRetryTimes());

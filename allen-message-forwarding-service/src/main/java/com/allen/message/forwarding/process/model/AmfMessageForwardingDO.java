@@ -68,7 +68,7 @@ public class AmfMessageForwardingDO implements Serializable {
 	private String callbackUrl;
 
 	/**
-	 * 转发处理状态：0-初始化，1-处理中，2-完成
+	 * 转发处理状态：0-处理中，1-重试中，2-已完成
 	 */
 	private Integer forwardingStatus;
 
@@ -88,7 +88,7 @@ public class AmfMessageForwardingDO implements Serializable {
 	private Integer forwardingRetryTimes;
 
 	/**
-	 * 回调处理状态：0-初始化，1-处理中，2-完成
+	 * 回调处理状态：0-处理中，1-重试中，2-已完成
 	 */
 	private Integer callbackStatus;
 
