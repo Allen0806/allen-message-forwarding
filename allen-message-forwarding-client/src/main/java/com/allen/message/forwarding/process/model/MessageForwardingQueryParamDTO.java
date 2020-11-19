@@ -87,7 +87,13 @@ public class MessageForwardingQueryParamDTO implements java.io.Serializable {
 	private String endDate;
 
 	/**
-	 * 分页查询时起始行号，从0开始。当messageNo为空时必须给定
+	 * 分页查询时的页数，当messageNo为空时startNo和pageNo必须给定其一，如果都给定，以startNo为准
+	 */
+	@ApiModelProperty(value = "分页查询时的页数，当messageNo为空时startNo和pageNo必须给定其一，如果都给定，以startNo为准", dataType = "Integer", required = false)
+	private Integer pageNo;
+
+	/**
+	 * 分页查询时起始行号，从0开始。当messageNo为空时startNo和pageNo必须给定其一
 	 */
 	@ApiModelProperty(value = "分页查询时起始行号，从0开始。当messageNo为空时必须给定", dataType = "Integer", required = false)
 	private Integer startNo;
@@ -177,6 +183,14 @@ public class MessageForwardingQueryParamDTO implements java.io.Serializable {
 
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
+	}
+
+	public Integer getPageNo() {
+		return pageNo;
+	}
+
+	public void setPageNo(Integer pageNo) {
+		this.pageNo = pageNo;
 	}
 
 	public Integer getStartNo() {

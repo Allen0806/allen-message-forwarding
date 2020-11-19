@@ -13,6 +13,7 @@ import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -61,8 +62,17 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	@Autowired
 	private RedissonClient redissonClient;
 
+	/**
+	 * restTemplate 实例
+	 */
 	@Autowired
 	private RestTemplate restTemplate;
+
+	/**
+	 * 回调处理线程池
+	 */
+	@Autowired
+	private ThreadPoolTaskExecutor callbackExecutor;
 
 	/**
 	 * RocketMQ生产者实例
@@ -428,9 +438,8 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 			messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
 			messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
 			messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
-			ThreadPoolExecutor executor = ThreadPoolExecutorUtil
-					.getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
-			executor.execute(() -> send2CallbackMQ(messageForwarding));
+			// 使用 ThreadPoolTaskExecutor 异步执行，也可以调用异步方法
+			callbackExecutor.submit(() -> send2CallbackMQ(messageForwarding));
 		}
 	}
 
@@ -439,6 +448,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * 
 	 * @param messageForwarding
 	 */
+	// @Async("callbackExecutor") //异步方法，括号里的是线程池对象名称，可以不给定，用默认的
 	private void send2CallbackMQ(ForwardingMessage4MQ messageForwarding) {
 		try {
 			rocketMQProducer.send4Callback(JsonUtil.object2Json(messageForwarding));

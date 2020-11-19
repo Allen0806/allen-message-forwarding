@@ -58,10 +58,12 @@ public class ResultStatuses {
 	public static final ResultStatus MF_1010 = new ResultStatus("MF1010", "消息转发异常");
 	public static final ResultStatus MF_1011 = new ResultStatus("MF1011", "消息转发方式不正确");
 	public static final ResultStatus MF_1012 = new ResultStatus("MF1012", "消息回调异常");
+	public static final ResultStatus MF_1013 = new ResultStatus("MF1013", "查询条件为空");
+	public static final ResultStatus MF_1014 = new ResultStatus("MF1014", "当前页数或起始行号不能同时为空或起始行号小于0或者当前页数小于1");
+	public static final ResultStatus MF_1015 = new ResultStatus("MF1015", "每页行数不能为空或者小于1");
 	
-	public static final ResultStatus MF_1013 = new ResultStatus("MF1013", "");
-	public static final ResultStatus MF_1014 = new ResultStatus("MF1014", "");
-	public static final ResultStatus MF_1015 = new ResultStatus("MF1015", "");
+	
+	
 	public static final ResultStatus MF_1016 = new ResultStatus("MF1016", "");
 	public static final ResultStatus MF_1017 = new ResultStatus("MF1017", "");
 	public static final ResultStatus MF_1018 = new ResultStatus("MF1018", "");

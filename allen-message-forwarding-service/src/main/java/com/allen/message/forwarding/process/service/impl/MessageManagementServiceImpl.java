@@ -1,9 +1,11 @@
 package com.allen.message.forwarding.process.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,8 @@ import com.allen.message.forwarding.process.model.AmfMessageDO;
 import com.allen.message.forwarding.process.model.AmfMessageForwardingDO;
 import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
+import com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO;
+import com.allen.message.forwarding.process.model.MessageQueryParamDTO;
 import com.allen.message.forwarding.process.service.MessageManagementService;
 import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.json.JsonUtil;
@@ -270,8 +274,67 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
 	@Override
 	public MessageForwardingDTO getMessageForwarding(String messageNo, Long forwardingId) {
+		if (StringUtil.isBlank(messageNo) || forwardingId == null) {
+			return null;
+		}
 		AmfMessageForwardingDO messageForwardingDO = messageForwardingDAO.get(messageNo, forwardingId);
 		return toMessageForwardingDTO(messageForwardingDO);
+	}
+
+	@Override
+	public List<MessageDTO> listMessage(MessageQueryParamDTO messageQueryParam) {
+		if (messageQueryParam == null) {
+			LOGGER.error("查询条件为空");
+			throw new CustomBusinessException(ResultStatuses.MF_1013);
+		}
+		String messageNo = messageQueryParam.getMessageNo();
+		Integer pageNo = messageQueryParam.getPageNo();
+		Integer startNo = messageQueryParam.getStartNo();
+		Integer pageSize = messageQueryParam.getPageSize();
+		if (StringUtil.isBlank(messageNo)) {
+			if ((pageNo == null && startNo == null) || (startNo != null && startNo < 0)
+					|| (pageNo != null && pageNo < 1)) {
+				LOGGER.error("当前页数或起始行号不能同时为空或起始行号小于0或者当前页数小于1，查询条件：{}", messageQueryParam);
+				throw new CustomBusinessException(ResultStatuses.MF_1014);
+			}
+			if (pageSize == null || pageSize < 1) {
+				LOGGER.error("每页行数不能为空或者小于1，查询条件：{}", messageQueryParam);
+				throw new CustomBusinessException(ResultStatuses.MF_1015);
+			}
+		}
+		if (startNo == null) {
+			messageQueryParam.setStartNo((pageNo - 1) * pageSize);
+		}
+		List<AmfMessageDO> messageDOList = messageDAO.list(messageQueryParam);
+		return toMessageDTO(messageDOList);
+	}
+
+	@Override
+	public List<MessageForwardingDTO> listMessageForwarding(MessageForwardingQueryParamDTO forwardingQueryParam) {
+		if (forwardingQueryParam == null) {
+			LOGGER.error("查询条件为空");
+			throw new CustomBusinessException(ResultStatuses.MF_1013);
+		}
+		String messageNo = forwardingQueryParam.getMessageNo();
+		Integer pageNo = forwardingQueryParam.getPageNo();
+		Integer startNo = forwardingQueryParam.getStartNo();
+		Integer pageSize = forwardingQueryParam.getPageSize();
+		if (StringUtil.isBlank(messageNo)) {
+			if ((pageNo == null && startNo == null) || (startNo != null && startNo < 0)
+					|| (pageNo != null && pageNo < 1)) {
+				LOGGER.error("当前页数或起始行号不能同时为空或起始行号小于0或者当前页数小于1，查询条件：{}", forwardingQueryParam);
+				throw new CustomBusinessException(ResultStatuses.MF_1014);
+			}
+			if (pageSize == null || pageSize < 1) {
+				LOGGER.error("每页行数不能为空或者小于1，查询条件：{}", forwardingQueryParam);
+				throw new CustomBusinessException(ResultStatuses.MF_1015);
+			}
+		}
+		if (startNo == null) {
+			forwardingQueryParam.setStartNo((pageNo - 1) * pageSize);
+		}
+		List<AmfMessageForwardingDO> forwardingDOList = messageForwardingDAO.list(forwardingQueryParam);
+		return toMessageForwardingDTO(forwardingDOList);
 	}
 
 	/**
@@ -354,6 +417,19 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 	/**
 	 * 转换为消息DTO对象
 	 * 
+	 * @param messageDOList
+	 * @return
+	 */
+	private List<MessageDTO> toMessageDTO(List<AmfMessageDO> messageDOList) {
+		if (messageDOList == null || messageDOList.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return messageDOList.parallelStream().map(e -> toMessageDTO(e)).collect(Collectors.toList());
+	}
+
+	/**
+	 * 转换为消息DTO对象
+	 * 
 	 * @param messageDO
 	 * @return
 	 */
@@ -380,6 +456,20 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		messageDTO.setCreateTime(messageDO.getCreateTime());
 		messageDTO.setUpdateTime(messageDO.getUpdateTime());
 		return messageDTO;
+	}
+
+	/**
+	 * 转发明细DO转换为DTO
+	 * 
+	 * @param messageForwardingDOList
+	 * @return
+	 */
+	private List<MessageForwardingDTO> toMessageForwardingDTO(List<AmfMessageForwardingDO> messageForwardingDOList) {
+		if (messageForwardingDOList == null || messageForwardingDOList.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return messageForwardingDOList.parallelStream().map(e -> toMessageForwardingDTO(e))
+				.collect(Collectors.toList());
 	}
 
 	/**

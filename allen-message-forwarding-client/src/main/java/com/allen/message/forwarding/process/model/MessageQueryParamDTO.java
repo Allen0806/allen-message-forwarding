@@ -145,6 +145,14 @@ public class MessageQueryParamDTO implements java.io.Serializable {
 		this.endDate = endDate;
 	}
 
+	public Integer getPageNo() {
+		return pageNo;
+	}
+
+	public void setPageNo(Integer pageNo) {
+		this.pageNo = pageNo;
+	}
+
 	public Integer getStartNo() {
 		return startNo;
 	}
