@@ -13,8 +13,11 @@ import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.RestTemplate;
 
 import com.allen.message.forwarding.constant.CallbackStatus;
@@ -73,6 +76,12 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 */
 	@Autowired
 	private ThreadPoolTaskExecutor callbackExecutor;
+
+	/**
+	 * kafka客户端生产者模版
+	 */
+	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
 
 	/**
 	 * RocketMQ生产者实例
@@ -157,12 +166,14 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 					switch (forwardingWay) {
 					case HTTP:
 						forwardingResult = forwardByHttp(messageDTO, messageForwardingDTO);
+						update4ForwardingResult(messageForwardingDTO, forwardingResult, true);
 						break;
 					case ROCKETMQ:
 						forwardingResult = forwardByRocketMQ(messageDTO, messageForwardingDTO);
+						update4ForwardingResult(messageForwardingDTO, forwardingResult, true);
 						break;
 					case KAFKA:
-						forwardingResult = forwardByKafka(messageDTO, messageForwardingDTO);
+						forwardByKafka(messageDTO, messageForwardingDTO);
 						break;
 					default:
 						// 如果转发方式不正确，则直接更新为转发失败
@@ -170,7 +181,6 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 						update4ForwardingResult(messageForwardingDTO, false, false);
 						return;
 					}
-					update4ForwardingResult(messageForwardingDTO, forwardingResult, true);
 				} catch (Exception e) {
 					LOGGER.error("消息转发处理异常，消息转发明细：" + messageForwarding, e);
 					throw new CustomBusinessException(ResultStatuses.MF_1010, e);
@@ -367,11 +377,14 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * 
 	 * @param messageDTO           消息
 	 * @param messageForwardingDTO 转发明细
-	 * @return 转发结果
 	 */
-	private boolean forwardByKafka(MessageDTO messageDTO, MessageForwardingDTO messageForwardingDTO) {
-		// TODO
-		return false;
+	private void forwardByKafka(MessageDTO messageDTO, MessageForwardingDTO messageForwardingDTO) {
+		String messageContent = messageDTO.getMessageContent();
+		String targetAddress = messageForwardingDTO.getTargetAddress();
+		ListenableFuture<SendResult<String, String>> resultListenableFuture = kafkaTemplate.send(targetAddress,
+				messageContent);
+		resultListenableFuture.addCallback(successCallback -> update4ForwardingResult(messageForwardingDTO, true, true),
+				failureCallback -> update4ForwardingResult(messageForwardingDTO, false, true));
 	}
 
 	/**

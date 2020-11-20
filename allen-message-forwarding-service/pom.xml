@@ -39,6 +39,10 @@
     		<artifactId>rocketmq-spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.allen</groupId>
 			<artifactId>allen-message-forwarding-client</artifactId>
 			<version>${allen-message-forwarding.version}</version>

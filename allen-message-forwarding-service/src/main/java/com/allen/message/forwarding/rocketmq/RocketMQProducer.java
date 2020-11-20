@@ -7,7 +7,7 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.allen.message.forwarding.constant.ResultStatuses;
 import com.allen.tool.exception.CustomBusinessException;
@@ -20,7 +20,7 @@ import com.allen.tool.string.StringUtil;
  * @date 2020年11月6日
  * @since 1.0.0
  */
-@Service
+@Component
 public class RocketMQProducer {
 
 	/**
