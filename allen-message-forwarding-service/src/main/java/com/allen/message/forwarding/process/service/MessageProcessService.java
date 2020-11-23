@@ -38,4 +38,14 @@ public interface MessageProcessService {
 	 * @param messageForwarding 消息转发明细
 	 */
 	void callback(@NotNull(message = "消息转发明细不能为空") @Valid ForwardingMessage4MQ messageForwarding);
+
+	/**
+	 * 转发重试
+	 */
+	void retryForward();
+
+	/**
+	 * 回调重试
+	 */
+	void retryCallback();
 }

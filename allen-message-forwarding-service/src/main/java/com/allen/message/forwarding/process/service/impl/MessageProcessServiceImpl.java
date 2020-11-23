@@ -258,6 +258,18 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 		}
 	}
 
+	@Override
+	public void retryForward() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void retryCallback() {
+		// TODO Auto-generated method stub
+
+	}
+
 	/**
 	 * 转换为消息DTO对象
 	 * 
