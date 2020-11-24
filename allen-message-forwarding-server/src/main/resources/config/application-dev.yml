@@ -205,7 +205,7 @@ eureka:
     service-url:
       defaultZone: http://allen:allen1234@${spring.cloud.client.ip-address}:8701/eureka/
         
-#配置Mybatis
+# 配置Mybatis
 mybatis:
   # 路径都使用双星，不使用单星
   mapper-locations: classpath*:mapper/**/*Mapper.xml
@@ -214,4 +214,14 @@ mybatis:
   configuration:
     # 开启驼峰命名转换，如：Table(create_time) -> Entity(createTime)。不需要我们关心怎么进行字段匹配，mybatis会自动识别`大写字母与下划线`
     map-underscore-to-camel-case: true
-      
+
+# 配置定时任务
+xxl:
+  job:
+    admin:
+      address: http://127.0.0.1:8706/xxl-job-admin
+    executor:
+      appname: xxl-job-executor-message-forwarding
+      port: 9999
+      logpath: /Users/allen/Documents/Develop/logs/${spring.application.name}
+      logretentiondays: 30
