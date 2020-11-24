@@ -1,5 +1,6 @@
 package com.allen.message.forwarding.process.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.allen.message.forwarding.process.model.MessageDTO;
@@ -38,6 +39,13 @@ public interface MessageManagementService {
 	void updateCallbackResult(MessageForwardingDTO messageForwardingDTO);
 
 	/**
+	 * 迁移消息信息，仅限插入到历史表
+	 * 
+	 * @param deadline 截止时间，即只迁移创建时间小于给定时间的数据
+	 */
+	void migrate(LocalDateTime deadline);
+
+	/**
 	 * 获取消息信息
 	 * 
 	 * @param messageNo 消息流水号
@@ -55,12 +63,28 @@ public interface MessageManagementService {
 	MessageForwardingDTO getMessageForwarding(String messageNo, Long forwardingId);
 
 	/**
+	 * 查询符合条件的消息数量
+	 * 
+	 * @param messageQueryParam 查询条件
+	 * @return 消息数量
+	 */
+	Integer countMessage(MessageQueryParamDTO messageQueryParam);
+
+	/**
 	 * 根据查询条件查询消息信息
 	 * 
 	 * @param messageQueryParam 查询条件
 	 * @return 消息列表
 	 */
 	List<MessageDTO> listMessage(MessageQueryParamDTO messageQueryParam);
+
+	/**
+	 * 查询符合条件的消息转发明细数量
+	 * 
+	 * @param forwardingQueryParam 查询条件
+	 * @return 数量
+	 */
+	Integer countMessageForwarding(MessageForwardingQueryParamDTO forwardingQueryParam);
 
 	/**
 	 * 根据查询条件查询消息转发信息

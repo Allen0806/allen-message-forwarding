@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import com.allen.message.forwarding.process.service.MessageProcessService;
 
@@ -14,6 +15,7 @@ import com.allen.message.forwarding.process.service.MessageProcessService;
  * @date 2020年11月23日
  * @since 1.0.0
  */
+@Component
 public class MessageProcessSpringJob {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MessageProcessSpringJob.class);

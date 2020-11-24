@@ -48,4 +48,9 @@ public interface MessageProcessService {
 	 * 回调重试
 	 */
 	void retryCallback();
+
+	/**
+	 * 历史消息迁移
+	 */
+	void migrate();
 }

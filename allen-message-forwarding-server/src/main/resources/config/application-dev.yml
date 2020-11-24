@@ -159,6 +159,8 @@ server:
 rocketmq:
   name-server: localhost:9876
   producer:    group: message-forwarding-producermessage:
+  # 历史消息保留天数
+  retention-days: 30
   rocketmq:
     send:
       topic: amf-message-sending

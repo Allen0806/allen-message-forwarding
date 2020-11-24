@@ -1,5 +1,6 @@
 package com.allen.message.forwarding.process.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -182,6 +183,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public void updateCallbackResult(MessageForwardingDTO messageForwardingDTO) {
 		if (Objects.isNull(messageForwardingDTO) || messageForwardingDTO.getId() == null) {
@@ -263,6 +265,16 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
 	}
 
+	@Transactional
+	@Override
+	public void migrate(LocalDateTime deadline) {
+		if (deadline == null) {
+			return;
+		}
+		messageDAO.migrate(deadline);
+		messageForwardingDAO.migrate(deadline);
+	}
+
 	@Override
 	public MessageDTO getMessage(String messageNo) {
 		if (StringUtil.isBlank(messageNo)) {
@@ -279,6 +291,15 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		}
 		AmfMessageForwardingDO messageForwardingDO = messageForwardingDAO.get(messageNo, forwardingId);
 		return toMessageForwardingDTO(messageForwardingDO);
+	}
+
+	@Override
+	public Integer countMessage(MessageQueryParamDTO messageQueryParam) {
+		if (messageQueryParam == null) {
+			LOGGER.error("查询条件为空");
+			throw new CustomBusinessException(ResultStatuses.MF_1013);
+		}
+		return messageDAO.count(messageQueryParam);
 	}
 
 	@Override
@@ -307,6 +328,15 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		}
 		List<AmfMessageDO> messageDOList = messageDAO.list(messageQueryParam);
 		return toMessageDTO(messageDOList);
+	}
+
+	@Override
+	public Integer countMessageForwarding(MessageForwardingQueryParamDTO forwardingQueryParam) {
+		if (forwardingQueryParam == null) {
+			LOGGER.error("查询条件为空");
+			throw new CustomBusinessException(ResultStatuses.MF_1013);
+		}
+		return messageForwardingDAO.count(forwardingQueryParam);
 	}
 
 	@Override

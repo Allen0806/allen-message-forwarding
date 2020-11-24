@@ -28,8 +28,8 @@ public class ThreadPoolConfig {
 	public Executor callbackExecutor() {
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		// 设置线程池参数信息
-		taskExecutor.setCorePoolSize(10);
-		taskExecutor.setMaxPoolSize(50);
+		taskExecutor.setCorePoolSize(5);
+		taskExecutor.setMaxPoolSize(20);
 		taskExecutor.setQueueCapacity(200);
 		taskExecutor.setKeepAliveSeconds(10);
 		taskExecutor.setThreadNamePrefix("message-callback-");
@@ -52,7 +52,7 @@ public class ThreadPoolConfig {
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		// 设置线程池参数信息
 		taskExecutor.setCorePoolSize(10);
-		taskExecutor.setMaxPoolSize(50);
+		taskExecutor.setMaxPoolSize(20);
 		taskExecutor.setQueueCapacity(200);
 		taskExecutor.setKeepAliveSeconds(10);
 		taskExecutor.setThreadNamePrefix("message-forwarding-");

@@ -13,6 +13,7 @@ import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -32,6 +33,7 @@ import com.allen.message.forwarding.process.model.ForwardingMessage4Callback;
 import com.allen.message.forwarding.process.model.ForwardingMessage4MQ;
 import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
+import com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO;
 import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.message.forwarding.process.service.MessageManagementService;
 import com.allen.message.forwarding.process.service.MessageProcessService;
@@ -100,6 +102,12 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 */
 	@Autowired
 	private MessageManagementService messageManagementService;
+
+	/**
+	 * 历史消息保留天数
+	 */
+	@Value("${message.retention-days}")
+	private Integer retentionDays;
 
 	@Override
 	public void send(MessageSendingDTO messageReceiveDTO) {
@@ -260,14 +268,53 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 
 	@Override
 	public void retryForward() {
-		// TODO Auto-generated method stub
-
+		MessageForwardingQueryParamDTO queryParam = new MessageForwardingQueryParamDTO();
+		queryParam.setForwardingStatus(ForwardingStatus.RETRYING.value());
+		Integer count = messageManagementService.countMessageForwarding(queryParam);
+		if (count == null || count == 0) {
+			return;
+		}
+		Integer pageSize = 1000;
+		queryParam.setPageSize(pageSize);
+		int pageAmount = count / 1000 + 1;
+		for (int i = 0; i < pageAmount; i++) {
+			Integer startNo = i * pageSize;
+			queryParam.setStartNo(startNo);
+			List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding(queryParam);
+			// 异步发送消息到MQ
+			ThreadPoolExecutor executor = ThreadPoolExecutorUtil
+					.getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
+			executor.execute(() -> send2ForwardingMQ(messageForwardings));
+		}
 	}
 
 	@Override
 	public void retryCallback() {
-		// TODO Auto-generated method stub
+		MessageForwardingQueryParamDTO queryParam = new MessageForwardingQueryParamDTO();
+		queryParam.setForwardingStatus(ForwardingStatus.FINISH.value());
+		queryParam.setCallbackStatus(CallbackStatus.RETRYING.value());
+		Integer count = messageManagementService.countMessageForwarding(queryParam);
+		if (count == null || count == 0) {
+			return;
+		}
+		Integer pageSize = 1000;
+		queryParam.setPageSize(pageSize);
+		int pageAmount = count / 1000 + 1;
+		for (int i = 0; i < pageAmount; i++) {
+			Integer startNo = i * pageSize;
+			queryParam.setStartNo(startNo);
+			List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding(queryParam);
+			// 异步发送消息到MQ
+			callbackExecutor.submit(() -> send2CallbackMQ(messageForwardings));
+		}
 
+	}
+
+	@Override
+	public void migrate() {
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime deadline = now.minusDays(retentionDays);
+		messageManagementService.migrate(deadline);
 	}
 
 	/**
@@ -325,6 +372,34 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 			messageForwarding.setForwardingId(forwardingConfig.getId());
 			send2ForwardingMQ(messageForwarding);
 		}
+	}
+
+	/**
+	 * 将转发明细发送到转发MQ
+	 * 
+	 * @param messageForwardingDTOList
+	 */
+	private void send2ForwardingMQ(List<MessageForwardingDTO> messageForwardingDTOList) {
+		if (Objects.isNull(messageForwardingDTOList) || messageForwardingDTOList.isEmpty()) {
+			return;
+		}
+		messageForwardingDTOList.parallelStream().forEach(e -> send2ForwardingMQ(e));
+	}
+
+	/**
+	 * 将转发明细发送到转发MQ
+	 * 
+	 * @param messageForwardingDTO
+	 */
+	private void send2ForwardingMQ(MessageForwardingDTO messageForwardingDTO) {
+		if (Objects.isNull(messageForwardingDTO)) {
+			return;
+		}
+		ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
+		messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
+		messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
+		messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
+		send2ForwardingMQ(messageForwarding);
 	}
 
 	/**
@@ -459,12 +534,8 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 
 		// 发送到回调MQ
 		if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
-			ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
-			messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
-			messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
-			messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
 			// 使用 ThreadPoolTaskExecutor 异步执行，也可以调用异步方法
-			callbackExecutor.submit(() -> send2CallbackMQ(messageForwarding));
+			callbackExecutor.submit(() -> send2CallbackMQ(messageForwardingDTO));
 		}
 	}
 
@@ -473,8 +544,27 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * 
 	 * @param messageForwarding
 	 */
+	private void send2CallbackMQ(List<MessageForwardingDTO> messageForwardingDTOList) {
+		if (Objects.isNull(messageForwardingDTOList) || messageForwardingDTOList.isEmpty()) {
+			return;
+		}
+		messageForwardingDTOList.parallelStream().forEach(e -> send2CallbackMQ(e));
+	}
+
+	/**
+	 * 将转发明细发送到回调MQ
+	 * 
+	 * @param messageForwarding
+	 */
 	// @Async("callbackExecutor") //异步方法，括号里的是线程池对象名称，可以不给定，用默认的
-	private void send2CallbackMQ(ForwardingMessage4MQ messageForwarding) {
+	private void send2CallbackMQ(MessageForwardingDTO messageForwardingDTO) {
+		if (messageForwardingDTO == null) {
+			return;
+		}
+		ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
+		messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
+		messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
+		messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
 		try {
 			rocketMQProducer.send4Callback(JsonUtil.object2Json(messageForwarding));
 		} catch (CustomBusinessException e) {
