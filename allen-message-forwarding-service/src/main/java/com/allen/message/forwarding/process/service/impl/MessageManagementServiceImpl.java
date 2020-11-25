@@ -271,8 +271,8 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 		if (deadline == null) {
 			return;
 		}
-		messageDAO.migrate(deadline);
 		messageForwardingDAO.migrate(deadline);
+		messageDAO.migrate(deadline);
 	}
 
 	@Override

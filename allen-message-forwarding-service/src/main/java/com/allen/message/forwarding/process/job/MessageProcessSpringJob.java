@@ -55,4 +55,18 @@ public class MessageProcessSpringJob {
 		}
 		LOGGER.info("消息回调重试任务执行结束");
 	}
+
+	/**
+	 * 迁移历史消息任务，每天0点执行一次
+	 */
+	@Scheduled(cron = "0 0 0 * * ? *")
+	public void migrationJobHandler() {
+		LOGGER.info("迁移历史消息任务开始执行");
+		try {
+			messageProcessService.migrate();
+		} catch (Exception e) {
+			LOGGER.error("迁移历史消息任务执行失败", e);
+		}
+		LOGGER.info("迁移历史消息任务执行结束");
+	}
 }

@@ -21,9 +21,9 @@ public interface MessageProcessService {
 	/**
 	 * 接收上游系统发送过来的消息，保存到数据库，并发送的消息队列进行下一步转发处理
 	 * 
-	 * @param messageReceiveDTO 消息传入对象
+	 * @param messageSendingDTO 消息传入对象
 	 */
-	void send(@NotNull(message = "消息传入对象不能为空") @Valid MessageSendingDTO messageReceiveDTO);
+	void send(@NotNull(message = "消息传入对象不能为空") @Valid MessageSendingDTO messageSendingDTO);
 
 	/**
 	 * 转发消息
