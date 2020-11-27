@@ -20,7 +20,7 @@ import com.allen.tool.string.StringUtil;
  * @since 1.0.0
  */
 @Service
-@RocketMQMessageListener(nameServer = "${rocketmq.name-server}", topic = "${message.rocketmq.forward.topic}", consumerGroup = "${message.rocketmq.forward.consumer.group}", selectorExpression = "${message.rocketmq.forward.tag}")
+@RocketMQMessageListener(nameServer = "${rocketmq.name-server}", topic = "${message.rocketmq.forward.topic}", consumerGroup = "${message.rocketmq.consumer.group}", selectorExpression = "${message.rocketmq.forward.tag}")
 public class MessageForwardingConsumer implements RocketMQListener<String> {
 
 	/**

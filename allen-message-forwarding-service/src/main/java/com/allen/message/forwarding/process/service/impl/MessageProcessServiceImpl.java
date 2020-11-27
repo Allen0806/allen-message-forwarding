@@ -171,6 +171,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 					MessageDTO messageDTO = messageManagementService.getMessage(messageNo);
 					ForwardingWay forwardingWay = ForwardingWay.valueOf(messageForwardingDTO.getForwardingWay());
 					boolean forwardingResult = false;
+					// TODO 可以采用策略+工厂模式
 					switch (forwardingWay) {
 					case HTTP:
 						forwardingResult = forwardByHttp(messageDTO, messageForwardingDTO);
@@ -281,7 +282,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 			Integer startNo = i * pageSize;
 			queryParam.setStartNo(startNo);
 			List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding(queryParam);
-			// 异步发送消息到MQ
+			// 异步发送消息到MQ TODO 采用批量发送消息
 			ThreadPoolExecutor executor = ThreadPoolExecutorUtil
 					.getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
 			executor.execute(() -> send2ForwardingMQ(messageForwardings));
@@ -304,7 +305,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 			Integer startNo = i * pageSize;
 			queryParam.setStartNo(startNo);
 			List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding(queryParam);
-			// 异步发送消息到MQ
+			// 异步发送消息到MQ TODO 采用批量发送消息
 			callbackExecutor.submit(() -> send2CallbackMQ(messageForwardings));
 		}
 
@@ -383,7 +384,19 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 		if (Objects.isNull(messageForwardingDTOList) || messageForwardingDTOList.isEmpty()) {
 			return;
 		}
-		messageForwardingDTOList.parallelStream().forEach(e -> send2ForwardingMQ(e));
+		List<String> messageList = new ArrayList<>(messageForwardingDTOList.size());
+		for (MessageForwardingDTO messageForwardingDTO : messageForwardingDTOList) {
+			ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
+			messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
+			messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
+			messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
+			messageList.add(JsonUtil.object2Json(messageForwarding));
+		}
+		try {
+			rocketMQProducer.send4Fowarding(messageList);
+		} catch (CustomBusinessException e) {
+			LOGGER.error("批量发送转发明细到转发MQ异常", e);
+		}
 	}
 
 	/**
@@ -391,6 +404,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * 
 	 * @param messageForwardingDTO
 	 */
+	@SuppressWarnings("unused")
 	private void send2ForwardingMQ(MessageForwardingDTO messageForwardingDTO) {
 		if (Objects.isNull(messageForwardingDTO)) {
 			return;
@@ -542,13 +556,25 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	/**
 	 * 将转发明细发送到回调MQ
 	 * 
-	 * @param messageForwarding
+	 * @param messageForwardingDTOList
 	 */
 	private void send2CallbackMQ(List<MessageForwardingDTO> messageForwardingDTOList) {
 		if (Objects.isNull(messageForwardingDTOList) || messageForwardingDTOList.isEmpty()) {
 			return;
 		}
-		messageForwardingDTOList.parallelStream().forEach(e -> send2CallbackMQ(e));
+		List<String> messageList = new ArrayList<>(messageForwardingDTOList.size());
+		for (MessageForwardingDTO messageForwardingDTO : messageForwardingDTOList) {
+			ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
+			messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
+			messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
+			messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
+			messageList.add(JsonUtil.object2Json(messageForwarding));
+		}
+		try {
+			rocketMQProducer.send4Callback(messageList);
+		} catch (CustomBusinessException e) {
+			LOGGER.error("批量发送转发明细到回调MQ异常", e);
+		}
 	}
 
 	/**

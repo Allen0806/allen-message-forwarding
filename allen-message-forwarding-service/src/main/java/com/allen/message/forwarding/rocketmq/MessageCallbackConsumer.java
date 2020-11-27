@@ -20,7 +20,7 @@ import com.allen.tool.string.StringUtil;
  * @since 1.0.0
  */
 @Service
-@RocketMQMessageListener(nameServer = "${rocketmq.name-server}", topic = "${message.rocketmq.callback.topic}", consumerGroup = "${message.rocketmq.callback.consumer.group}", selectorExpression = "${message.rocketmq.callback.tag}")
+@RocketMQMessageListener(nameServer = "${rocketmq.name-server}", topic = "${message.rocketmq.callback.topic}", consumerGroup = "${message.rocketmq.consumer.group}", selectorExpression = "${message.rocketmq.callback.tag}")
 public class MessageCallbackConsumer implements RocketMQListener<String> {
 
 	/**
