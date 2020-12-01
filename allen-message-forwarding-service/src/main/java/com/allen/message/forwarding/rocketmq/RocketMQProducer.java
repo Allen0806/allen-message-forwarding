@@ -3,6 +3,7 @@ package com.allen.message.forwarding.rocketmq;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -192,13 +193,18 @@ public class RocketMQProducer {
 		if (Objects.isNull(messageForwardings) || messageForwardings.isEmpty()) {
 			throw new CustomBusinessException(ResultStatuses.MF_1007);
 		}
-		List<Message<String>> messages = new ArrayList<>(messageForwardings.size());
-		for (ForwardingMessage4MQ messageForwarding : messageForwardings) {
-			String keys = messageForwarding.getMessageNo() + "-" + messageForwarding.getForwardingId();
-			Message<String> message = MessageBuilder.withPayload(JsonUtil.object2Json(messageForwarding))
-					.setHeader(MessageConst.PROPERTY_KEYS, keys).build();
-			messages.add(message);
-		}
+		List<Message<String>> messages = messageForwardings.parallelStream()
+				.map(e -> MessageBuilder.withPayload(JsonUtil.object2Json(e))
+						.setHeader(MessageConst.PROPERTY_KEYS, e.getMessageNo() + "-" + e.getForwardingId()).build())
+				.collect(Collectors.toList());
+
+//		List<Message<String>> messages = new ArrayList<>(messageForwardings.size());
+//		for (ForwardingMessage4MQ messageForwarding : messageForwardings) {
+//			String keys = messageForwarding.getMessageNo() + "-" + messageForwarding.getForwardingId();
+//			Message<String> message = MessageBuilder.withPayload(JsonUtil.object2Json(messageForwarding))
+//					.setHeader(MessageConst.PROPERTY_KEYS, keys).build();
+//			messages.add(message);
+//		}
 		return send(destination, messages);
 	}
 }

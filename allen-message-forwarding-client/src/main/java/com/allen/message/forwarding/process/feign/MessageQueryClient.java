@@ -15,7 +15,6 @@ import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO;
 import com.allen.message.forwarding.process.model.MessageQueryParamDTO;
-import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.tool.result.BaseResult;
 
 /**
@@ -24,17 +23,8 @@ import com.allen.tool.result.BaseResult;
  * @author Allen
  * @date 2020年4月20日
  */
-@FeignClient(name = "allen-message-forwarding-server", path = "/mf", fallback = MessageSendFallback.class)
-public interface MessageForwardingClient {
-
-	/**
-	 * 消息发送Feign Client接口
-	 * 
-	 * @param message 消息对象
-	 * @return 接收结果
-	 */
-	@PostMapping(value = "/process/send", headers = { "Content-Type=application/json" })
-	BaseResult<Object> send(@RequestBody MessageSendingDTO message);
+@FeignClient(name = "allen-message-forwarding-server", path = "/mf/process", fallback = MessageSendFallback.class)
+public interface MessageQueryClient {
 
 	/**
 	 * 获取消息信息，同时返回消息转发明细

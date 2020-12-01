@@ -16,9 +16,7 @@ import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO;
 import com.allen.message.forwarding.process.model.MessageQueryParamDTO;
-import com.allen.message.forwarding.process.model.MessageSendingDTO;
 import com.allen.message.forwarding.process.service.MessageManagementService;
-import com.allen.message.forwarding.process.service.MessageProcessService;
 import com.allen.tool.result.BaseResult;
 
 /**
@@ -30,32 +28,14 @@ import com.allen.tool.result.BaseResult;
  *
  */
 @RestController
-@RequestMapping(path = "/mf/process/")
-public class MessageProcessController {
-
-	/**
-	 * 消息处理服务
-	 */
-	@Autowired
-	private MessageProcessService messageProcessService;
+@RequestMapping(path = "/mf/process")
+public class MessageQueryController {
 
 	/**
 	 * 消息管理服务
 	 */
 	@Autowired
 	private MessageManagementService messageManagementService;
-
-	/**
-	 * 接收消息
-	 * 
-	 * @param message 消息对象
-	 * @return 响应对象
-	 */
-	@PostMapping(value = "/send")
-	public BaseResult<Object> send(@NotNull(message = "消息不能为空") @Valid @RequestBody MessageSendingDTO message) {
-		messageProcessService.send(message);
-		return BaseResult.success();
-	}
 
 	/**
 	 * 获取消息信息，同时返回消息转发明细
