@@ -7,6 +7,7 @@ import java.util.Objects;
 import javax.annotation.Resource;
 
 import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.common.message.MessageConst;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,9 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 import com.allen.message.forwarding.constant.ResultStatuses;
+import com.allen.message.forwarding.process.model.ForwardingMessage4MQ;
 import com.allen.tool.exception.CustomBusinessException;
+import com.allen.tool.json.JsonUtil;
 import com.allen.tool.string.StringUtil;
 
 /**
@@ -67,23 +70,23 @@ public class RocketMQProducer {
 	/**
 	 * 将消息发送的待转发队列，主要用于转发失败重试
 	 * 
-	 * @param message 消息字符串
+	 * @param messageForwarding 消息转发明细
 	 * @return 发送结果：true|false
 	 */
-	public boolean send4Fowarding(String message) {
+	public boolean send4Fowarding(ForwardingMessage4MQ messageForwarding) {
 		String destination = forwardingTopic + ":" + forwardingTag;
-		return send(destination, message);
+		return send4ForwardingMessage(destination, messageForwarding);
 	}
 
 	/**
 	 * 将消息发送的待转发队列，主要用于转发失败重试
 	 * 
-	 * @param messages 消息字符串集合
+	 * @param messageForwardings 消息转发明细集合
 	 * @return 发送结果：true|false
 	 */
-	public boolean send4Fowarding(List<String> messages) {
+	public boolean send4Fowarding(List<ForwardingMessage4MQ> messageForwardings) {
 		String destination = forwardingTopic + ":" + forwardingTag;
-		return send(destination, messages);
+		return send4ForwardingMessage(destination, messageForwardings);
 	}
 
 	/**
@@ -92,9 +95,9 @@ public class RocketMQProducer {
 	 * @param message 消息字符串
 	 * @return 发送结果：true|false
 	 */
-	public boolean send4Callback(String message) {
+	public boolean send4Callback(ForwardingMessage4MQ messageForwarding) {
 		String destination = callbackTopic + ":" + callbackTag;
-		return send(destination, message);
+		return send4ForwardingMessage(destination, messageForwarding);
 	}
 
 	/**
@@ -103,9 +106,9 @@ public class RocketMQProducer {
 	 * @param message 消息字符串集合
 	 * @return 发送结果：true|false
 	 */
-	public boolean send4Callback(List<String> messages) {
+	public boolean send4Callback(List<ForwardingMessage4MQ> messageForwardings) {
 		String destination = callbackTopic + ":" + callbackTag;
-		return send(destination, messages);
+		return send4ForwardingMessage(destination, messageForwardings);
 	}
 
 	/**
@@ -113,9 +116,10 @@ public class RocketMQProducer {
 	 * 
 	 * @param destination 给定的队列，组成形式：topic:tag
 	 * @param message     消息字符串
+	 * @param keys        消息ID
 	 * @return 发送结果：true|false
 	 */
-	public boolean send(String destination, String message) {
+	public boolean send(String destination, String message, String keys) {
 		if (StringUtil.isBlank(destination)) {
 			throw new CustomBusinessException(ResultStatuses.MF_1006);
 		}
@@ -123,7 +127,9 @@ public class RocketMQProducer {
 			throw new CustomBusinessException(ResultStatuses.MF_1007);
 		}
 		try {
-			SendResult sendResult = rocketMQTemplate.syncSend(destination, message);
+			Message<String> springMessage = MessageBuilder.withPayload(message)
+					.setHeader(MessageConst.PROPERTY_KEYS, keys).build();
+			SendResult sendResult = rocketMQTemplate.syncSend(destination, springMessage);
 			LOGGER.info("消息发送结果：{}", sendResult);
 			return true;
 		} catch (Exception e) {
@@ -138,24 +144,61 @@ public class RocketMQProducer {
 	 * @param messages    消息字符串集合
 	 * @return 发送结果：true|false
 	 */
-	public boolean send(String destination, List<String> messages) {
+	public boolean send(String destination, List<Message<String>> messages) {
 		if (StringUtil.isBlank(destination)) {
 			throw new CustomBusinessException(ResultStatuses.MF_1006);
 		}
 		if (Objects.isNull(messages) || messages.isEmpty()) {
 			throw new CustomBusinessException(ResultStatuses.MF_1007);
 		}
-		List<Message<String>> springMessages = new ArrayList<>(messages.size());
-		for (String message : messages) {
-			Message<String> springMessage = MessageBuilder.withPayload(message).build();
-			springMessages.add(springMessage);
-		}
 		try {
-			SendResult sendResult = rocketMQTemplate.syncSend(destination, springMessages);
+			SendResult sendResult = rocketMQTemplate.syncSend(destination, messages);
 			LOGGER.info("消息发送结果：{}", sendResult);
 			return true;
 		} catch (Exception e) {
 			throw new CustomBusinessException(ResultStatuses.MF_1008, e);
 		}
+	}
+
+	/**
+	 * 发送消息
+	 * 
+	 * @param destination       给定的队列，组成形式：topic:tag
+	 * @param messageForwarding 转发明细
+	 * @return 发送结果：true|false
+	 */
+	private boolean send4ForwardingMessage(String destination, ForwardingMessage4MQ messageForwarding) {
+		if (StringUtil.isBlank(destination)) {
+			throw new CustomBusinessException(ResultStatuses.MF_1006);
+		}
+		if (Objects.isNull(messageForwarding)) {
+			throw new CustomBusinessException(ResultStatuses.MF_1007);
+		}
+		String keys = messageForwarding.getMessageNo() + "-" + messageForwarding.getForwardingId();
+		return send(destination, JsonUtil.object2Json(messageForwarding), keys);
+	}
+
+	/**
+	 * 发送消息
+	 * 
+	 * @param destination        给定的队列，组成形式：topic:tag
+	 * @param messageForwardings 转发明细集合
+	 * @return 发送结果：true|false
+	 */
+	private boolean send4ForwardingMessage(String destination, List<ForwardingMessage4MQ> messageForwardings) {
+		if (StringUtil.isBlank(destination)) {
+			throw new CustomBusinessException(ResultStatuses.MF_1006);
+		}
+		if (Objects.isNull(messageForwardings) || messageForwardings.isEmpty()) {
+			throw new CustomBusinessException(ResultStatuses.MF_1007);
+		}
+		List<Message<String>> messages = new ArrayList<>(messageForwardings.size());
+		for (ForwardingMessage4MQ messageForwarding : messageForwardings) {
+			String keys = messageForwarding.getMessageNo() + "-" + messageForwarding.getForwardingId();
+			Message<String> message = MessageBuilder.withPayload(JsonUtil.object2Json(messageForwarding))
+					.setHeader(MessageConst.PROPERTY_KEYS, keys).build();
+			messages.add(message);
+		}
+		return send(destination, messages);
 	}
 }

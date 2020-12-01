@@ -384,16 +384,16 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 		if (Objects.isNull(messageForwardingDTOList) || messageForwardingDTOList.isEmpty()) {
 			return;
 		}
-		List<String> messageList = new ArrayList<>(messageForwardingDTOList.size());
+		List<ForwardingMessage4MQ> messageForwardingList = new ArrayList<>(messageForwardingDTOList.size());
 		for (MessageForwardingDTO messageForwardingDTO : messageForwardingDTOList) {
 			ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
 			messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
 			messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
 			messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
-			messageList.add(JsonUtil.object2Json(messageForwarding));
+			messageForwardingList.add(messageForwarding);
 		}
 		try {
-			rocketMQProducer.send4Fowarding(messageList);
+			rocketMQProducer.send4Fowarding(messageForwardingList);
 		} catch (CustomBusinessException e) {
 			LOGGER.error("批量发送转发明细到转发MQ异常", e);
 		}
@@ -423,7 +423,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 */
 	private void send2ForwardingMQ(ForwardingMessage4MQ messageForwarding) {
 		try {
-			rocketMQProducer.send4Fowarding(JsonUtil.object2Json(messageForwarding));
+			rocketMQProducer.send4Fowarding(messageForwarding);
 		} catch (CustomBusinessException e) {
 			LOGGER.error("发送转发明细到转发MQ异常，转发明细：" + messageForwarding, e);
 		}
@@ -465,7 +465,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 		String messageContent = messageDTO.getMessageContent();
 		String targetAddress = messageForwardingDTO.getTargetAddress();
 		try {
-			rocketMQProducer.send(targetAddress, messageContent);
+			rocketMQProducer.send(targetAddress, messageContent, messageDTO.getMessageNo());
 			return true;
 		} catch (CustomBusinessException e) {
 			LOGGER.error("通过RocketMQ转发消息失败，转发明细信息：" + messageForwardingDTO, e);
@@ -562,16 +562,16 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 		if (Objects.isNull(messageForwardingDTOList) || messageForwardingDTOList.isEmpty()) {
 			return;
 		}
-		List<String> messageList = new ArrayList<>(messageForwardingDTOList.size());
+		List<ForwardingMessage4MQ> messageForwardingList = new ArrayList<>(messageForwardingDTOList.size());
 		for (MessageForwardingDTO messageForwardingDTO : messageForwardingDTOList) {
 			ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
 			messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
 			messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
 			messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
-			messageList.add(JsonUtil.object2Json(messageForwarding));
+			messageForwardingList.add(messageForwarding);
 		}
 		try {
-			rocketMQProducer.send4Callback(messageList);
+			rocketMQProducer.send4Callback(messageForwardingList);
 		} catch (CustomBusinessException e) {
 			LOGGER.error("批量发送转发明细到回调MQ异常", e);
 		}
@@ -592,7 +592,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 		messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
 		messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
 		try {
-			rocketMQProducer.send4Callback(JsonUtil.object2Json(messageForwarding));
+			rocketMQProducer.send4Callback(messageForwarding);
 		} catch (CustomBusinessException e) {
 			LOGGER.error("发送转发明细到回调MQ异常，转发明细：" + messageForwarding, e);
 		}
