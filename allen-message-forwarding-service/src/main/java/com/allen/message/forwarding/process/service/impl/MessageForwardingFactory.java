@@ -19,7 +19,7 @@ public class MessageForwardingFactory {
 	 * @param forwardingWay 转发方式
 	 * @return 转发服务
 	 */
-	public static MessageForwarding getMessageForwardingService(ForwardingWay forwardingWay) {
+	public static MessageForwarding getService(ForwardingWay forwardingWay) {
 		switch (forwardingWay) {
 		case HTTP:
 			return SpringBeanUtil.getBean("messageForwardingByHttp", MessageForwarding.class);

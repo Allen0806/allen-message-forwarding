@@ -64,6 +64,6 @@ public class MessageForwardingByHttp implements MessageForwarding {
 			LOGGER.error("通过http接口转发消息异常，消息流水号：" + messageDTO.getMessageNo(), e);
 			forwardingResult = false;
 		}
-		messageProcessService.updateForwardingResult(messageForwardingDTO, forwardingResult);
+		messageProcessService.updateForwardingResult(messageForwardingDTO, forwardingResult, Boolean.TRUE);
 	}
 }

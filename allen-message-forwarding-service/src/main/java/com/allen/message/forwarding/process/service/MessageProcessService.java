@@ -38,9 +38,11 @@ public interface MessageProcessService {
 	 * 
 	 * @param messageForwardingDTO 转发明细
 	 * @param forwardingResult     转发结果
+	 * @param needRetry            是否需要重试
 	 */
 	void updateForwardingResult(@NotNull(message = "消息转发明细不能为空") MessageForwardingDTO messageForwardingDTO,
-			@NotNull(message = "消息转发结果不能为空") Boolean forwardingResult);
+			@NotNull(message = "消息转发结果不能为空") Boolean forwardingResult,
+			@NotNull(message = "是否需要重试不能为空") Boolean needRetry);
 
 	/**
 	 * 转发结果回调
@@ -54,9 +56,11 @@ public interface MessageProcessService {
 	 * 
 	 * @param messageForwardingDTO 转发明细
 	 * @param callbackResult       回调结果
+	 * @param needRetry            是否需要重试
 	 */
 	void updateCallbackResult(@NotNull(message = "消息转发明细不能为空") MessageForwardingDTO messageForwardingDTO,
-			@NotNull(message = "消息回调结果不能为空") Boolean callbackResult);
+			@NotNull(message = "消息回调结果不能为空") Boolean callbackResult,
+			@NotNull(message = "是否需要重试不能为空") Boolean needRetry);
 
 	/**
 	 * 转发重试

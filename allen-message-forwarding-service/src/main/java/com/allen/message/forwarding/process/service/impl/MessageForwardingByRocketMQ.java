@@ -22,7 +22,7 @@ import com.allen.tool.exception.CustomBusinessException;
  */
 @Service("messageForwardingByRocketMQ")
 public class MessageForwardingByRocketMQ implements MessageForwarding {
-	
+
 	/**
 	 * 日志纪录器
 	 */
@@ -39,7 +39,7 @@ public class MessageForwardingByRocketMQ implements MessageForwarding {
 	 */
 	@Autowired
 	private MessageProcessService messageProcessService;
-	
+
 	/**
 	 * RocketMQ生产者实例
 	 */
@@ -59,6 +59,6 @@ public class MessageForwardingByRocketMQ implements MessageForwarding {
 			LOGGER.error("通过RocketMQ转发消息失败，转发明细信息：" + messageForwardingDTO, e);
 			forwardingResult = false;
 		}
-		messageProcessService.updateForwardingResult(messageForwardingDTO, forwardingResult);
+		messageProcessService.updateForwardingResult(messageForwardingDTO, forwardingResult, Boolean.TRUE);
 	}
 }

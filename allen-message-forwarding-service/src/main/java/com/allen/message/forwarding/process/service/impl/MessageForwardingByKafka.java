@@ -54,11 +54,10 @@ public class MessageForwardingByKafka implements MessageForwarding {
 		String targetAddress = messageForwardingDTO.getTargetAddress();
 		ListenableFuture<SendResult<String, String>> resultListenableFuture = kafkaTemplate.send(targetAddress,
 				messageContent);
-		resultListenableFuture.addCallback(
-				successCallback -> messageProcessService.updateForwardingResult(messageForwardingDTO, true),
-				failureCallback -> {
+		resultListenableFuture.addCallback(successCallback -> messageProcessService
+				.updateForwardingResult(messageForwardingDTO, Boolean.TRUE, Boolean.TRUE), failureCallback -> {
 					LOGGER.error("通过Kafka转发消息失败，转发明细信息：" + messageForwardingDTO);
-					messageProcessService.updateForwardingResult(messageForwardingDTO, false);
+					messageProcessService.updateForwardingResult(messageForwardingDTO, Boolean.FALSE, Boolean.TRUE);
 				});
 	}
 }
