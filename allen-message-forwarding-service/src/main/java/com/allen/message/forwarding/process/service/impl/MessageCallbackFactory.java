@@ -1,8 +1,14 @@
 package com.allen.message.forwarding.process.service.impl;
 
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.allen.message.forwarding.constant.CallbackWay;
 import com.allen.message.forwarding.process.service.MessageCallback;
-import com.allen.tool.bean.SpringBeanUtil;
 
 /**
  * 回调服务工厂
@@ -11,7 +17,24 @@ import com.allen.tool.bean.SpringBeanUtil;
  * @date 2020年12月1日
  * @since 1.0.0
  */
+@Component
 public class MessageCallbackFactory {
+
+	/**
+	 * 静态服务实例集合
+	 */
+	private static Map<String, MessageCallback> services;
+
+	/**
+	 * 注入的服务实例
+	 */
+	@Autowired
+	private Map<String, MessageCallback> serviceMap;
+
+	@PostConstruct
+	public void init() {
+		services = serviceMap;
+	}
 
 	/**
 	 * 根据回调方式获取对应的回调服务，增加新的回调方式时扩展此方法
@@ -20,13 +43,14 @@ public class MessageCallbackFactory {
 	 * @return 回调服务
 	 */
 	public static MessageCallback getService(CallbackWay callbackWay) {
+
 		switch (callbackWay) {
 		case HTTP:
-			return SpringBeanUtil.getBean("messageForwardingByHttp", MessageCallback.class);
+			return services.get("messageCallbackByHttp");
 		case ROCKETMQ:
-			return SpringBeanUtil.getBean("messageForwardingByRocketMQ", MessageCallback.class);
+			return services.get("messageCallbackByRocketMQ");
 		case KAFKA:
-			return SpringBeanUtil.getBean("messageForwardingByKafka", MessageCallback.class);
+			return services.get("messageCallbackByKafka");
 		default:
 			return null;
 		}
