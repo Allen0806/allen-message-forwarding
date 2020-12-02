@@ -63,9 +63,9 @@ public class MessageProcessJob {
 	 * @return
 	 * @throws Exception
 	 */
+	@XxlJob("migrationJobHandler")
 	public  ReturnT<String> migrationJobHandler(String param) throws Exception {
 		XxlJobLogger.log("历史消息迁移任务开始执行");
-		messageProcessService.retryCallback();
 		messageProcessService.migrate();
 		return ReturnT.SUCCESS;
 	}

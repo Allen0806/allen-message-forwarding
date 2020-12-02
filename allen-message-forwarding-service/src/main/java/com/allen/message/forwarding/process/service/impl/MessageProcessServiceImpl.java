@@ -3,7 +3,6 @@ package com.allen.message.forwarding.process.service.impl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -14,11 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.RestTemplate;
 
 import com.allen.message.forwarding.constant.CallbackStatus;
@@ -35,16 +31,15 @@ import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO;
 import com.allen.message.forwarding.process.model.MessageSendingDTO;
+import com.allen.message.forwarding.process.service.MessageForwarding;
 import com.allen.message.forwarding.process.service.MessageManagementService;
 import com.allen.message.forwarding.process.service.MessageProcessService;
 import com.allen.message.forwarding.rocketmq.RocketMQProducer;
 import com.allen.tool.exception.CustomBusinessException;
-import com.allen.tool.http.HttpClientUtil;
 import com.allen.tool.json.JsonUtil;
 import com.allen.tool.result.BaseResult;
 import com.allen.tool.string.StringUtil;
 import com.allen.tool.thread.ThreadPoolExecutorUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * 消息转发处理服务层接口实现类
@@ -78,12 +73,6 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 */
 	@Autowired
 	private ThreadPoolTaskExecutor callbackExecutor;
-
-	/**
-	 * kafka客户端生产者模版
-	 */
-	@Autowired
-	private KafkaTemplate<String, String> kafkaTemplate;
 
 	/**
 	 * RocketMQ生产者实例
@@ -168,25 +157,16 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 						return;
 					}
 					// 根据不同的转发方式转发消息
-					MessageDTO messageDTO = messageManagementService.getMessage(messageNo);
 					ForwardingWay forwardingWay = ForwardingWay.valueOf(messageForwardingDTO.getForwardingWay());
-					// TODO 可以采用策略+工厂模式
-					switch (forwardingWay) {
-					case HTTP:
-						forwardByHttp(messageDTO, messageForwardingDTO);
-						break;
-					case ROCKETMQ:
-						forwardByRocketMQ(messageDTO, messageForwardingDTO);
-						break;
-					case KAFKA:
-						forwardByKafka(messageDTO, messageForwardingDTO);
-						break;
-					default:
+					MessageForwarding messageForwardingService = MessageForwardingFactory
+							.getMessageForwardingService(forwardingWay);
+					if (Objects.isNull(messageForwardingService)) {
 						// 如果转发方式不正确，则直接更新为转发失败
 						LOGGER.error("消息转发方式不正确，转发明细信息{}", messageForwardingDTO);
 						updateForwardingResult(messageForwardingDTO, false, false);
 						return;
 					}
+					messageForwardingService.forward(messageForwardingDTO);
 				} catch (Exception e) {
 					LOGGER.error("消息转发处理异常，消息转发明细：" + messageForwarding, e);
 					throw new CustomBusinessException(ResultStatuses.MF_1010, e);
@@ -201,62 +181,8 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	}
 
 	@Override
-	public void updateForwardingResult(MessageForwardingDTO messageForwardingDTO, boolean forwardingResult,
-			boolean needRetry) {
-		Integer retryTimes = messageForwardingDTO.getForwardingStatus() == ForwardingStatus.RETRYING.value()
-				? messageForwardingDTO.getForwardingRetryTimes() + 1
-				: 0;
-		MessageForwardingDTO newMessageForwardingDTO = new MessageForwardingDTO();
-		newMessageForwardingDTO.setId(messageForwardingDTO.getId());
-		newMessageForwardingDTO.setUpdateTime(messageForwardingDTO.getUpdateTime());
-		if (forwardingResult) {
-			newMessageForwardingDTO.setForwardingStatus(ForwardingStatus.FINISH.value());
-			newMessageForwardingDTO.setForwardingResult(MessageConstant.YES);
-			newMessageForwardingDTO.setForwardingSucessTime(LocalDateTime.now());
-			if (messageForwardingDTO.getForwardingStatus() == ForwardingStatus.RETRYING.value()) {
-				newMessageForwardingDTO.setForwardingRetryTimes(retryTimes);
-			}
-			if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
-				newMessageForwardingDTO.setCallbackStatus(CallbackStatus.PROCESSING.value());
-				newMessageForwardingDTO.setCallbackRetryTimes(0);
-			}
-			LOGGER.info("消息转发成功，消息转发明细信息：{}", messageForwardingDTO);
-		} else {
-			if (!needRetry) {
-				// 处理转发前失败的情况
-				newMessageForwardingDTO.setForwardingStatus(ForwardingStatus.FINISH.value());
-				newMessageForwardingDTO.setForwardingResult(MessageConstant.NO);
-				if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
-					newMessageForwardingDTO.setCallbackStatus(CallbackStatus.PROCESSING.value());
-					newMessageForwardingDTO.setCallbackRetryTimes(0);
-				}
-			} else {
-				// 处理转发失败的情况
-				if (retryTimes >= messageForwardingDTO.getMaxRetryTimes()) {
-					newMessageForwardingDTO.setForwardingStatus(ForwardingStatus.FINISH.value());
-					newMessageForwardingDTO.setForwardingResult(MessageConstant.NO);
-					if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
-						newMessageForwardingDTO.setCallbackStatus(CallbackStatus.PROCESSING.value());
-						newMessageForwardingDTO.setCallbackRetryTimes(0);
-					}
-				} else {
-					if (messageForwardingDTO.getForwardingStatus() == ForwardingStatus.PROCESSING.value()) {
-						newMessageForwardingDTO.setForwardingStatus(ForwardingStatus.RETRYING.value());
-					}
-				}
-				if (messageForwardingDTO.getForwardingStatus() == ForwardingStatus.RETRYING.value()) {
-					newMessageForwardingDTO.setForwardingRetryTimes(retryTimes);
-				}
-				LOGGER.error("消息转发失败，消息转发明细信息：{}", messageForwardingDTO);
-			}
-		}
-		messageManagementService.updateForwardingResult(newMessageForwardingDTO);
-	
-		// 发送到回调MQ
-		if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
-			// 使用 ThreadPoolTaskExecutor 异步执行，也可以调用异步方法
-			callbackExecutor.submit(() -> send2CallbackMQ(messageForwardingDTO));
-		}
+	public void updateForwardingResult(MessageForwardingDTO messageForwardingDTO, Boolean forwardingResult) {
+		updateForwardingResult(messageForwardingDTO, forwardingResult, true);
 	}
 
 	@Override
@@ -323,52 +249,9 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 		}
 	}
 
-	/**
-	 * 更新回调结果
-	 * 
-	 * @param messageForwardingDTO
-	 * @param callbackResult
-	 * @param needRetry
-	 */
 	@Override
-	public void updateCallbackResult(MessageForwardingDTO messageForwardingDTO, boolean callbackResult,
-			boolean needRetry) {
-		Integer retryTimes = messageForwardingDTO.getCallbackStatus() == CallbackStatus.RETRYING.value()
-				? messageForwardingDTO.getForwardingRetryTimes() + 1
-				: 0;
-		MessageForwardingDTO newMessageForwardingDTO = new MessageForwardingDTO();
-		newMessageForwardingDTO.setId(messageForwardingDTO.getId());
-		newMessageForwardingDTO.setUpdateTime(messageForwardingDTO.getUpdateTime());
-		if (callbackResult) {
-			newMessageForwardingDTO.setCallbackStatus(CallbackStatus.FINISH.value());
-			newMessageForwardingDTO.setCallbackResult(MessageConstant.YES);
-			newMessageForwardingDTO.setCallbackSucessTime(LocalDateTime.now());
-			if (messageForwardingDTO.getCallbackStatus() == CallbackStatus.RETRYING.value()) {
-				newMessageForwardingDTO.setCallbackRetryTimes(retryTimes);
-			}
-			LOGGER.info("消息回调成功，消息转发明细信息：{}", messageForwardingDTO);
-		} else {
-			if (!needRetry) {
-				// 处理回调前失败的情况
-				newMessageForwardingDTO.setCallbackStatus(CallbackStatus.FINISH.value());
-				newMessageForwardingDTO.setCallbackResult(MessageConstant.NO);
-			} else {
-				// 处理回调失败的情况
-				if (retryTimes >= messageForwardingDTO.getMaxRetryTimes()) {
-					newMessageForwardingDTO.setCallbackStatus(CallbackStatus.FINISH.value());
-					newMessageForwardingDTO.setCallbackResult(MessageConstant.NO);
-				} else {
-					if (messageForwardingDTO.getCallbackStatus() == CallbackStatus.PROCESSING.value()) {
-						newMessageForwardingDTO.setCallbackStatus(CallbackStatus.RETRYING.value());
-					}
-				}
-				if (messageForwardingDTO.getCallbackStatus() == CallbackStatus.RETRYING.value()) {
-					newMessageForwardingDTO.setCallbackRetryTimes(retryTimes);
-				}
-				LOGGER.error("消息回调失败，消息转发明细信息：{}", messageForwardingDTO);
-			}
-		}
-		messageManagementService.updateCallbackResult(newMessageForwardingDTO);
+	public void updateCallbackResult(MessageForwardingDTO messageForwardingDTO, Boolean callbackResult) {
+		updateCallbackResult(messageForwardingDTO, callbackResult, true);
 	}
 
 	@Override
@@ -534,66 +417,115 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	}
 
 	/**
-	 * 通过http接口转发消息
+	 * 更新转发结果
 	 * 
-	 * @param messageDTO           消息
-	 * @param messageForwarding4MQ 通过MQ接收的消息转发信息
-	 * @return 转发结果
+	 * @param messageForwardingDTO 转发明细
+	 * @param forwardingResult     转发结果
+	 * @param needRetry            是否需要重试
 	 */
-	private void forwardByHttp(MessageDTO messageDTO, MessageForwardingDTO messageForwardingDTO) {
-		String messageContent = messageDTO.getMessageContent();
-		Map<String, String> httpHeaders = messageDTO.getHttpHeaders();
-		String targetAddress = messageForwardingDTO.getTargetAddress();
-		boolean forwardingResult = false;
-		try {
-			String resultStr = HttpClientUtil.doPost4Json(targetAddress, httpHeaders, messageContent, 3);
-			if (StringUtil.isNotBlank(resultStr)) {
-				BaseResult<Object> baseResult = JsonUtil.json2Object(resultStr,
-						new TypeReference<BaseResult<Object>>() {
-						});
-				forwardingResult = baseResult.isSuccessful();
+	private void updateForwardingResult(MessageForwardingDTO messageForwardingDTO, boolean forwardingResult,
+			boolean needRetry) {
+		Integer retryTimes = messageForwardingDTO.getForwardingStatus() == ForwardingStatus.RETRYING.value()
+				? messageForwardingDTO.getForwardingRetryTimes() + 1
+				: 0;
+		MessageForwardingDTO newMessageForwardingDTO = new MessageForwardingDTO();
+		newMessageForwardingDTO.setId(messageForwardingDTO.getId());
+		newMessageForwardingDTO.setUpdateTime(messageForwardingDTO.getUpdateTime());
+		if (forwardingResult) {
+			newMessageForwardingDTO.setForwardingStatus(ForwardingStatus.FINISH.value());
+			newMessageForwardingDTO.setForwardingResult(MessageConstant.YES);
+			newMessageForwardingDTO.setForwardingSucessTime(LocalDateTime.now());
+			if (messageForwardingDTO.getForwardingStatus() == ForwardingStatus.RETRYING.value()) {
+				newMessageForwardingDTO.setForwardingRetryTimes(retryTimes);
 			}
-		} catch (Exception e) {
-			LOGGER.error("通过http接口转发消息异常，消息流水号：" + messageDTO.getMessageNo(), e);
-			forwardingResult = false;
+			if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
+				newMessageForwardingDTO.setCallbackStatus(CallbackStatus.PROCESSING.value());
+				newMessageForwardingDTO.setCallbackRetryTimes(0);
+			}
+			LOGGER.info("消息转发成功，消息转发明细信息：{}", messageForwardingDTO);
+		} else {
+			if (!needRetry) {
+				// 处理转发前失败的情况
+				newMessageForwardingDTO.setForwardingStatus(ForwardingStatus.FINISH.value());
+				newMessageForwardingDTO.setForwardingResult(MessageConstant.NO);
+				if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
+					newMessageForwardingDTO.setCallbackStatus(CallbackStatus.PROCESSING.value());
+					newMessageForwardingDTO.setCallbackRetryTimes(0);
+				}
+			} else {
+				// 处理转发失败的情况
+				if (retryTimes >= messageForwardingDTO.getMaxRetryTimes()) {
+					newMessageForwardingDTO.setForwardingStatus(ForwardingStatus.FINISH.value());
+					newMessageForwardingDTO.setForwardingResult(MessageConstant.NO);
+					if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
+						newMessageForwardingDTO.setCallbackStatus(CallbackStatus.PROCESSING.value());
+						newMessageForwardingDTO.setCallbackRetryTimes(0);
+					}
+				} else {
+					if (messageForwardingDTO.getForwardingStatus() == ForwardingStatus.PROCESSING.value()) {
+						newMessageForwardingDTO.setForwardingStatus(ForwardingStatus.RETRYING.value());
+					}
+				}
+				if (messageForwardingDTO.getForwardingStatus() == ForwardingStatus.RETRYING.value()) {
+					newMessageForwardingDTO.setForwardingRetryTimes(retryTimes);
+				}
+				LOGGER.error("消息转发失败，消息转发明细信息：{}", messageForwardingDTO);
+			}
 		}
-		updateForwardingResult(messageForwardingDTO, forwardingResult, true);
+		messageManagementService.updateForwardingResult(newMessageForwardingDTO);
+
+		// 发送到回调MQ
+		if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
+			// 使用 ThreadPoolTaskExecutor 异步执行，也可以调用异步方法
+			callbackExecutor.submit(() -> send2CallbackMQ(messageForwardingDTO));
+		}
 	}
 
 	/**
-	 * 通过RocketMQ转发消息
+	 * 更新回调结果
 	 * 
-	 * @param messageDTO           消息
 	 * @param messageForwardingDTO 转发明细
-	 * @return 转发结果
+	 * @param callbackResult       回调结果
+	 * @param needRetry            是否需要重试
 	 */
-	private void forwardByRocketMQ(MessageDTO messageDTO, MessageForwardingDTO messageForwardingDTO) {
-		String messageContent = messageDTO.getMessageContent();
-		String targetAddress = messageForwardingDTO.getTargetAddress();
-		boolean forwardingResult = false;
-		try {
-			rocketMQProducer.send(targetAddress, messageContent, messageDTO.getMessageNo());
-			forwardingResult = true;
-		} catch (CustomBusinessException e) {
-			LOGGER.error("通过RocketMQ转发消息失败，转发明细信息：" + messageForwardingDTO, e);
-			forwardingResult = false;
+	private void updateCallbackResult(MessageForwardingDTO messageForwardingDTO, boolean callbackResult,
+			boolean needRetry) {
+		Integer retryTimes = messageForwardingDTO.getCallbackStatus() == CallbackStatus.RETRYING.value()
+				? messageForwardingDTO.getForwardingRetryTimes() + 1
+				: 0;
+		MessageForwardingDTO newMessageForwardingDTO = new MessageForwardingDTO();
+		newMessageForwardingDTO.setId(messageForwardingDTO.getId());
+		newMessageForwardingDTO.setUpdateTime(messageForwardingDTO.getUpdateTime());
+		if (callbackResult) {
+			newMessageForwardingDTO.setCallbackStatus(CallbackStatus.FINISH.value());
+			newMessageForwardingDTO.setCallbackResult(MessageConstant.YES);
+			newMessageForwardingDTO.setCallbackSucessTime(LocalDateTime.now());
+			if (messageForwardingDTO.getCallbackStatus() == CallbackStatus.RETRYING.value()) {
+				newMessageForwardingDTO.setCallbackRetryTimes(retryTimes);
+			}
+			LOGGER.info("消息回调成功，消息转发明细信息：{}", messageForwardingDTO);
+		} else {
+			if (!needRetry) {
+				// 处理回调前失败的情况
+				newMessageForwardingDTO.setCallbackStatus(CallbackStatus.FINISH.value());
+				newMessageForwardingDTO.setCallbackResult(MessageConstant.NO);
+			} else {
+				// 处理回调失败的情况
+				if (retryTimes >= messageForwardingDTO.getMaxRetryTimes()) {
+					newMessageForwardingDTO.setCallbackStatus(CallbackStatus.FINISH.value());
+					newMessageForwardingDTO.setCallbackResult(MessageConstant.NO);
+				} else {
+					if (messageForwardingDTO.getCallbackStatus() == CallbackStatus.PROCESSING.value()) {
+						newMessageForwardingDTO.setCallbackStatus(CallbackStatus.RETRYING.value());
+					}
+				}
+				if (messageForwardingDTO.getCallbackStatus() == CallbackStatus.RETRYING.value()) {
+					newMessageForwardingDTO.setCallbackRetryTimes(retryTimes);
+				}
+				LOGGER.error("消息回调失败，消息转发明细信息：{}", messageForwardingDTO);
+			}
 		}
-		updateForwardingResult(messageForwardingDTO, forwardingResult, true);
-	}
-
-	/**
-	 * 通过Kafka转发消息
-	 * 
-	 * @param messageDTO           消息
-	 * @param messageForwardingDTO 转发明细
-	 */
-	private void forwardByKafka(MessageDTO messageDTO, MessageForwardingDTO messageForwardingDTO) {
-		String messageContent = messageDTO.getMessageContent();
-		String targetAddress = messageForwardingDTO.getTargetAddress();
-		ListenableFuture<SendResult<String, String>> resultListenableFuture = kafkaTemplate.send(targetAddress,
-				messageContent);
-		resultListenableFuture.addCallback(successCallback -> updateForwardingResult(messageForwardingDTO, true, true),
-				failureCallback -> updateForwardingResult(messageForwardingDTO, false, true));
+		messageManagementService.updateCallbackResult(newMessageForwardingDTO);
 	}
 
 	/**

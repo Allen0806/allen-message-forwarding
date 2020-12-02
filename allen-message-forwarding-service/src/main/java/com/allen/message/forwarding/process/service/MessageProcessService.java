@@ -34,13 +34,13 @@ public interface MessageProcessService {
 	void forward(@NotNull(message = "消息转发明细不能为空") @Valid ForwardingMessage4MQ messageForwarding);
 
 	/**
-	 * 更新转发结果
+	 * 更新转发结果，各种转发方式完成转发后需要调用此方法更新转发结果
 	 * 
 	 * @param messageForwardingDTO 转发明细
 	 * @param forwardingResult     转发结果
-	 * @param needRetry            是否需要重试
 	 */
-	void updateForwardingResult(MessageForwardingDTO messageForwardingDTO, boolean forwardingResult, boolean needRetry);
+	void updateForwardingResult(@NotNull(message = "消息转发明细不能为空") MessageForwardingDTO messageForwardingDTO,
+			@NotNull(message = "消息转发结果不能为空") Boolean forwardingResult);
 
 	/**
 	 * 转发结果回调
@@ -50,13 +50,13 @@ public interface MessageProcessService {
 	void callback(@NotNull(message = "消息转发明细不能为空") @Valid ForwardingMessage4MQ messageForwarding);
 
 	/**
-	 * 更新回调结果
+	 * 更新回调结果，各种回调方式完成回调后需要调用此方法更新回调结果
 	 * 
 	 * @param messageForwardingDTO 转发明细
 	 * @param callbackResult       回调结果
-	 * @param needRetry            是否需要重试
 	 */
-	void updateCallbackResult(MessageForwardingDTO messageForwardingDTO, boolean callbackResult, boolean needRetry);
+	void updateCallbackResult(@NotNull(message = "消息转发明细不能为空") MessageForwardingDTO messageForwardingDTO,
+			@NotNull(message = "消息回调结果不能为空") Boolean callbackResult);
 
 	/**
 	 * 转发重试

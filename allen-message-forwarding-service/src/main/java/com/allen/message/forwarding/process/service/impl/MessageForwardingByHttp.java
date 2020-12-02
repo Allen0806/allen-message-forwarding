@@ -27,18 +27,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
  */
 @Service("messageForwardingByHttp")
 public class MessageForwardingByHttp implements MessageForwarding {
-	
+
 	/**
 	 * 日志纪录器
 	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(MessageForwardingByHttp.class);
-	
+
 	/**
 	 * 消息管理服务
 	 */
 	@Autowired
 	private MessageManagementService messageManagementService;
-	
+
 	/**
 	 * 消息处理服务
 	 */
@@ -64,6 +64,6 @@ public class MessageForwardingByHttp implements MessageForwarding {
 			LOGGER.error("通过http接口转发消息异常，消息流水号：" + messageDTO.getMessageNo(), e);
 			forwardingResult = false;
 		}
-		messageProcessService.updateForwardingResult(messageForwardingDTO, forwardingResult, true);
+		messageProcessService.updateForwardingResult(messageForwardingDTO, forwardingResult);
 	}
 }
