@@ -182,7 +182,6 @@ rocketmq:
     send:
       topic: amf-message-sending
       
-    
 eureka:
   instance:
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
