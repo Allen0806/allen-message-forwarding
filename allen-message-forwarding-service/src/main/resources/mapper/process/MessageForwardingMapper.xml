@@ -165,7 +165,7 @@
           and `forwarding_id` = #{forwardingId}
     </select>
     
-    <select id="count" parameterType="com.allen.message.forwarding.process.model.ForwardingQueryParamDTO" resultType="int">
+    <select id="count" parameterType="com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO" resultType="int">
 		select count(*)
 		from   amf_message_forwarding
 		<where>
@@ -203,7 +203,7 @@
 	</select>
 	
 	<!-- 分页查询 -->
-	<select id="list" parameterType="com.allen.message.forwarding.process.model.ForwardingQueryParamDTO" resultMap="forwardingResultMap">
+	<select id="list" parameterType="com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO" resultMap="forwardingResultMap">
         select
         <include refid="forwardingColumns"></include>
         from  amf_message_forwarding

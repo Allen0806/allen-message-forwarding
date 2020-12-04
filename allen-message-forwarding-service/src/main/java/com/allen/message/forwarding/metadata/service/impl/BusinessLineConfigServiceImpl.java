@@ -1,6 +1,14 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.constant.ResultStatuses.*;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0001;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0101;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0102;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0103;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0104;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0105;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0106;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0107;
+import static com.allen.message.forwarding.constant.ResultStatuses.MF_0108;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -10,6 +18,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,12 +50,14 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	 * 来源系统配置管理服务实例
 	 */
 	@Autowired
+	@Lazy
 	private SourceSystemConfigService sourceSystemConfigService;
 
 	/**
 	 * 消息配置管理服务实例
 	 */
 	@Autowired
+	@Lazy
 	private MessageConfigService messageConfigService;
 
 	/**

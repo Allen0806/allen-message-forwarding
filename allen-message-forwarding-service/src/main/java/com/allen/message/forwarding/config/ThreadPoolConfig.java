@@ -1,6 +1,5 @@
 package com.allen.message.forwarding.config;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.springframework.context.annotation.Bean;
@@ -25,7 +24,7 @@ public class ThreadPoolConfig {
 	 * @return 线程池对象
 	 */
 	@Bean("callbackExecutor")
-	public Executor callbackExecutor() {
+	public ThreadPoolTaskExecutor callbackExecutor() {
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		// 设置线程池参数信息
 		taskExecutor.setCorePoolSize(5);
@@ -48,7 +47,7 @@ public class ThreadPoolConfig {
 	 * @return 线程池对象
 	 */
 	@Bean("forwardingExecutor")
-	public Executor forwardingExecutor() {
+	public ThreadPoolTaskExecutor forwardingExecutor() {
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		// 设置线程池参数信息
 		taskExecutor.setCorePoolSize(10);

@@ -141,9 +141,9 @@
         <result property="messageId" column="message_id"/>
         <result property="targetSystem" column="target_system"/>
         <result property="forwardingWay" column="forwarding_way"/>
-        <result property=targetAddress column="target_address"/>
+        <result property="targetAddress" column="target_address"/>
         <result property="retryTimes" column="retry_times"/>
-        <result property="callbackRequired" column=callback_required/>
+        <result property="callbackRequired" column="callback_required"/>
         <result property="deleted" column="is_deleted"/>
         <result property="createdBy" column="created_by"/>
         <result property="createTime" column="create_time"/>

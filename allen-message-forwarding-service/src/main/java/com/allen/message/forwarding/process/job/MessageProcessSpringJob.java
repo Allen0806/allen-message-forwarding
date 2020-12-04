@@ -30,7 +30,7 @@ public class MessageProcessSpringJob {
 	 * 消息转发重试任务，每5分钟执行一次
 	 * 
 	 */
-	@Scheduled(cron = "0 0/5 * * * ? *")
+	@Scheduled(cron = "0 0/5 * * * ?")
 	public void forwardingRetryJobHandler() {
 		LOGGER.info("消息转发重试任务开始执行");
 		try {
@@ -45,7 +45,7 @@ public class MessageProcessSpringJob {
 	 * 消息回调重试任务，每5分钟执行一次
 	 * 
 	 */
-	@Scheduled(cron = "0 0/5 * * * ? *")
+	@Scheduled(cron = "0 0/5 * * * ?")
 	public void callbackRetryJobHandler() {
 		LOGGER.info("消息回调重试任务开始执行");
 		try {
@@ -59,7 +59,7 @@ public class MessageProcessSpringJob {
 	/**
 	 * 迁移历史消息任务，每天0点执行一次
 	 */
-	@Scheduled(cron = "0 0 0 * * ? *")
+	@Scheduled(cron = "0 0 0 * * ?")
 	public void migrationJobHandler() {
 		LOGGER.info("迁移历史消息任务开始执行");
 		try {

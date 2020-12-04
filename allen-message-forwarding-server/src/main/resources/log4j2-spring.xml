@@ -92,9 +92,9 @@
             <DefaultRolloverStrategy max="30" />
 		</RollingFile>
 		<!-- rocketMQ 日志配置，不知道是否好用 -->
-		<RocketMQ name="rocketmqAppender" producerGroup="message-forwarding-producer" nameServerAddress="localhost:9876">
+<!-- 		<RocketMQ name="rocketmqAppender" producerGroup="message-forwarding-producer" nameServerAddress="localhost:9876">
   			<PatternLayout pattern="%d [%p] hahahah %c %m%n"/>
-		</RocketMQ>
+		</RocketMQ> -->
 	</appenders>
 
 	<!-- 然后定义logger，只有定义了logger并引入的appender，appender才会生效 -->

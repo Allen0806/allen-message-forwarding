@@ -49,14 +49,14 @@ public class MessageConfigServiceImpl3 implements MessageConfigService {
 	/**
 	 * 消息转发服务层实例
 	 */
-	@Autowired
+	//@Autowired
 	private MessageForwardingConfigService messageForwardingConfigService;
 
 	/**
 	 * redisTemplate实例
 	 */
 	@Autowired
-	private RedisTemplate<String, MessageConfigDTO> redisTemplate;
+	private RedisTemplate<String, Object> redisTemplate;
 
 	/**
 	 * redis锁
@@ -359,7 +359,7 @@ public class MessageConfigServiceImpl3 implements MessageConfigService {
 	private MessageConfigDTO getFromCache(Integer messageId) {
 		String cacheKey = MessageConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageId;
 		if (redisTemplate.hasKey(cacheKey)) {
-			MessageConfigDTO messageConfigDTO = redisTemplate.opsForValue().get(cacheKey);
+			MessageConfigDTO messageConfigDTO = (MessageConfigDTO)redisTemplate.opsForValue().get(cacheKey);
 			if (messageConfigDTO != null) {
 				return messageConfigDTO;
 			}

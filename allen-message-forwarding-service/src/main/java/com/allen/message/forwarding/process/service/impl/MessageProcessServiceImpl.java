@@ -63,6 +63,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	 * 回调处理线程池
 	 */
 	@Autowired
+//	@Qualifier("callbackExecutor")
 	private ThreadPoolTaskExecutor callbackExecutor;
 
 	/**

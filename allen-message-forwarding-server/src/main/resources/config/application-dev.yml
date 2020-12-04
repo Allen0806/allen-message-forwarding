@@ -164,21 +164,25 @@ rocketmq:
   # 历史消息保留天数
   retention-days: 30
   rocketmq:
-    consumer:
-        group: amf-message-forwarding-consumer
     # 默认send、forward、callback的topic相同，通过tag区分
     send:
-      topic: amf-message-forwarding
+      topic: amf-message-sending
       tag: sending
+      consumer:
+        group: amf-message-sending-consumer
     forward:
       topic: amf-message-forwarding
       tag: forwarding
+      consumer:
+        group: amf-message-forwarding-consumer
     callback:
-      topic: amf-message-forwarding
+      topic: amf-message-callback
       tag: callback
+      consumer:
+        group: amf-message-callback-consumer
   kafka:
     consumer:
-        group: amf-message-forwardign-consumer
+        group: amf-message-forwarding-consumer
     send:
       topic: amf-message-sending
       
@@ -220,9 +224,12 @@ mybatis:
 xxl:
   job:
     admin:
-      address: http://127.0.0.1:8706/xxl-job-admin
+      addresses: http://127.0.0.1:8706/xxl-job-admin
     executor:
       appname: xxl-job-executor-message-forwarding
+      address:
+      ip: 
       port: 9999
       logpath: /Users/allen/Documents/Develop/logs/${spring.application.name}
       logretentiondays: 30
+    accessToken: 

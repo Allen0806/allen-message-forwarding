@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.allen.message.forwarding.constant.MessageConstant;
 import com.allen.message.forwarding.metadata.dao.MessageForwardingConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO;
-import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
 import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
 import com.allen.message.forwarding.metadata.model.MessageForwardingConfigVO;
 import com.allen.message.forwarding.metadata.service.MessageForwardingConfigService;
@@ -46,7 +45,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 	 * redisTemplate实例
 	 */
 	@Autowired
-	private RedisTemplate<String, MessageConfigDTO> redisTemplate;
+	private RedisTemplate<String, Object> redisTemplate;
 
 	/**
 	 * 消息转发配置DAO层实例
