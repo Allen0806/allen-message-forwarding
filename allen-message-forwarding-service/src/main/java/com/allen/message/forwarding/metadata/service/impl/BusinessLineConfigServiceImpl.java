@@ -1,15 +1,5 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0001;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0101;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0102;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0103;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0104;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0105;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0106;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0107;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0108;
-
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -18,16 +8,16 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.allen.message.forwarding.constant.ResultStatuses;
 import com.allen.message.forwarding.metadata.dao.BusinessLineConfigDAO;
+import com.allen.message.forwarding.metadata.dao.SourceSystemConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfBusinessLineConfigDO;
 import com.allen.message.forwarding.metadata.model.BusinessLineConfigVO;
 import com.allen.message.forwarding.metadata.service.BusinessLineConfigService;
 import com.allen.message.forwarding.metadata.service.MessageConfigService;
-import com.allen.message.forwarding.metadata.service.SourceSystemConfigService;
 import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.string.StringUtil;
 
@@ -47,17 +37,9 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BusinessLineConfigServiceImpl.class);
 
 	/**
-	 * 来源系统配置管理服务实例
-	 */
-	@Autowired
-	@Lazy
-	private SourceSystemConfigService sourceSystemConfigService;
-
-	/**
 	 * 消息配置管理服务实例
 	 */
 	@Autowired
-	@Lazy
 	private MessageConfigService messageConfigService;
 
 	/**
@@ -65,6 +47,12 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	 */
 	@Autowired
 	private BusinessLineConfigDAO businessLineConfigDAO;
+	
+	/**
+	 * 消息来源系统配置信息DAO层接口实例
+	 */
+	@Autowired
+	private SourceSystemConfigDAO sourceSystemConfigDAO;
 
 	@Transactional
 	@Override
@@ -82,7 +70,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		if (count == 0) {
 			LOGGER.error("保存业务线信息失败，业务线名称：{}，创建人：{}", businessLineConfigDO.getBusinessLineName(),
 					businessLineConfigDO.getCreatedBy());
-			throw new CustomBusinessException(MF_0101);
+			throw new CustomBusinessException(ResultStatuses.MF_0101);
 		}
 		LOGGER.info("保存业务线信息成功，业务线名称：{}，创建人：{}", businessLineConfigDO.getBusinessLineName(),
 				businessLineConfigDO.getCreatedBy());
@@ -96,7 +84,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(id);
 		if (businessLineConfigDO == null) {
 			LOGGER.error("不存在对应的业务线信息，业务线主键：{}", id);
-			throw new CustomBusinessException(MF_0102);
+			throw new CustomBusinessException(ResultStatuses.MF_0102);
 		}
 
 		if (businessLineConfigDO.getBusinessLineName().equals(newBusinessLineName)) {
@@ -111,7 +99,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		int count = businessLineConfigDAO.update(businessLineConfigDO);
 		if (count == 0) {
 			LOGGER.error("更新业务线信息失败，业务线ID：{}，修改人：{}", businessLineId, updatedBy);
-			throw new CustomBusinessException(MF_0103);
+			throw new CustomBusinessException(ResultStatuses.MF_0103);
 		}
 		// 更新消息配置信息的业务线名称
 		messageConfigService.updateBusinessLineName(businessLineId, newBusinessLineName, updatedBy);
@@ -124,21 +112,21 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 		AmfBusinessLineConfigDO businessLineConfigDO = businessLineConfigDAO.get(id);
 		if (businessLineConfigDO == null) {
 			LOGGER.error("不存在对应的业务线信息，业务线主键：{}", id);
-			throw new CustomBusinessException(MF_0102);
+			throw new CustomBusinessException(ResultStatuses.MF_0102);
 		}
 		String businessLineName = businessLineConfigDO.getBusinessLineName();
 		// 判断是否存在关联的未标记为删除的来源系统信息，如果存在，则不允许删除
-		int sourceSystemAmount = sourceSystemConfigService.count(id);
+		int sourceSystemAmount = sourceSystemConfigDAO.count(id);
 		if (sourceSystemAmount > 0) {
 			LOGGER.error("存在来源系统信息，不能进行业务线信息删除操作，业务线名称：{}", businessLineName);
-			throw new CustomBusinessException(MF_0104);
+			throw new CustomBusinessException(ResultStatuses.MF_0104);
 		}
 		businessLineConfigDO.setDeleted(1);
 		businessLineConfigDO.setUpdatedBy(updatedBy);
 		int count = businessLineConfigDAO.update(businessLineConfigDO);
 		if (count == 0) {
 			LOGGER.error("删除业务线信息失败，业务线名称：{}，删除人：{}", businessLineName, updatedBy);
-			throw new CustomBusinessException(MF_0105);
+			throw new CustomBusinessException(ResultStatuses.MF_0105);
 		}
 		LOGGER.info("删除消业务线信息成功，业务线名称：{}，删除人{}", businessLineName, updatedBy);
 	}
@@ -158,19 +146,19 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	@Override
 	public List<BusinessLineConfigVO> list4Fuzzy(String businessLineId, String businessLineName) {
 		if (StringUtil.isBlank(businessLineId) && StringUtil.isBlank(businessLineName)) {
-			throw new CustomBusinessException(MF_0106);
+			throw new CustomBusinessException(ResultStatuses.MF_0106);
 		}
 		if (StringUtil.isNotBlank(businessLineId)) {
 			if (businessLineId.contains("%")) {
 				LOGGER.error("业务线ID中不能包含%，业务线ID：{}", businessLineId);
-				throw new CustomBusinessException(MF_0107);
+				throw new CustomBusinessException(ResultStatuses.MF_0107);
 			}
 			businessLineId = businessLineId.trim() + "%";
 		}
 		if (StringUtil.isNotBlank(businessLineName)) {
 			if (businessLineName.contains("%")) {
 				LOGGER.error("业务线名称中不能包含%，业务线ID：{}", businessLineId);
-				throw new CustomBusinessException(MF_0108);
+				throw new CustomBusinessException(ResultStatuses.MF_0108);
 			}
 			businessLineName = businessLineName.trim() + "%";
 		}
@@ -187,7 +175,7 @@ public class BusinessLineConfigServiceImpl implements BusinessLineConfigService 
 	@Override
 	public List<BusinessLineConfigVO> list4Paging(int pageNo, int pageSize) {
 		if (pageNo < 1 || pageSize < 1) {
-			throw new CustomBusinessException(MF_0001);
+			throw new CustomBusinessException(ResultStatuses.MF_0001);
 		}
 		int startNo = (pageNo - 1) * pageSize;
 		List<AmfBusinessLineConfigDO> businessLineConfigDOList = businessLineConfigDAO.list4Paging(startNo, pageSize);

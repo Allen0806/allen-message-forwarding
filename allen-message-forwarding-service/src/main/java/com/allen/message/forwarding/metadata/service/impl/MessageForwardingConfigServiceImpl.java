@@ -1,9 +1,5 @@
 package com.allen.message.forwarding.metadata.service.impl;
 
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0401;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0402;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0403;
-import static com.allen.message.forwarding.constant.ResultStatuses.MF_0404;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.allen.message.forwarding.constant.MessageConstant;
+import com.allen.message.forwarding.constant.ResultStatuses;
 import com.allen.message.forwarding.metadata.dao.MessageForwardingConfigDAO;
 import com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO;
 import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
@@ -63,7 +60,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 		int count = forwardingConfigDAO.save(messageForwardingConfigDO);
 		if (count == 0) {
 			LOGGER.error("保存消息转发配置信息失败，消息转发配置信息：{}", messageForwardingConfigDO);
-			throw new CustomBusinessException(MF_0401);
+			throw new CustomBusinessException(ResultStatuses.MF_0401);
 		}
 		LOGGER.info("保存消息转发配置信息失败，消息转发配置信息：{}", messageForwardingConfigDO);
 
@@ -77,7 +74,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 				.get(messageForwardingConfigVO.getId());
 		if (messageForwardingConfigDO == null) {
 			LOGGER.error("不存在对应的转发配置信息，消息转发配置信息：{}", messageForwardingConfigVO);
-			throw new CustomBusinessException(MF_0402);
+			throw new CustomBusinessException(ResultStatuses.MF_0402);
 		}
 		messageForwardingConfigDO.setTargetSystem(messageForwardingConfigVO.getTargetSystem());
 		messageForwardingConfigDO.setForwardingWay(messageForwardingConfigVO.getForwardingWay());
@@ -88,7 +85,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 		int count = forwardingConfigDAO.update(messageForwardingConfigDO);
 		if (count == 0) {
 			LOGGER.error("更新消息转发配置信息失败，消息转发配置信息：{}", messageForwardingConfigDO);
-			throw new CustomBusinessException(MF_0403);
+			throw new CustomBusinessException(ResultStatuses.MF_0403);
 		}
 		LOGGER.info("更新消息转发配置信息成功，消息转发配置信息：{}", messageForwardingConfigDO);
 	}
@@ -99,14 +96,14 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
 		AmfMessageForwardingConfigDO messageForwardingConfigDO = forwardingConfigDAO.get(id);
 		if (messageForwardingConfigDO == null) {
 			LOGGER.error("不存在对应的转发配置信息，消息转发配置主键：{}", id);
-			throw new CustomBusinessException(MF_0402);
+			throw new CustomBusinessException(ResultStatuses.MF_0402);
 		}
 		messageForwardingConfigDO.setDeleted(1);
 		messageForwardingConfigDO.setUpdatedBy(updatedBy);
 		int count = forwardingConfigDAO.update(messageForwardingConfigDO);
 		if (count == 0) {
 			LOGGER.error("删除消息转发配置信息失败，消息转发配置主键：{}，删除人：{}", id, updatedBy);
-			throw new CustomBusinessException(MF_0404);
+			throw new CustomBusinessException(ResultStatuses.MF_0404);
 		}
 		// 清除缓存
 		evictCache(messageForwardingConfigDO.getMessageId());

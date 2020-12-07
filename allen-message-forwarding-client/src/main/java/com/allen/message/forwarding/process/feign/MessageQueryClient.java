@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.allen.message.forwarding.process.fallback.MessageSendFallback;
+import com.allen.message.forwarding.process.fallback.MessageQueryFallback;
 import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO;
@@ -23,7 +23,7 @@ import com.allen.tool.result.BaseResult;
  * @author Allen
  * @date 2020年4月20日
  */
-@FeignClient(name = "allen-message-forwarding-server", path = "/mf/process", fallback = MessageSendFallback.class)
+@FeignClient(name = "allen-message-forwarding-server", path = "/mf/process", fallback = MessageQueryFallback.class)
 public interface MessageQueryClient {
 
 	/**
