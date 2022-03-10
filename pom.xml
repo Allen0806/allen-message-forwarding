@@ -14,7 +14,7 @@
 	<description>Allen Message Forwarding</description>
 	<modules>
 		<module>allen-message-forwarding-client</module>
-		<module>allen-message-forwarding-service</module>
+		<module>allen-message-forwarding-core</module>
 		<module>allen-message-forwarding-server</module>
 	</modules>
 	<properties>
