@@ -117,7 +117,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 	/**
 	 * 转发消息
 	 * 
-	 * @param messageForwardings
+	 * @param messageForwarding
 	 */
 	@Override
 	public void forward(ForwardingMessage4MQ messageForwarding) {
