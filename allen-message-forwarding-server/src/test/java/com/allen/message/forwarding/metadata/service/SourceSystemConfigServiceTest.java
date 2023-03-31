@@ -1,18 +1,13 @@
 package com.allen.message.forwarding.metadata.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.allen.message.forwarding.metadata.model.SourceSystemConfigVO;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.allen.message.forwarding.metadata.model.SourceSystemConfigVO;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * 消息来源系统服务层单元测试类
