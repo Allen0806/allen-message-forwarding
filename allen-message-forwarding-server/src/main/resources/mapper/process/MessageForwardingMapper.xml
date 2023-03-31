@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allen.message.forwarding.process.dao.MessageForwardingDAO">
+	<!-- 插入 -->
+	<insert id="save"
+		parameterType="com.allen.message.forwarding.process.model.AmfMessageForwardingDO"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id" statementType="PREPARED" timeout="10">
+		insert into `amf_message_forwarding`
+		(
+			`message_no`,
+			`message_keyword`,
+			`message_id`,
+			`forwarding_id`,
+			`forwarding_way`,
+			`target_address`,
+			`max_retry_times`,
+			`callback_required`,
+			`callback_url`,
+			`forwarding_status`,
+			`forwarding_result`,
+			`forwarding_success_time`,
+			`forwarding_retry_times`,
+			`callback_status`,
+			`callback_result`,
+			`callback_success_time`,
+			`callback_retry_times`
+		)
+		values 
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.messageNo},
+			#{item.messageKeyword},
+			#{item.messageId},
+			#{item.forwardingId},
+			#{item.forwardingWay},
+			#{item.targetAddress},
+			#{item.maxRetryTimes},
+			#{item.callbackRequired},
+			#{item.callbackUrl},
+			#{item.forwardingStatus},
+			#{item.forwardingResult},
+			#{item.forwardingSucessTime},
+			#{item.forwardingRetryTimes},
+			#{item.callbackStatus},
+			#{item.callbackResult},
+			#{item.callbackSucessTime}
+			#{item.callbackRetryTimes}
+		)
+		</foreach>
+	</insert>
+    
+	<!-- 根据主键ID更新 -->
+    <update id="update" parameterType="com.allen.message.forwarding.process.model.AmfMessageForwardingDO">
+        update `amf_message_forwarding`
+        set
+        <trim suffixOverrides=",">
+        	<if test="forwardingStatus != null">
+                `forwarding_status` = #{forwardingStatus},
+            </if>
+            <if test="forwardingResult != null">
+                `forwarding_result` = #{forwardingResult},
+            </if>
+            <if test="forwardingSucessTime != null">
+                `forwarding_success_time` = #{forwardingSucessTime},
+            </if>
+            <if test="forwardingRetryTimes != null">
+                `forwarding_retry_times` = #{forwardingRetryTimes},
+            </if>
+            <if test="callbackStatus != null">
+                `callback_status` = #{callbackStatus},
+            </if>
+            <if test="callbackResult != null">
+                `callback_result` = #{callbackResult},
+            </if>
+            <if test="callbackSucessTime != null">
+                `callback_success_time` = #{callbackSucessTime},
+            </if>
+            <if test="callbackRetryTimes != null">
+                `callback_retry_times` = #{callbackRetryTimes},
+            </if>
+        </trim>
+        where `id` = #{id}
+        and   `update_time` = #{updateTime}
+    </update>
+    
+    <insert id="migrate" parameterType="java.time.LocalDateTime">
+    	insert into amf_message_forwarding_history
+    	select t1.*
+    	  from amf_message_forwarding as t1, amf_message as t2 
+         where t1.message_no = t2.message_no
+    	   and t2.`create_time` &lt; #{deadline} 
+    	   and t2.`forwarding_total_amount` = t2.`forwarding_success_amount`
+    </insert>
+    
+    <delete id="remove" parameterType="java.time.LocalDateTime">
+		delete from amf_message_forwarding as t1
+        where t1.message_no in 
+        	  ( select t2.message_no 
+        	      from amf_message as t2 
+        	     where t2.`create_time` &lt; #{deadline} 
+    	  		   and t2.`forwarding_total_amount` = t2.`forwarding_success_amount`
+    	  	  )
+	</delete>
+	
+    <!-- 通用查询语句块 -->
+	<sql id="forwardingColumns">
+		`id`,
+		`message_no`,
+		`message_keyword`,
+		`message_id`,
+		`forwarding_id`,
+		`forwarding_way`,
+		`target_address`,
+		`max_retry_times`,
+		`callback_required`,
+		`callback_url`,
+		`forwarding_status`,
+		`forwarding_result`,
+		`forwarding_success_time`,
+		`forwarding_retry_times`,
+		`callback_status`,
+		`callback_result`,
+		`callback_success_time`,
+		`callback_retry_times`
+		`create_time`,
+		`update_time`
+	</sql>
+    
+    <resultMap id="forwardingResultMap" type="com.allen.message.forwarding.process.model.AmfMessageForwardingDO" >
+        <result property="id" column="id"/>
+        <result property="messageNo" column="message_no"/>
+        <result property="messageKeyword" column="message_keyword"/>
+        <result property="messageId" column="message_id"/>
+        <result property="forwardingId" column="forwarding_id"/>
+        <result property="forwardingWay" column="forwarding_way"/>
+        <result property="targetAddress" column="target_address"/>
+        <result property="maxRetryTimes" column="max_retry_times"/>
+        <result property="callbackRequired" column="callback_required"/>
+        <result property="callbackUrl" column="callback_url"/>
+        <result property="forwardingStatus" column="forwarding_status"/>
+        <result property="forwardingResult" column="forwarding_result"/>
+        <result property="forwardingSucessTime" column="forwarding_success_time"/>
+        <result property="forwardingRetryTimes" column="forwarding_retry_times"/>
+        <result property="callbackStatus" column="callback_status"/>
+        <result property="callbackResult" column="callback_result"/>
+        <result property="callbackSucessTime" column="callback_success_time"/>
+        <result property="callbackRetryTimes" column="callback_retry_times"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <select id="getById" parameterType="string" resultMap="forwardingResultMap">
+        select
+        <include refid="forwardingColumns"></include>
+        from  `amf_message_forwarding`
+        where `id` = #{id}
+    </select>
+    
+     <select id="get" resultMap="forwardingResultMap">
+        select
+        <include refid="forwardingColumns"></include>
+         from `amf_message_forwarding`
+        where `message_no` = #{messageNo}
+          and `forwarding_id` = #{forwardingId}
+    </select>
+    
+    <select id="count" parameterType="com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO" resultType="int">
+		select count(*)
+		from   amf_message_forwarding
+		<where>
+			<if test="messageNo != null">
+				message_no = #{messageNo}
+			</if>
+			<if test="messageKeyword != null">
+				and message_keyword = #{messageKeyword}
+			</if>
+			<if test="messageId != null">
+				and message_id = #{messageId}
+			</if>
+			<if test="forwardingId != null">
+				and forwarding_id = #{forwardingId}
+			</if>
+			<if test="forwardingStatus != null">
+				and forwarding_status = #{forwardingStatus}
+			</if>
+			<if test="forwardingResult != null">
+				and forwarding_result = #{forwardingResult}
+			</if>
+			<if test="callbackStatus != null">
+				and callback_status = #{callbackStatus}
+			</if>
+			<if test="callbackResult != null">
+				and callback_result = #{callbackResult}
+			</if>
+			<if test="beginDate != null">
+				and create_time &gt;= unix_timestamp(#{beginDate})
+			</if>
+			<if test="endDate != null">
+				and create_time &lt;= unix_timestamp(#{endDate})
+			</if>
+		</where>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="list" parameterType="com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO" resultMap="forwardingResultMap">
+        select
+        <include refid="forwardingColumns"></include>
+        from  amf_message_forwarding
+		<where>
+			<if test="messageNo != null">
+				message_no = #{messageNo}
+			</if>
+			<if test="messageKeyword != null">
+				and message_keyword = #{messageKeyword}
+			</if>
+			<if test="messageId != null">
+				and message_id = #{messageId}
+			</if>
+			<if test="forwardingId != null">
+				and forwarding_id = #{forwardingId}
+			</if>
+			<if test="forwardingStatus != null">
+				and forwarding_status = #{forwardingStatus}
+			</if>
+			<if test="forwardingResult != null">
+				and forwarding_result = #{forwardingResult}
+			</if>
+			<if test="callbackStatus != null">
+				and callback_status = #{callbackStatus}
+			</if>
+			<if test="callbackResult != null">
+				and callback_result = #{callbackResult}
+			</if>
+			<if test="beginDate != null">
+				and create_time &gt;= unix_timestamp(#{beginDate})
+			</if>
+			<if test="endDate != null">
+				and create_time &lt;= unix_timestamp(#{endDate})
+			</if>
+				order by create_time desc
+			<if test="startNo != null and pageSize != null">
+				limit #{startNo}, #{pageSize}
+			</if>
+		</where>
+	</select>
+</mapper>

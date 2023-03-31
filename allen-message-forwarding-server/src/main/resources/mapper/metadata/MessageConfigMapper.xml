@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allen.message.forwarding.metadata.dao.MessageConfigDAO">
+	<!-- 插入 -->
+	<insert id="save"
+		parameterType="com.allen.message.forwarding.metadata.model.AmfMessageConfigDO"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id" statementType="PREPARED" timeout="10">
+		insert into `amf_message_config`
+		(
+		<trim suffixOverrides=",">
+			<if test="id != null">
+				`id`,
+			</if>
+			<if test="businessLineId != null">
+				`business_line_id`,
+			</if>
+			<if test="businessLineName != null">
+				`business_line_name`,
+			</if>
+			<if test="sourceSystemId != null">
+				`souce_system_id`,
+			</if>
+			<if test="sourceSystemName != null">
+				`source_system_name`,
+			</if>
+			<if test="messageId != null">
+				`message_id`,
+			</if>
+			<if test="messageName != null">
+				`message_name`,
+			</if>
+			<if test="messageStatus != null">
+				`message_status`,
+			</if>
+			<if test="callbackUrl != null">
+				`callback_url`,
+			</if>
+			<if test="deleted != null">
+				`is_deleted`,
+			</if>
+			<if test="createdBy != null">
+				`created_by`,
+			</if>
+			<if test="createTime != null">
+				`create_time`,
+			</if>
+			<if test="updatedBy != null">
+				`updated_by`,
+			</if>
+			<if test="updateTime != null">
+				`update_time`,
+			</if>
+		</trim>
+		)
+		select 
+		<trim suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="businessLineId != null">
+				#{businessLineId},
+			</if>
+			<if test="businessLineName != null">
+				#{businessLineName},
+			</if>
+			<if test="sourceSystemId != null">
+				#{sourceSystemId},
+			</if>
+			<if test="sourceSystemName != null">
+				#{sourceSystemName},
+			</if>
+			    <!-- 插入时最大值累加，保证唯一性，初始值为1000 -->
+				case when max(source_system_id) is not null then max(source_system_id) + 1 else 100000 end,
+			<if test="messageName != null">
+				#{messageName},
+			</if>
+			<if test="messageStatus != null">
+				#{messageStatus},
+			</if>
+			<if test="callbackUrl != null">
+				#{callbackUrl},
+			</if>
+			<if test="deleted != null">
+				#{deleted},
+			</if>
+			<if test="createdBy != null">
+				#{createdBy},
+			</if>
+			<if test="createTime != null">
+				#{createTime},
+			</if>
+			<if test="updatedBy != null">
+				#{updatedBy},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime},
+			</if>
+		</trim>
+		from amf_message_config
+	</insert>
+    
+	<!-- 根据主键ID更新 -->
+    <update id="update" parameterType="com.allen.message.forwarding.metadata.model.AmfMessageConfigDO">
+        update `amf_message_config`
+        set
+        <trim suffixOverrides=",">
+            <if test="messageName != null and messageName != ''">
+                `message_name` = #{messageName},
+            </if>
+            <if test="messageStatus != null">
+                `message_status` = #{messageStatus},
+            </if>
+            <if test="callbackUrl != null and callbackUrl != ''">
+                `callback_url` = #{callbackUrl},
+            </if>
+            <if test="deleted != null">
+                `is_deleted` = #{deleted},
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                `updated_by` = #{updatedBy},
+            </if>
+        </trim>
+        where `id` = #{id}
+        and   `update_time` = #{updateTime}
+    </update>
+    
+    <update id="updateBusinessLineName">
+        update `amf_message_config`
+        set `business_line_name` = #{businessLineName},
+            `updated_by` = #{updatedBy}
+        where `business_line_id` = #{businessLineId}
+    </update>
+    
+    <update id="updateSourceSystemName">
+        update `amf_message_config`
+        set `source_system_name` = #{sourceSystemName},
+            `updated_by` = #{updatedBy},
+        where `source_system_id` = #{sourceSystemId}
+    </update>
+    
+    <!-- 通用查询语句块 -->
+	<sql id="messageConfigColumns">
+		id,
+		business_line_id,
+		business_line_name,
+		souce_system_id,
+		source_system_name,
+		message_id,
+		message_name,
+		message_status,
+		callback_url,
+		is_deleted,
+		created_by,
+		create_time,
+		updated_by,
+		update_time
+	</sql>
+    
+    <resultMap id="messageConfigResultMap" type="com.allen.message.forwarding.metadata.model.AmfMessageConfigDO" >
+        <result property="id" column="id"/>
+        <result property="businessLineId" column="business_line_id"/>
+        <result property="businessLineName" column="business_line_name"/>
+        <result property="sourceSystemId" column="souce_system_id"/>
+        <result property="sourceSystemName" column="source_system_name"/>
+        <result property="messageId" column="message_id"/>
+        <result property="messageName" column="message_name"/>
+        <result property="messageStatus" column="message_status"/>
+         <result property="callbackUrl" column="callback_url"/>
+        <result property="deleted" column="is_deleted"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <select id="get" parameterType="long" resultMap="messageConfigResultMap">
+        select
+        <include refid="messageConfigColumns"></include>
+        from  `amf_message_config`
+        where `id` = #{id}
+        and   `is_deleted` = 0
+    </select>
+    
+    <select id="getByMessageId" parameterType="int" resultMap="messageConfigResultMap">
+        select
+        <include refid="messageConfigColumns"></include>
+        from  `amf_message_config`
+        where `message_id` = #{messageId}
+        and   `message_status` = 1
+        and   `is_deleted` = 0
+    </select>
+    
+    <select id="countByBusinessLineId" parameterType="int" resultType="int">
+		select count(*)
+		from  `amf_message_config`
+		where `business_line_id` = #{businessLineId}
+		and `is_deleted` = 0
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="listByBusinessLineId4Paging" resultMap="messageConfigResultMap">
+        select
+        <include refid="messageConfigColumns"></include>
+        from  `amf_message_config`
+        where `business_line_id` = #{businessLineId}
+        and `is_deleted` = 0
+        limit #{startNo}, #{pageSize}
+	</select>
+    
+	<select id="countBySourceSystemId" parameterType="int" resultType="int">
+		select count(*)
+		from  `amf_message_config`
+		where `souce_system_id` = #{sourceSystemId}
+		and `is_deleted` = 0
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="listBySourceSystemId4Paging" resultMap="messageConfigResultMap">
+        select
+        <include refid="messageConfigColumns"></include>
+        from  `amf_message_config`
+        where `souce_system_id` = #{sourceSystemId}
+        and `is_deleted` = 0
+        limit #{startNo}, #{pageSize}
+	</select>
+</mapper>

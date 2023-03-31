@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allen.message.forwarding.metadata.dao.MessageForwardingConfigDAO">
+	<!-- 插入 -->
+	<insert id="save"
+		parameterType="com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id" statementType="PREPARED" timeout="10">
+		insert into `amf_message_forwarding_config`
+		(
+		<trim suffixOverrides=",">
+			<if test="id != null">
+				`id`,
+			</if>
+			<if test="messageConfigId != null">
+				`message_id`,
+			</if>
+			<if test="targetSystem != null">
+				`target_system`,
+			</if>
+			<if test="forwardingWay != null">
+				`forwarding_way`,
+			</if>
+			<if test="targetAddress != null">
+				`target_address`,
+			</if>
+			<if test="retryTimes != null">
+				`retry_times`,
+			</if>
+			<if test="callbackRequired != null">
+				`callback_required`,
+			</if>
+			<if test="deleted != null">
+				`is_deleted`,
+			</if>
+			<if test="createdBy != null">
+				`created_by`,
+			</if>
+			<if test="createTime != null">
+				`create_time`,
+			</if>
+			<if test="updatedBy != null">
+				`updated_by`,
+			</if>
+			<if test="updateTime != null">
+				`update_time`,
+			</if>
+		</trim>
+		)
+		values ( 
+		<trim suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="messageId != null">
+				#{messageId},
+			</if>
+			<if test="targetSystem != null">
+				#{targetSystem},
+			</if>
+			<if test="forwardingWay != null">
+				#{forwardingWay},
+			</if>
+			<if test="targetAddress != null">
+				#{targetAddress},
+			</if>
+			<if test="retryTimes != null">
+				#{retryTimes},
+			</if>
+			<if test="callbackRequired != null">
+				#{callbackRequired},
+			</if>
+			<if test="deleted != null">
+				#{deleted},
+			</if>
+			<if test="createdBy != null">
+				#{createdBy},
+			</if>
+			<if test="createTime != null">
+				#{createTime},
+			</if>
+			<if test="updatedBy != null">
+				#{updatedBy},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime},
+			</if>
+		</trim>
+		)
+	</insert>
+    
+	<!-- 根据主键ID更新 -->
+    <update id="update" parameterType="com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO">
+        update `amf_message_forwarding_config`
+        set
+        <trim suffixOverrides=",">
+        	 <if test="targetSystem != null and targetSystem != ''">
+                `target_system` = #{targetSystem},
+            </if>
+             <if test="forwardingWay != null and forwardingWay != ''">
+                `forwarding_way` = #{forwardingWay},
+            </if>
+            <if test="targetAddress != null and targetAddress != ''">
+                `target_address` = #{targetAddress},
+            </if>
+            <if test="retryTimes != null">
+                `retry_times` = #{retryTimes},
+            </if>
+            <if test="callbackRequired != null">
+                `callback_required` = #{callbackRequired},
+            </if>
+            <if test="deleted != null">
+                `is_deleted` = #{deleted},
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                `updated_by` = #{updatedBy},
+            </if>
+        </trim>
+        where `id` = #{id}
+        and   `update_time` = #{updateTime}
+    </update>
+    
+    <!-- 通用查询语句块 -->
+	<sql id="messageForwardingConfigColumns">
+		id,
+		message_id,
+		target_system,
+		forwarding_way,
+		target_address,
+		retry_times,
+		callback_required,
+		is_deleted,
+		created_by,
+		create_time,
+		updated_by,
+		update_time
+	</sql>
+    
+    <resultMap id="messageForwardingConfigResultMap" type="com.allen.message.forwarding.metadata.model.AmfMessageForwardingConfigDO" >
+        <result property="id" column="id"/>
+        <result property="messageId" column="message_id"/>
+        <result property="targetSystem" column="target_system"/>
+        <result property="forwardingWay" column="forwarding_way"/>
+        <result property="targetAddress" column="target_address"/>
+        <result property="retryTimes" column="retry_times"/>
+        <result property="callbackRequired" column="callback_required"/>
+        <result property="deleted" column="is_deleted"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <select id="get" parameterType="long" resultMap="messageForwardingConfigResultMap">
+        select
+        <include refid="messageForwardingConfigColumns"></include>
+        from  `amf_message_forwarding_config`
+        where `id` = #{id}
+        and   `is_deleted` = 0
+    </select>
+    
+    <select id="count" parameterType="int" resultType="int">
+        select count(*)
+        from  `amf_message_forwarding_config`
+        where `message_id` = #{messageId}
+        and `is_deleted` = 0
+	</select>
+    
+	<select id="list" parameterType="int" resultMap="messageForwardingConfigResultMap">
+        select
+        <include refid="messageForwardingConfigColumns"></include>
+        from  `amf_message_forwarding_config`
+        where `message_id` = #{messageId}
+        and `is_deleted` = 0
+	</select>
+</mapper>

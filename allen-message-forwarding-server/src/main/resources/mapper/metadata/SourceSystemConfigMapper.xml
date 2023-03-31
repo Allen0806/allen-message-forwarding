@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allen.message.forwarding.metadata.dao.SourceSystemConfigDAO">
+	<!-- 插入 -->
+	<insert id="save"
+		parameterType="com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id" statementType="PREPARED" timeout="10">
+		insert into `amf_source_system_config`
+		(
+		<trim suffixOverrides=",">
+			<if test="id != null">
+				`id`,
+			</if>
+			<if test="businessLineConfigId != null">
+				`business_line_config_id`,
+			</if>
+				`source_system_id`,
+			<if test="sourceSystemName != null">
+				`source_system_name`,
+			</if>
+			<if test="deleted != null">
+				`is_deleted`,
+			</if>
+			<if test="createdBy != null">
+				`created_by`,
+			</if>
+			<if test="createTime != null">
+				`create_time`,
+			</if>
+			<if test="updatedBy != null">
+				`updated_by`,
+			</if>
+			<if test="updateTime != null">
+				`update_time`,
+			</if>
+		</trim>
+		)
+		select 
+		<trim suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="businessLineConfigId != null">
+				#{businessLineConfigId},
+			</if>
+				<!-- 插入时最大值累加，保证唯一性，初始值为1000 -->
+				case when max(source_system_id) is not null then max(source_system_id) + 1 else 1000 end,
+			<if test="sourceSystemName != null">
+				#{sourceSystemName},
+			</if>
+			<if test="deleted != null">
+				#{deleted},
+			</if>
+			<if test="createdBy != null">
+				#{createdBy},
+			</if>
+			<if test="createTime != null">
+				#{createTime},
+			</if>
+			<if test="updatedBy != null">
+				#{updatedBy},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime},
+			</if>
+		</trim>
+		from amf_source_system_config
+	</insert>
+    
+	<!-- 根据主键ID更新 -->
+    <update id="update" parameterType="com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO">
+        update `amf_source_system_config`
+        set
+        <trim suffixOverrides=",">
+            <if test="sourceSystemName != null and sourceSystemName!=''">
+                `source_system_name` = #{sourceSystemName},
+            </if>
+            <if test="deleted != null">
+                `is_deleted` = #{deleted},
+            </if>
+            <if test="updatedBy != null and updatedBy!=''">
+                `updated_by` = #{updatedBy},
+            </if>
+        </trim>
+        where `id` = #{id}
+        and   `update_time` = #{updateTime}
+    </update>
+    
+    <!-- 通用查询语句块 -->
+	<sql id="sourceSystemConfigColumns">
+		id,
+		business_line_config_id,
+		source_system_id,
+		source_system_name,
+		is_deleted,
+		created_by,
+		create_time,
+		updated_by,
+		update_time
+	</sql>
+    
+    <resultMap id="sourceSystemConfigResultMap" type="com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO" >
+        <result property="id" column="id"/>
+        <result property="businessLineConfigId" column="business_line_config_id"/>
+        <result property="sourceSystemId" column="source_system_id"/>
+        <result property="sourceSystemName" column="source_system_name"/>
+        <result property="deleted" column="is_deleted"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <select id="get" parameterType="long" resultMap="sourceSystemConfigResultMap">
+        select
+        <include refid="sourceSystemConfigColumns"></include>
+        from  `amf_source_system_config`
+        where `id` = #{id}
+        and   `is_deleted` = 0
+    </select>
+
+	<select id="count" parameterType="string" resultType="int">
+		select count(*)
+		from  `amf_source_system_config`
+		where `business_line_config_id` = #{businessLineConfigId}
+		and   `is_deleted` = 0
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="list4Paging" resultMap="sourceSystemConfigResultMap">
+        select
+        <include refid="sourceSystemConfigColumns"></include>
+        from  `amf_source_system_config`
+        where `business_line_config_id` = #{businessLineConfigId}
+        and   `is_deleted` = 0
+        limit #{startNo}, #{pageSize}
+	</select>
+</mapper>
