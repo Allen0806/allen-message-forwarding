@@ -1,0 +1,247 @@
+# 服务器端口号
+server:
+  port: 8083
+  servlet:
+    # 配置项目名称（默认为 /），如果配置了项目名称，那么在访问路径中要加上配置的路径
+    context-path: /
+    session:
+      # 服务器session最大超时时间(分钟)
+      timeout: 30m
+    encoding:
+      charset: UTF-8
+  # tomcat配置
+  tomcat:
+    # tomcat字符集
+    uri-encoding: UTF-8
+    # tomcat最大连接数
+    max-connections: 2000
+    # accept队列长度
+    accept-count: 5000
+    # 最大连接超时时间
+    connection-timeout: 5000
+    accesslog:
+      # 启用访问日志
+      enabled: true
+      # 访问日志的格式模式
+      pattern: common
+      # 是否缓冲输出，使其仅定期刷新
+      buffered: true
+      # 创建日志文件的目录。可以绝对或相对于Tomcat基础目录（整体一定是绝对路径，windows要加盘符）
+      #directory: D:/Users/allen/Develop/logs/${spring.application.name}
+      directory: ./logs
+       # 日志文件名前缀
+      prefix: ${spring.application.name}-access-
+      # 要放在日志文件名中的日期格式
+      file-date-format: yyyy-MM-dd
+       # 日志文件名后缀
+      suffix: .log
+      # 是否延迟在文件名中包含日期戳，直到旋转时间
+      rename-on-rotate: false
+      # 设置请求的IP地址，主机名，协议和端口的请求属性
+      request-attributes-enabled: false
+      # 是否启用访问日志轮换
+      rotate: true
+    threads:
+      # tomcat最大线程数
+      max: 1000
+      
+spring:
+  application:
+    name: allen-message-forwarding-server
+  main:
+    banner-mode: "off"
+  datasource:
+    # 使用druid连接池
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/amf?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&allowMultiQueries=true
+     # 配置基本属性
+    username: root
+    password: Root@1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # druid相关配置
+    druid:
+      # 配置初始化大小/最小/最大
+      initial-size: 5
+      min-idle: 5
+      max-active: 30
+      # 获取连接等待超时时间
+      max-wait: 60000
+      # 间隔多久进行一次检测，检测需要关闭的空闲连接
+      time-between-eviction-runs-millis: 60000
+      # 一个连接在池中最小生存的时间
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 'x'
+      # 是否在连接空闲一段时间后检测其可用性
+      test-while-idle: true
+      # 是否在获得连接后检测其可用性
+      test-on-borrow: false
+      # 是否在连接放回连接池后检测其可用性
+      test-on-return: false
+      # 打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+      pool-prepared-statements: false
+      max-pool-prepared-statement-per-connection-size: 20
+      # 监控统计过滤器stat，拦截防注入过滤器wall
+      filters: stat,wall
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+#      filter: 
+#        wall:
+#          enabled: true
+#          db-type: mysql
+#          config:
+#            # 是否允许同时执行多条语句
+#            multi-statement-allow: true
+      web-stat-filter:
+        enabled: true
+        url-pattern: "/*"
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+        session-stat-enable: true
+      stat-view-servlet:
+         # 是否启用StatViewServlet默认值true
+        enabled: true
+        # 访问路径为/druid时，跳转到StatViewServlet
+        url-pattern: "/druid/*"
+        # 是否能够重置数据
+        reset-enable: false
+        # 需要账号密码才能访问控制台，默认为root
+        login-username: druid
+        login-password: druid
+        # IP白名单
+        allow: 127.0.0.1
+        # IP黑名单（共同存在时，deny优先于allow）
+        deny: 
+  redis:
+    host: localhost
+    port: 6379
+#    password: admin1234
+    database: 0
+    timeout: 1000ms
+    lettuce:
+      pool:
+        min-idle: 5
+        max-idle: 10
+        max-active: 8
+        max-wait: 5000ms
+  kafka:
+    bootstrap-servers:
+    - localhost:9092
+    #公共参数，其他的timeout.ms, request.timeout.ms, metadata.fetch.timeout.ms保持默认值
+    #properties:
+      #这个参数指定producer在发送批量消息前等待的时间，当设置此参数后，即便没有达到批量消息的指定大小(batch-size)，到达时间后生产者也会发送批量消息到broker。默认情况下，生产者的发送消息线程只要空闲了就会发送消息，即便只有一条消息。设置这个参数后，发送线程会等待一定的时间，这样可以批量发送消息增加吞吐量，但同时也会增加延迟。
+      #linger.ms: 50 #默认值：0毫秒，当消息发送比较频繁时，增加一些延迟可增加吞吐量和性能。
+      #这个参数指定producer在一个TCP connection可同时发送多少条消息到broker并且等待broker响应，设置此参数较高的值可以提高吞吐量，但同时也会增加内存消耗。另外，如果设置过高反而会降低吞吐量，因为批量消息效率降低。设置为1，可以保证发送到broker的顺序和调用send方法顺序一致，即便出现失败重试的情况也是如此。
+      #注意：当前消息符合at-least-once，自kafka1.0.0以后，为保证消息有序以及exactly once，这个配置可适当调大为5。
+      #max.in.flight.requests.per.connection: 1 #默认值：5，设置为1即表示producer在connection上发送一条消息，至少要等到这条消息被broker确认收到才继续发送下一条，因此是有序的。
+    producer:
+      #这个参数可以是任意字符串，它是broker用来识别消息是来自哪个客户端的。在broker进行打印日志、衡量指标或者配额限制时会用到。
+      clientId: ${spring.application.name} #方便kafkaserver打印日志定位请求来源
+      #acks=0：生产者把消息发送到broker即认为成功，不等待broker的处理结果。这种方式的吞吐最高，但也是最容易丢失消息的。
+      #acks=1：生产者会在该分区的leader写入消息并返回成功后，认为消息发送成功。如果群首写入消息失败，生产者会收到错误响应并进行重试。这种方式能够一定程度避免消息丢失，但如果leader宕机时该消息没有复制到其他副本，那么该消息还是会丢失。另外，如果我们使用同步方式来发送，延迟会比前一种方式大大增加（至少增加一个网络往返时间）；如果使用异步方式，应用感知不到延迟，吞吐量则会受异步正在发送中的数量限制。
+      #acks=all：生产者会等待所有副本成功写入该消息，这种方式是最安全的，能够保证消息不丢失，但是延迟也是最大的。
+      #如果是发送日志之类的，允许部分丢失，可指定acks=0，如果想不丢失消息，可配置为all，但需密切关注性能和吞吐量。
+      acks: all #默认值：1
+      #当生产者发送消息收到一个可恢复异常时，会进行重试，这个参数指定了重试的次数。在实际情况中，这个参数需要结合retry.backoff.ms（重试等待间隔）来使用，建议总的重试时间比集群重新选举leader的时间长，这样可以避免生产者过早结束重试导致失败。
+      #另外需注意，当开启重试时，若未设置max.in.flight.requests.per.connection=1，则可能出现发往同一个分区的两批消息的顺序出错，比如，第一批发送失败了，第二批成功了，然后第一批重试成功了，此时两者的顺序就颠倒了。
+      retries: 2  #发送失败时重试多少次，0=禁用重试（默认值）
+      #默认情况下消息是不压缩的，此参数可指定采用何种算法压缩消息，可取值：none,snappy,gzip,lz4。snappy压缩算法由Google研发，这种算法在性能和压缩比取得比较好的平衡；相比之下，gzip消耗更多的CPU资源，但是压缩效果也是最好的。通过使用压缩，我们可以节省网络带宽和Kafka存储成本。
+      compressionType: "none" #如果不开启压缩，可设置为none（默认值），比较大的消息可开启。
+      #当多条消息发送到一个分区时，Producer会进行批量发送，这个参数指定了批量消息大小的上限（以字节为单位）。当批量消息达到这个大小时，Producer会一起发送到broker；但即使没有达到这个大小，生产者也会有定时机制来发送消息，避免消息延迟过大。
+      batch-size: 16384 #默认16K，值越小延迟越低，但是吞吐量和性能会降低。0=禁用批量发送
+      #这个参数设置Producer暂存待发送消息的缓冲区内存的大小，如果应用调用send方法的速度大于Producer发送的速度，那么调用会阻塞一定（max.block.ms）时间后抛出异常。
+      buffer-memory: 33554432 #缓冲区默认大小32M
+    consumer:
+      group-id: message-forwarding-consumer
+      auto-offset-reset: latest
+      #关闭自动提交 改由spring-kafka提交
+      enable-auto-commit: false
+      #周期性自动提交的间隔，单位毫秒
+      auto-commit-interval: 2000 #默认值：5000
+      #这个参数允许消费者指定从broker读取消息时最小的Payload的字节数。当消费者从broker读取消息时，如果数据字节数小于这个阈值，broker会等待直到有足够的数据，然后才返回给消费者。对于写入量不高的主题来说，这个参数可以减少broker和消费者的压力，因为减少了往返的时间。而对于有大量消费者的主题来说，则可以明显减轻broker压力。
+      fetch-min-size: 1 #默认值： 1
+      #上面的fetch.min.bytes参数指定了消费者读取的最小数据量，而这个参数则指定了消费者读取时最长等待时间，从而避免长时间阻塞。这个参数默认为500ms。
+      fetch-max-wait: 500 #默认值：500毫秒
+      #这个参数控制一个poll()调用返回的记录数，即consumer每次批量拉多少条数据。
+      max-poll-records: 500 #默认值：500
+    listener:
+     #创建多少个consumer，值必须小于等于Kafka Topic的分区数。
+     ack-mode: MANUAL_IMMEDIATE
+     concurrency: 1  #推荐设置为topic的分区数
+     
+rocketmq:
+  name-server: localhost:9876
+  producer:
+    group: message-forwarding-producer
+
+message:
+  # 历史消息保留天数
+  retention-days: 30
+  rocketmq:
+    # 默认send、forward、callback的topic相同，通过tag区分
+    send:
+      topic: amf-message-sending
+      tag: sending
+      consumer:
+        group: amf-message-sending-consumer
+    forward:
+      topic: amf-message-forwarding
+      tag: forwarding
+      consumer:
+        group: amf-message-forwarding-consumer
+    callback:
+      topic: amf-message-callback
+      tag: callback
+      consumer:
+        group: amf-message-callback-consumer
+  kafka:
+    consumer:
+        group: amf-message-forwarding-consumer
+    send:
+      topic: amf-message-sending
+      
+eureka:
+  instance:
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
+    hostname: ${spring.cloud.client.ip-address}
+    # true：实例以 IP 的形式注册；false：实例以机器 HOSTNAME 形式注册
+    prefer-ip-address: true
+    # 表示 Eureka Server 在接收到上一个心跳之后等待下一个心跳的秒数（默认 90 秒），
+    # 若不能在指定时间内收到心跳，则移除此实例，并禁止此实例的流量。
+    # 需要设置为至少高于 lease-renewal-interval-in-seconds 的值，不然会被误移除了。
+    lease-expiration-duration-in-seconds: 30
+    # 表示 Eureka Client 向 Eureka Server 发送心跳的频率（默认 30 秒），
+    # 如果在 lease-expiration-duration-in-seconds 指定的时间内未收到心跳，则移除该实例。
+    lease-renewal-interval-in-seconds: 10
+  client:
+    # Eureka Client 刷新本地缓存时间，默认30秒
+    registry-fetch-interval-seconds: 5
+    # 表示是否将自己注册到Eureka Server，默认为true。
+    register-with-eureka: true 
+    # 表示是否从Eureka Server获取注册信息，默认为true。
+    fetch-registry: true
+    # 表示客户端需要注册的 Eureka Server 的地址。
+    service-url:
+      defaultZone: http://allen:allen1234@${spring.cloud.client.ip-address}:8701/eureka/
+        
+# 配置Mybatis
+mybatis:
+  # 路径都使用双星，不使用单星
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  type-aliases-package: com.allen.**.model
+  type-handlers-package: com.allen.**.typehandler
+  configuration:
+    # 开启驼峰命名转换，如：Table(create_time) -> Entity(createTime)。不需要我们关心怎么进行字段匹配，mybatis会自动识别`大写字母与下划线`
+    map-underscore-to-camel-case: true
+
+# 配置定时任务
+xxl:
+  job:
+    admin:
+      addresses: http://127.0.0.1:8706/xxl-job-admin
+    executor:
+      appname: xxl-job-executor-message-forwarding
+      address:
+      ip: 
+      port: 9999
+      logpath: /Users/allen/Documents/Develop/logs/${spring.application.name}
+      logretentiondays: 30
+    accessToken: 

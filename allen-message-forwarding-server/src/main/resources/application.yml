@@ -1,7 +1,0 @@
-spring:
-  profiles:
-    active: "dev"
-    group:
-      "dev": "dev"
-      "test": "test"
-      "prod": "prod"

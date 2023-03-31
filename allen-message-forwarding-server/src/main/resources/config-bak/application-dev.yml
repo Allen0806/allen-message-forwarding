@@ -1,0 +1,297 @@
+server:
+  port: 8080
+  servlet:
+    # 配置项目名称（默认为 /），如果配置了项目名称，那么在访问路径中要加上配置的路径
+    context-path: /
+    session:
+      # 服务器session最大超时时间(分钟)
+      timeout: 30m
+    encoding:
+      charset: UTF-8
+  # tomcat配置
+  tomcat:
+    # tomcat 基础路径
+    basedir: ./
+    # tomcat字符集
+    uri-encoding: UTF-8
+    # tomcat最大连接数
+    max-connections: 2000
+    # accept队列长度
+    accept-count: 5000
+    # 最大连接超时时间，单位：毫秒
+    connection-timeout: 5000
+    threads:
+      # tomcat最大线程数
+      max: 1000
+    accesslog:
+      # 启用访问日志
+      enabled: true
+      # 访问日志的格式模式
+      pattern: common
+      encoding: UTF-8
+      # 是否缓冲输出，使其仅定期刷新
+      buffered: true
+      # 创建日志文件的目录。可以绝对或相对于Tomcat基础目录（整体一定是绝对路径，windows要加盘符）
+      directory: logs
+      # 日志文件名前缀
+      prefix: ${spring.application.name}-access-
+      # 日志文件名后缀
+      suffix: .log
+      # 要放在日志文件名中的日期格式
+      file-date-format: yyyy-MM-dd
+      # 日志保留的最大天数，-1表示无限制
+      max-days: -1
+      # 是否启用访问日志轮换
+      rotate: true
+      # 是否延迟在文件名中包含日期戳，直到旋转时间
+      rename-on-rotate: false
+      # 设置请求的IP地址，主机名，协议和端口的请求属性
+      request-attributes-enabled: false
+
+spring:
+  application:
+    name: allen-message-forwarding
+  main:
+    banner-mode: "off"
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterAccess=600s
+  datasource:
+    # druid相关配置
+    druid:
+      web-stat-filter:
+        enabled: true
+        url-pattern: "/*"
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+        session-stat-enable: true
+      stat-view-servlet:
+        # 是否启用StatViewServlet默认值true
+        enabled: true
+        # 访问路径为/druid时，跳转到StatViewServlet
+        url-pattern: "/druid/*"
+        # 是否能够重置数据
+        reset-enable: false
+        # 需要账号密码才能访问控制台，默认为root
+        login-username: druid
+        login-password: druid
+        # IP白名单
+        allow: 127.0.0.1
+        # IP黑名单（共同存在时，deny优先于allow）
+        deny:
+    dynamic:
+      # druid相关配置
+      druid:
+        # 配置初始化大小/最小/最大
+        initial-size: 10
+        min-idle: 10
+        max-active: 50
+        # 获取连接等待超时时间
+        max-wait: 60000
+        # 间隔多久进行一次检测，检测需要关闭的空闲连接
+        time-between-eviction-runs-millis: 60000
+        # 一个连接在池中最小生存的时间
+        min-evictable-idle-time-millis: 300000
+        validation-query: SELECT 'x'
+        # 是否在连接空闲一段时间后检测其可用性
+        test-while-idle: true
+        # 是否在获得连接后检测其可用性
+        test-on-borrow: false
+        # 是否在连接放回连接池后检测其可用性
+        test-on-return: false
+        # 打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+        pool-prepared-statements: false
+        max-pool-prepared-statement-per-connection-size: 20
+        # 监控统计过滤器stat，拦截防注入过滤器wall
+        filters: stat,wall
+      # 动态数据源的主数据源
+      primary: master
+      datasource:
+        master:
+          # 使用druid连接池
+          type: com.alibaba.druid.pool.DruidDataSource
+          url: jdbc:mysql://localhost:3306/amf?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&allowMultiQueries=true
+          # 配置基本属性
+          username: root
+          password: Root@1234
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          # druid相关配置
+          druid:
+            # 配置初始化大小/最小/最大
+            initial-size: 5
+            min-idle: 5
+            max-active: 30
+            # 获取连接等待超时时间
+            max-wait: 60000
+            # 间隔多久进行一次检测，检测需要关闭的空闲连接
+            time-between-eviction-runs-millis: 60000
+            # 一个连接在池中最小生存的时间
+            min-evictable-idle-time-millis: 300000
+            validation-query: SELECT 'x'
+            # 是否在连接空闲一段时间后检测其可用性
+            test-while-idle: true
+            # 是否在获得连接后检测其可用性
+            test-on-borrow: false
+            # 是否在连接放回连接池后检测其可用性
+            test-on-return: false
+            # 打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+            pool-prepared-statements: false
+            max-pool-prepared-statement-per-connection-size: 20
+            # 监控统计过滤器stat，拦截防注入过滤器wall
+            filters: stat,wall,slf4j
+            filter:
+              wall:
+                enabled: true
+                db-type: mysql
+                config:
+                  # 是否允许同时执行多条语句
+                  multi-statement-allow: true
+              stat:
+                enabled: true
+                db-type: mysql
+                log-slow-sql: true
+                slow-sql-millis: 5000
+              slf4j:
+                enabled: true
+                statement-create-after-log-enabled: false
+                statement-close-after-log-enabled: false
+                result-set-open-after-log-enabled: false
+                result-set-close-after-log-enabled: false
+  # redis配置
+  redis:
+    host: localhost
+    port: 6379
+    password: redis
+    database: 0
+    timeout: 1000
+    lettuce:
+      pool:
+        min-idle: 5
+        max-idle: 10
+        max-active: 10
+        max-wait: 5000
+  # 支持swagger功能引入
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  cloud:
+    stream:
+      function:
+        definition: demoSave;demoUpdate
+      bindings:
+        demoSave-out-0:
+          destination: demo-save-topic
+          content-type: application/json
+        demoSave-in-0:
+          destination: demo-save-topic
+          content-type: application/json
+          group: demo-save-consumer-group
+        demoUpdate-out-0:
+          destination: demo-update-topic
+          content-type: application/json
+        demoUpdate-in-0:
+          destination: demo-update-topic
+          content-type: application/json
+          group: demo-update-consumer-group
+      rocketmq:
+        binder:
+          name-server: localhost:9876
+          group: allen-demo-group
+        bindings:
+          demoSave-in-0:
+            consumer:
+              enabled: true
+              broadcasting: false
+          demoUpdate-in-0:
+            consumer:
+              enabled: true
+              broadcasting: false
+
+# 配置Mybatis Plus
+mybatis-plus:
+  # xml文件路径
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  # 实体类路径
+  type-aliases-package: com.lczq.demo.**.model
+  type-handlers-package: com.lczq.**.typehandler
+  configuration:
+    # 驼峰转换
+    map-underscore-to-camel-case: true
+    # 是否开启缓存
+    cache-enabled: false
+    # 打印sql
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 全局配置
+  global-config:
+    # 数据库字段驼峰下划线转换
+    db-column-underline: true
+
+# okHttp参数配置
+ok:
+  http:
+    # 连接超时时间，单位：秒
+    connect-timeout: 10
+    # 读超时时间，单位：秒
+    read-timeout: 10
+    # 写超时时间，单位：秒
+    write-timeout: 10
+    # 最大连接数
+    max-idle-connections: 200
+    # 连接存活时间，单位：秒
+    keep-alive-duration: 300
+
+# feign client 参数配置
+feign:
+  client:
+    config:
+      default:
+        # 设置重试处理器，默认直接抛出异常
+        retryer: feign.Retryer.Default
+        # 连接超时时间，单位：毫秒
+        connect-timeout: 10000
+        # 读超时时间，单位：毫秒
+        read-timeout: 10000
+        # 日志级别
+        logger-level: FULL
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
+
+# 配置定时任务-示例
+xxl:
+  job:
+    admin:
+      addresses: http://localhost:8081/xxl-job-admin
+    executor:
+      appname: allen-message-forwarding-job-executor
+      address:
+      ip:
+      # 此端口不同项目不能相同
+      port: 9090
+      logpath: ./logs
+      logretentiondays: 30
+    accessToken:
+
+# 是否启动swagger
+swagger:
+  enable: true
+
+# 配置神域-示例
+# shenyu:
+#  client:
+#    registerType: http
+#    serverLists: http://localhost:9095
+#    props:
+#      contextPath: /demo
+#      isFull: true
+#      nacosNameSpace: allen-dev
+
+message:
+  # 历史消息保留天数
+  retention-days: 30

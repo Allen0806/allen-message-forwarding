@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: allen-message-forwarding
+  profiles:
+    active: "dev"
+    group:
+      "dev": "dev"
+
+---
+# 开发环境配置
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+  cloud:
+    nacos:
+      discovery:
+        # 集群外地址
+        server-addr: localhost:8848
+        # group固定为：allen-dev
+        group: allen-dev
+        # namespace固定为：allen-dev
+        namespace: allen-dev
+      config:
+        # 集群外地址
+        server-addr: localhost:8848
+        file-extension: yaml
+        # group固定为：allen-dev
+        group: allen-dev
+        # namespace固定为：allen-dev
+        namespace: allen-dev

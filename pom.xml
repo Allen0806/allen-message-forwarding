@@ -14,7 +14,6 @@
 	<description>Allen Message Forwarding</description>
 	<modules>
 		<module>allen-message-forwarding-client</module>
-		<module>allen-message-forwarding-core</module>
 		<module>allen-message-forwarding-server</module>
 	</modules>
 	<properties>
@@ -22,14 +21,25 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.allen</groupId>
 			<artifactId>allen-tools</artifactId>
 			<version>${allen-tools.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<optional>true</optional>
-		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<tagNameFormat>@{project.version}</tagNameFormat>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
