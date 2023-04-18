@@ -3,22 +3,22 @@ package com.allen.message.forwarding.metadata.service.impl;
 import com.allen.message.forwarding.constant.MessageConstant;
 import com.allen.message.forwarding.constant.ResultStatuses;
 import com.allen.message.forwarding.metadata.dao.MessageConfigDAO;
-import com.allen.message.forwarding.metadata.model.AmfMessageConfigDO;
-import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
-import com.allen.message.forwarding.metadata.model.MessageConfigVO;
-import com.allen.message.forwarding.metadata.model.MessageForwardingConfigDTO;
+import com.allen.message.forwarding.metadata.model.*;
 import com.allen.message.forwarding.metadata.service.MessageConfigService;
 import com.allen.message.forwarding.metadata.service.MessageForwardingConfigService;
 import com.allen.tool.exception.CustomBusinessException;
+import com.allen.tool.param.PagingQueryParam;
+import com.allen.tool.result.PagingQueryResult;
 import com.allen.tool.string.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 @Service("messageConfigService2")
+@RefreshScope
 public class MessageConfigServiceImpl2 implements MessageConfigService {
 
     /**
@@ -41,19 +42,19 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
     /**
      * DAO层实例
      */
-    @Autowired
+    @Resource
     private MessageConfigDAO messageConfigDAO;
 
     /**
      * 消息转发服务层实例
      */
-    @Autowired
+    @Resource
     private MessageForwardingConfigService messageForwardingConfigService;
 
     @Transactional
     @Override
     public void save(MessageConfigVO messageConfigVO) {
-        AmfMessageConfigDO messageConfigDO = toDO(messageConfigVO);
+        AmfMessageConfigDO messageConfigDO = toDataObject(messageConfigVO);
         if (StringUtil.isBlank(messageConfigDO.getUpdatedBy())) {
             messageConfigDO.setUpdatedBy(messageConfigDO.getCreatedBy());
         }
@@ -148,26 +149,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
     @Override
     public MessageConfigVO get(Long id) {
         AmfMessageConfigDO messageConfigDO = messageConfigDAO.get(id);
-        return toVO(messageConfigDO);
-    }
-
-    @Override
-    public int countBySourceSystemId(Integer sourceSystemId) {
-        return messageConfigDAO.countBySourceSystemId(sourceSystemId);
-    }
-
-    @Override
-    public List<MessageConfigVO> listBySourceSystemId4Paging(Integer sourceSystemId, int pageNo, int pageSize) {
-        if (pageNo < 1 || pageSize < 1) {
-            throw new CustomBusinessException(ResultStatuses.MF_0001);
-        }
-        int startNo = (pageNo - 1) * pageSize;
-        List<AmfMessageConfigDO> messageConfigDOList = messageConfigDAO.listBySourceSystemId4Paging(sourceSystemId,
-                startNo, pageSize);
-        if (messageConfigDOList == null || messageConfigDOList.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return messageConfigDOList.parallelStream().map(e -> toVO(e)).collect(Collectors.toList());
+        return toViewObject(messageConfigDO);
     }
 
     // redis中缓存的key为：cacheNames::key
@@ -183,9 +165,45 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
         if (forwardingConfigs == null || forwardingConfigs.isEmpty()) {
             return null;
         }
-        MessageConfigDTO messageConfigDTO = toDTO(messageConfigDO);
+        MessageConfigDTO messageConfigDTO = toTransferObject(messageConfigDO);
         messageConfigDTO.setForwardingConfigs(forwardingConfigs);
         return messageConfigDTO;
+    }
+
+    @Override
+    public Integer count(MessageConfigQueryParamDTO queryParam) {
+        if (queryParam == null) {
+            queryParam = new MessageConfigQueryParamDTO();
+        }
+        return messageConfigDAO.count(queryParam);
+    }
+
+    @Override
+    public PagingQueryResult<MessageConfigVO> list4Paging(PagingQueryParam<MessageConfigQueryParamDTO> pagingQueryParam) {
+        Integer pageNo = pagingQueryParam.getPageNo();
+        if (pageNo == null) {
+            pageNo = 1;
+            pagingQueryParam.setPageNo(pageNo);
+        }
+        Integer pageSize = pagingQueryParam.getPageSize();
+        if (pageSize == null) {
+            pageSize = 10;
+            pagingQueryParam.setPageSize(pageSize);
+        }
+        Integer startNo = (pageNo - 1) * pageSize;
+        pagingQueryParam.setStartNo(startNo);
+        MessageConfigQueryParamDTO queryParam = pagingQueryParam.getParam();
+        if (queryParam == null) {
+            queryParam = new MessageConfigQueryParamDTO();
+            pagingQueryParam.setParam(queryParam);
+        }
+        Integer quantity = messageConfigDAO.count(queryParam);
+        List<AmfMessageConfigDO> messageConfigDOList = messageConfigDAO.list4Paging(pagingQueryParam);
+        if (messageConfigDOList == null || messageConfigDOList.isEmpty()) {
+            return new PagingQueryResult<>(Collections.emptyList(), quantity, pageNo, pageSize);
+        }
+        List<MessageConfigVO> messageConfigVOList = messageConfigDOList.parallelStream().map(e -> toViewObject(e)).collect(Collectors.toList());
+        return new PagingQueryResult<>(messageConfigVOList, quantity, pageNo, pageSize);
     }
 
     /**
@@ -194,7 +212,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
      * @param messageConfigVO VO对象
      * @return DO对象
      */
-    private AmfMessageConfigDO toDO(MessageConfigVO messageConfigVO) {
+    private AmfMessageConfigDO toDataObject(MessageConfigVO messageConfigVO) {
         if (messageConfigVO == null) {
             return null;
         }
@@ -221,7 +239,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
      * @param messageConfigDO DO对象
      * @return VO对象
      */
-    private MessageConfigVO toVO(AmfMessageConfigDO messageConfigDO) {
+    private MessageConfigVO toViewObject(AmfMessageConfigDO messageConfigDO) {
         if (messageConfigDO == null) {
             return null;
         }
@@ -248,7 +266,7 @@ public class MessageConfigServiceImpl2 implements MessageConfigService {
      * @param messageConfigDO DTO对象
      * @return DTO对象
      */
-    private MessageConfigDTO toDTO(AmfMessageConfigDO messageConfigDO) {
+    private MessageConfigDTO toTransferObject(AmfMessageConfigDO messageConfigDO) {
         if (messageConfigDO == null) {
             return null;
         }

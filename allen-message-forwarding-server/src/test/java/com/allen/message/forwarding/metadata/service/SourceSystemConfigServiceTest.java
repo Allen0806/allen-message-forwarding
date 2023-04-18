@@ -53,7 +53,7 @@ public class SourceSystemConfigServiceTest {
 
 	/**
 	 * Test method for
-	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#save(com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO)}.
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#save(com.allen.message.forwarding.metadata.model.SourceSystemConfigVO)}.
 	 */
 	@Test
 	final void testSave() {
@@ -69,7 +69,7 @@ public class SourceSystemConfigServiceTest {
 
 	/**
 	 * Test method for
-	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#update(com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO)}.
+	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#update(com.allen.message.forwarding.metadata.model.SourceSystemConfigVO)}.
 	 */
 //	@Test
 	final void testUpdate() {
@@ -99,24 +99,6 @@ public class SourceSystemConfigServiceTest {
 		assertEquals("信贷系统", sourceSystemConfigDTO.getBusinessLineName());
 	}
 
-	/**
-	 * Test method for
-	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#count(java.lang.Long)}.
-	 */
-//	@Test
-	final void testCount() {
-		int count = sourceSystemConfigService.count(1L);
-		assertEquals(1, count);
-	}
 
-	/**
-	 * Test method for
-	 * {@link com.allen.message.forwarding.metadata.service.impl.SourceSystemConfigServiceImpl#listByBusinessLineId4Paging(java.lang.Long, int, int)}.
-	 */
-//	@Test
-	final void testListByBusinessLineId4Paging() {
-		List<SourceSystemConfigVO> list = sourceSystemConfigService.list4Paging(1L, 1, 10);
-		assertEquals(1, list.size());
-	}
 
 }

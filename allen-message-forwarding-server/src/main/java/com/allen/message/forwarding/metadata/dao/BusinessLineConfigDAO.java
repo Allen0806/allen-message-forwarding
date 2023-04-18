@@ -1,6 +1,8 @@
 package com.allen.message.forwarding.metadata.dao;
 
 import com.allen.message.forwarding.metadata.model.AmfBusinessLineConfigDO;
+import com.allen.message.forwarding.metadata.model.BusinessLineConfigQueryParamDTO;
+import com.allen.tool.param.PagingQueryParam;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -58,17 +60,15 @@ public interface BusinessLineConfigDAO {
 
     /**
      * 获取未标记为删除的所属业务线配置信息数量
-     *
+     * @param queryParam 查询条件
      * @return 所属业务线配置信息数量
      */
-    int count();
+    int count(BusinessLineConfigQueryParamDTO queryParam);
 
     /**
      * 分页查询未标记为删除的所属业务线配置信息
-     *
-     * @param startNo  起始行号
-     * @param pageSize 每页行数
+     * @param pagingQueryParam 分页查询条件
      * @return 分页查询结果
      */
-    List<AmfBusinessLineConfigDO> list4Paging(@Param("startNo") int startNo, @Param("pageSize") int pageSize);
+    List<AmfBusinessLineConfigDO> list4Paging(PagingQueryParam<BusinessLineConfigQueryParamDTO> pagingQueryParam);
 }

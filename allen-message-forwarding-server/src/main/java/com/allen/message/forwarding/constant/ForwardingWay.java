@@ -42,17 +42,10 @@ public enum ForwardingWay {
      * @return 枚举对象
      */
     public static ForwardingWay instanceOf(String value) {
-        if (StringUtil.isBlank(value)) {
-            return null;
-        }
-        if ("01".equals(value)) {
-            return HTTP;
-        }
-        if ("02".equals(value)) {
-            return KAFKA;
-        }
-        if ("03".equals(value)) {
-            return ROCKETMQ;
+        for (ForwardingWay item : ForwardingWay.values()) {
+            if (item.value().equals(value)) {
+                return item;
+            }
         }
         return null;
     }

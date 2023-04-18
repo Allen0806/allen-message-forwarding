@@ -4,14 +4,16 @@ import com.allen.message.forwarding.metadata.model.MessageForwardingConfigVO;
 import com.allen.message.forwarding.metadata.service.MessageForwardingConfigService;
 import com.allen.tool.result.BaseResult;
 import com.allen.tool.validation.ValidationGroup;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.groups.Default;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.groups.Default;
 import java.util.List;
 
 /**
@@ -21,15 +23,11 @@ import java.util.List;
  * @date 2020年11月3日
  * @since 1.0.0
  */
+@Api(tags = {"消息转发配置管理接口"})
+@RefreshScope
 @RestController
 @RequestMapping(path = "/mf/meta/mfc")
 public class MessageForwardingConfigController {
-
-    /**
-     * 日志纪录器
-     */
-    @SuppressWarnings("unused")
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageForwardingConfigController.class);
 
     /**
      * 消息转发配置管理服务实例
@@ -40,12 +38,12 @@ public class MessageForwardingConfigController {
     /**
      * 新增消息转发配置信息
      *
-     * @param messageConfigDO 消息转发配置信息
+     * @param messageForwardingConfigVO 消息转发配置信息
      * @return 新增结果
      */
+    @ApiOperation("新增消息转发配置信息")
     @PostMapping("/save")
-    public BaseResult<Object> save(@NotNull(message = "消息转发配置信息不能为空") @Validated({ValidationGroup.Insert.class,
-            Default.class}) @RequestBody MessageForwardingConfigVO messageForwardingConfigVO) {
+    public BaseResult<Object> save(@Validated({ValidationGroup.Insert.class, Default.class}) @RequestBody MessageForwardingConfigVO messageForwardingConfigVO) {
         messageForwardingConfigService.save(messageForwardingConfigVO);
         return BaseResult.success();
     }
@@ -53,12 +51,12 @@ public class MessageForwardingConfigController {
     /**
      * 修改消息转发配置信息
      *
-     * @param messageConfigDO 消息转发配置信息
+     * @param messageForwardingConfigVO 消息转发配置信息
      * @return 修改结果
      */
+    @ApiOperation("修改消息转发配置信息")
     @PostMapping("/update")
-    public BaseResult<Object> update(@NotNull(message = "消息转发配置信息不能为空") @Validated({ValidationGroup.Update.class,
-            Default.class}) @RequestBody MessageForwardingConfigVO messageForwardingConfigVO) {
+    public BaseResult<Object> update(@Validated({ValidationGroup.Update.class, Default.class}) @RequestBody MessageForwardingConfigVO messageForwardingConfigVO) {
         messageForwardingConfigService.update(messageForwardingConfigVO);
         return BaseResult.success();
     }
@@ -70,9 +68,9 @@ public class MessageForwardingConfigController {
      * @param updatedBy 修改人ID
      * @return 删除结果
      */
+    @ApiOperation("根据主键删除消息转发配置信息，逻辑删除")
     @PostMapping("/remove/{id}/{updatedBy}")
-    public BaseResult<Object> remove(@NotNull(message = "消息ID不能为空") @PathVariable("id") Long id,
-                                     @NotNull(message = "修改人ID不能为空") @PathVariable("updatedBy") String updatedBy) {
+    public BaseResult<Object> remove(@PathVariable("id") Long id, @PathVariable("updatedBy") String updatedBy) {
         messageForwardingConfigService.remove(id, updatedBy);
         return BaseResult.success();
     }
@@ -83,9 +81,9 @@ public class MessageForwardingConfigController {
      * @param id 主键ID
      * @return 消息转发配置信息
      */
+    @ApiOperation("根据主键获取消息转发配置信息")
     @PostMapping("/get/{id}")
-    public BaseResult<MessageForwardingConfigVO> get(
-            @NotNull(message = "消息转发配置信息主键ID不能为空") @PathVariable("id") Long id) {
+    public BaseResult<MessageForwardingConfigVO> get(@PathVariable("id") Long id) {
         MessageForwardingConfigVO messageForwardingConfigVO = messageForwardingConfigService.get(id);
         return BaseResult.success(messageForwardingConfigVO);
     }
@@ -96,9 +94,9 @@ public class MessageForwardingConfigController {
      * @param messageId 消息ID
      * @return 消息转发配置信息
      */
+    @ApiOperation("根据消息ID获取消息转发配置信息")
     @PostMapping("/list/{messageId}")
-    public BaseResult<List<MessageForwardingConfigVO>> list(
-            @NotNull(message = "消息ID不能为空") @PathVariable("messageId") Integer messageId) {
+    public BaseResult<List<MessageForwardingConfigVO>> list(@PathVariable("messageId") Integer messageId) {
         List<MessageForwardingConfigVO> MessageForwardingConfigVOList = messageForwardingConfigService.list(messageId);
         return BaseResult.success(MessageForwardingConfigVOList);
     }

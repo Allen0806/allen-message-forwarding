@@ -28,37 +28,37 @@ public class MessageForwardingConfigDTO implements Serializable {
     /**
      * 消息ID
      */
-    @ApiModelProperty(value = "消息ID", dataType = "Integer")
+    @ApiModelProperty(value = "消息ID")
     private Integer messageId;
 
     /**
      * 目标系统名称，最长30位
      */
-    @ApiModelProperty(value = "目标系统名称，最长30位，新增时不可为空", dataType = "String")
+    @ApiModelProperty(value = "目标系统名称，最长30位，新增时不可为空")
     private String targetSystem;
 
     /**
      * 转发到目标系统的方式，固定2位长度：01-Http，02-Kafka，03-RocketMQ
      */
-    @ApiModelProperty(value = "转发到目标系统的方式，固定2位长度：01-Http，02-Kafka，03-RocketMQ", dataType = "String")
+    @ApiModelProperty(value = "转发到目标系统的方式，固定2位长度：01-Http，02-Kafka，03-RocketMQ")
     private String forwardingWay;
 
     /**
      * 目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔）
      */
-    @ApiModelProperty(value = "目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔）", dataType = "String")
+    @ApiModelProperty(value = "目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔）")
     private String targetAddress;
 
     /**
      * 重试次数，默认值为3，最大值为10次
      */
-    @ApiModelProperty(value = "重试次数，默认值为3，最大值为10次", dataType = "Integer")
+    @ApiModelProperty(value = "重试次数，默认值为3，最大值为10次")
     private Integer retryTimes;
 
     /**
      * 是否需要回调，0-否，1-是
      */
-    @ApiModelProperty(value = "是否需要回调，0-否，1-是，默认为0", dataType = "Integer")
+    @ApiModelProperty(value = "是否需要回调，0-否，1-是，默认为0")
     private Integer callbackRequired;
 
     public Long getId() {

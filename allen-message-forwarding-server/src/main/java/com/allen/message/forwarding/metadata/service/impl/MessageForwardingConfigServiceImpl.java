@@ -12,12 +12,13 @@ import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.string.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 @Service
+@RefreshScope
 public class MessageForwardingConfigServiceImpl implements MessageForwardingConfigService {
 
     /**
@@ -40,19 +42,19 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
     /**
      * redisTemplate实例
      */
-    @Autowired
+    @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 消息转发配置DAO层实例
      */
-    @Autowired
+    @Resource
     private MessageForwardingConfigDAO forwardingConfigDAO;
 
     @Transactional
     @Override
     public void save(MessageForwardingConfigVO messageForwardingConfigVO) {
-        AmfMessageForwardingConfigDO messageForwardingConfigDO = toDO(messageForwardingConfigVO);
+        AmfMessageForwardingConfigDO messageForwardingConfigDO = toDataObject(messageForwardingConfigVO);
         if (StringUtil.isBlank(messageForwardingConfigDO.getUpdatedBy())) {
             messageForwardingConfigDO.setUpdatedBy(messageForwardingConfigDO.getCreatedBy());
         }
@@ -112,7 +114,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
     @Override
     public MessageForwardingConfigVO get(Long id) {
         AmfMessageForwardingConfigDO messageForwardingConfigDO = forwardingConfigDAO.get(id);
-        return toVO(messageForwardingConfigDO);
+        return toViewObject(messageForwardingConfigDO);
     }
 
     @Override
@@ -126,7 +128,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
         if (forwardingConfigDOList == null || forwardingConfigDOList.isEmpty()) {
             return Collections.emptyList();
         }
-        return forwardingConfigDOList.parallelStream().map(e -> toVO(e)).collect(Collectors.toList());
+        return forwardingConfigDOList.parallelStream().map(e -> toViewObject(e)).collect(Collectors.toList());
     }
 
     @Override
@@ -135,7 +137,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
         if (forwardingConfigDOList == null || forwardingConfigDOList.isEmpty()) {
             return Collections.emptyList();
         }
-        return forwardingConfigDOList.parallelStream().map(e -> toDTO(e)).collect(Collectors.toList());
+        return forwardingConfigDOList.parallelStream().map(e -> toTransferObject(e)).collect(Collectors.toList());
     }
 
     /**
@@ -144,7 +146,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
      * @param messageForwardingConfigVO
      * @return
      */
-    private AmfMessageForwardingConfigDO toDO(MessageForwardingConfigVO messageForwardingConfigVO) {
+    private AmfMessageForwardingConfigDO toDataObject(MessageForwardingConfigVO messageForwardingConfigVO) {
         if (messageForwardingConfigVO == null) {
             return null;
         }
@@ -169,7 +171,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
      * @param messageForwardingConfigDO
      * @return
      */
-    private MessageForwardingConfigVO toVO(AmfMessageForwardingConfigDO messageForwardingConfigDO) {
+    private MessageForwardingConfigVO toViewObject(AmfMessageForwardingConfigDO messageForwardingConfigDO) {
         if (messageForwardingConfigDO == null) {
             return null;
         }
@@ -194,7 +196,7 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
      * @param messageForwardingConfigDO
      * @return
      */
-    private MessageForwardingConfigDTO toDTO(AmfMessageForwardingConfigDO messageForwardingConfigDO) {
+    private MessageForwardingConfigDTO toTransferObject(AmfMessageForwardingConfigDO messageForwardingConfigDO) {
         if (messageForwardingConfigDO == null) {
             return null;
         }
@@ -216,8 +218,9 @@ public class MessageForwardingConfigServiceImpl implements MessageForwardingConf
      */
     private void evictCache(Integer messageId) {
         // 清除缓存
-        String cacheKey = MessageConstant.MESSAGE_CONFIG_CACHE_NAME + "::" + messageId;
-        if (redisTemplate.hasKey(cacheKey)) {
+        String cacheKey = MessageConstant.MESSAGE_CONFIG_CACHE_NAME + ":" + messageId;
+        Boolean hasKey = redisTemplate.hasKey(cacheKey);
+        if (hasKey == Boolean.TRUE) {
             redisTemplate.delete(cacheKey);
         }
     }

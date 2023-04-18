@@ -1,5 +1,8 @@
 package com.allen.message.forwarding.process.model;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +14,7 @@ import java.util.Map;
  * @date 2020年5月8日
  * @since 1.0.0
  */
+@ApiModel("消息对象")
 public class MessageDTO implements java.io.Serializable {
 
     /**
@@ -21,66 +25,79 @@ public class MessageDTO implements java.io.Serializable {
     /**
      * 主键ID，修改时不可为空
      */
+    @ApiModelProperty(value = "主键ID，修改时不可为空")
     private Long id;
 
     /**
      * 消息流水号，固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复
      */
+    @ApiModelProperty(value = "消息流水号，固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复")
     private String messageNo;
 
     /**
      * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
      */
+    @ApiModelProperty(value = "消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位")
     private String messageKeyword;
 
     /**
      * 业务线ID，最长20位
      */
+    @ApiModelProperty(value = "业务线ID，最长20位")
     private String businessLineId;
 
     /**
      * 来源系统ID，固定4位
      */
+    @ApiModelProperty(value = "来源系统ID，固定4位")
     private Integer sourceSystemId;
 
     /**
      * 消息ID，即消息配置信息里的消息ID，固定6位
      */
+    @ApiModelProperty(value = "消息ID，即消息配置信息里的消息ID，固定6位")
     private Integer messageId;
 
     /**
      * 通过Http接口转发消息时，设置到http header里的参数，比如接口编号等
      */
+    @ApiModelProperty(value = "通过Http接口转发消息时，设置到http header里的参数，比如接口编号等")
     private Map<String, String> httpHeaders;
 
     /**
      * 要转发的消息内容
      */
+    @ApiModelProperty(value = "要转发的消息内容")
     private String messageContent;
 
     /**
      * 应转发的总数量，即为消息转发配置的数量
      */
+    @ApiModelProperty(value = "应转发的总数量，即为消息转发配置的数量")
     private Integer forwardingTotalAmount;
 
     /**
      * 实际转发成功数量
      */
+    @ApiModelProperty(value = "实际转发成功数量")
     private Integer forwardingSuccessAmount;
 
     /**
      * 创建时间，默认值为系统当前时间，不可修改
      */
+    @ApiModelProperty(value = "创建时间，默认值为系统当前时间，不可修改")
     private LocalDateTime createTime;
 
     /**
      * 最后修改时间，默认值为系统当前时间，数据修改时自动更新
      */
+    @ApiModelProperty(value = "最后修改时间，默认值为系统当前时间，数据修改时自动更新")
     private LocalDateTime updateTime;
 
     /**
      * 转发明细信息
      */
+    @ApiModelProperty(value = "转发明细信息")
     private List<MessageForwardingDTO> messageForwardings;
 
     public Long getId() {

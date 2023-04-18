@@ -3,7 +3,7 @@ package com.allen.message.forwarding.process.service;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 
 /**
- * 消息转发处理顶层接口，不通的转发方式需实现此接口
+ * 消息转发处理顶层接口，不同的转发方式需实现此接口
  *
  * @author Allen
  * @date 2020年12月1日

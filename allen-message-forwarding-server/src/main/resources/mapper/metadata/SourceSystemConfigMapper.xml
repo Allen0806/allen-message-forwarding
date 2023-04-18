@@ -73,7 +73,7 @@
         update `amf_source_system_config`
         set
         <trim suffixOverrides=",">
-            <if test="sourceSystemName != null and sourceSystemName!=''">
+            <if test="sourceSystemName != null and sourceSystemName != ''">
                 `source_system_name` = #{sourceSystemName},
             </if>
             <if test="deleted != null">
@@ -123,8 +123,18 @@
 	<select id="count" parameterType="string" resultType="int">
 		select count(*)
 		from  `amf_source_system_config`
-		where `business_line_config_id` = #{businessLineConfigId}
-		and   `is_deleted` = 0
+		<where>
+			<if test="businessLineConfigId != null">
+				`business_line_config_id` = #{businessLineConfigId}
+			</if>
+			<if test="sourceSystemId != null ">
+				and `source_system_id` = #{sourceSystemId}
+			</if>
+			<if test="sourceSystemName != null and sourceSystemName != ''">
+				and `source_system_name` like CONCAT('%', #{sourceSystemName}, '%')
+			</if>
+			and `is_deleted` = 0
+		</where>
 	</select>
 	
 	<!-- 分页查询 -->
@@ -132,8 +142,19 @@
         select
         <include refid="sourceSystemConfigColumns"></include>
         from  `amf_source_system_config`
-        where `business_line_config_id` = #{businessLineConfigId}
-        and   `is_deleted` = 0
+		<where>
+			<if test="param.businessLineConfigId != null">
+				`business_line_config_id` = #{param.businessLineConfigId}
+			</if>
+			<if test="param.sourceSystemId != null ">
+				and `source_system_id` = #{param.sourceSystemId}
+			</if>
+			<if test="param.sourceSystemName != null and param.sourceSystemName != ''">
+				and `source_system_name` like CONCAT('%', #{param.sourceSystemName}, '%')
+			</if>
+			and `is_deleted` = 0
+		</where>
+		order by `id` desc
         limit #{startNo}, #{pageSize}
 	</select>
 </mapper>

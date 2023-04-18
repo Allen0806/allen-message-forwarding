@@ -110,7 +110,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
      * @param messageForwarding
      */
     @Override
-    public void forward(ForwardingMessage4MQ messageForwarding) {
+    public void forward(ForwardingMessage4MQDTO messageForwarding) {
         // 1.获取锁，如果失败则返回，key：messageNo+forwardingId，
         // 2.从数据库中获取转发明细，判断是否转发成功或失败
         // 3.转发消息
@@ -221,7 +221,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
     }
 
     @Override
-    public void callback(ForwardingMessage4MQ messageForwarding) {
+    public void callback(ForwardingMessage4MQDTO messageForwarding) {
         String messageNo = messageForwarding.getMessageNo();
         Long forwardingId = messageForwarding.getForwardingId();
         String lockKey = MessageConstant.MESSAGE_CALLBACK_LOCK_NAME + "::" + messageNo + "::" + forwardingId;
@@ -417,7 +417,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
     private void send2ForwardingMQ(MessageSendingDTO messageReceive, MessageConfigDTO messageConfig) {
         List<MessageForwardingConfigDTO> forwardingConfigs = messageConfig.getForwardingConfigs();
         for (MessageForwardingConfigDTO forwardingConfig : forwardingConfigs) {
-            ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
+            ForwardingMessage4MQDTO messageForwarding = new ForwardingMessage4MQDTO();
             messageForwarding.setMessageNo(messageReceive.getMessageNo());
             messageForwarding.setMessageId(messageReceive.getMessageId());
             messageForwarding.setForwardingId(forwardingConfig.getId());
@@ -434,9 +434,9 @@ public class MessageProcessServiceImpl implements MessageProcessService {
         if (Objects.isNull(messageForwardingDTOList) || messageForwardingDTOList.isEmpty()) {
             return;
         }
-        List<ForwardingMessage4MQ> messageForwardingList = new ArrayList<>(messageForwardingDTOList.size());
+        List<ForwardingMessage4MQDTO> messageForwardingList = new ArrayList<>(messageForwardingDTOList.size());
         for (MessageForwardingDTO messageForwardingDTO : messageForwardingDTOList) {
-            ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
+            ForwardingMessage4MQDTO messageForwarding = new ForwardingMessage4MQDTO();
             messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
             messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
             messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
@@ -459,7 +459,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
         if (Objects.isNull(messageForwardingDTO)) {
             return;
         }
-        ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
+        ForwardingMessage4MQDTO messageForwarding = new ForwardingMessage4MQDTO();
         messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
         messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
         messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
@@ -471,7 +471,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
      *
      * @param messageForwarding
      */
-    private void send2ForwardingMQ(ForwardingMessage4MQ messageForwarding) {
+    private void send2ForwardingMQ(ForwardingMessage4MQDTO messageForwarding) {
         try {
             rocketMQProducer.send4Fowarding(messageForwarding);
         } catch (CustomBusinessException e) {
@@ -488,9 +488,9 @@ public class MessageProcessServiceImpl implements MessageProcessService {
         if (Objects.isNull(messageForwardingDTOList) || messageForwardingDTOList.isEmpty()) {
             return;
         }
-        List<ForwardingMessage4MQ> messageForwardingList = new ArrayList<>(messageForwardingDTOList.size());
+        List<ForwardingMessage4MQDTO> messageForwardingList = new ArrayList<>(messageForwardingDTOList.size());
         for (MessageForwardingDTO messageForwardingDTO : messageForwardingDTOList) {
-            ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
+            ForwardingMessage4MQDTO messageForwarding = new ForwardingMessage4MQDTO();
             messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
             messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
             messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());
@@ -513,7 +513,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
         if (messageForwardingDTO == null) {
             return;
         }
-        ForwardingMessage4MQ messageForwarding = new ForwardingMessage4MQ();
+        ForwardingMessage4MQDTO messageForwarding = new ForwardingMessage4MQDTO();
         messageForwarding.setMessageNo(messageForwardingDTO.getMessageNo());
         messageForwarding.setMessageId(messageForwardingDTO.getMessageId());
         messageForwarding.setForwardingId(messageForwardingDTO.getForwardingId());

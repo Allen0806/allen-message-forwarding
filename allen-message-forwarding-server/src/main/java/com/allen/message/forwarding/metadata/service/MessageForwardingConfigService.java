@@ -23,7 +23,7 @@ public interface MessageForwardingConfigService {
     /**
      * 新增消息转发配置信息
      *
-     * @param messageConfigDO 消息转发配置信息
+     * @param messageForwardingConfigVO 消息转发配置信息
      */
     @Validated({ValidationGroup.Insert.class, Default.class})
     void save(@NotNull(message = "消息转发配置信息不能为空") @Valid MessageForwardingConfigVO messageForwardingConfigVO);
@@ -31,7 +31,7 @@ public interface MessageForwardingConfigService {
     /**
      * 修改消息转发配置信息
      *
-     * @param messageConfigDO 消息转发配置信息
+     * @param messageForwardingConfigVO 消息转发配置信息
      */
     @Validated({ValidationGroup.Update.class, Default.class})
     void update(@NotNull(message = "消息转发配置信息不能为空") @Valid MessageForwardingConfigVO messageForwardingConfigVO);

@@ -1,13 +1,15 @@
 package com.allen.message.forwarding.metadata.service;
 
+import com.allen.message.forwarding.metadata.model.SourceSystemConfigQureyParamDTO;
 import com.allen.message.forwarding.metadata.model.SourceSystemConfigVO;
+import com.allen.tool.param.PagingQueryParam;
+import com.allen.tool.result.PagingQueryResult;
 import com.allen.tool.validation.ValidationGroup;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
-import java.util.List;
 
 /**
  * 消息来源系统配置信息管理Service层接口
@@ -52,21 +54,10 @@ public interface SourceSystemConfigService {
     SourceSystemConfigVO get(@NotNull(message = "消息来源系统配置信息主键ID不能为空") Long id);
 
     /**
-     * 根据业务线主键统计未删除的消息来源系统配置信息数量
+     * 分页查询未删除的消息来源系统配置信息
      *
-     * @param businessLineConfigId 所属业务线主键
-     * @return 消息来源系统配置信息数量
-     */
-    int count(@NotNull(message = "消息来源系统配置信息业务线主键不能为空") Long businessLineConfigId);
-
-    /**
-     * 根据业务线ID分页查询未删除的消息来源系统配置信息
-     *
-     * @param businessLineConfigId 业务线主键
-     * @param pageNo               当前页数
-     * @param pageSize             每页行数
+     * @param pagingQueryParam 分页查询参数
      * @return 分页查询结果
      */
-    List<SourceSystemConfigVO> list4Paging(@NotNull(message = "消息来源系统配置信息业务线主键不能为空") Long businessLineConfigId,
-                                           @NotNull(message = "当前页数不能为空") int pageNo, @NotNull(message = "每页行数不能为空") int pageSize);
+    PagingQueryResult<SourceSystemConfigVO> list4Paging(@NotNull(message = "消息来源系统配置信息分页查询参数不能为空") PagingQueryParam<SourceSystemConfigQureyParamDTO> pagingQueryParam);
 }

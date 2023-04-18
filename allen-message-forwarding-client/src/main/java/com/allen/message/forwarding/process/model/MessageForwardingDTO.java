@@ -1,15 +1,19 @@
 package com.allen.message.forwarding.process.model;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 消息转发结果DO类
+ * 消息转发结果对象
  *
  * @author Allen
  * @date 2020年11月3日
  * @since 1.0.0
  */
+@ApiModel("消息转发结果对象")
 public class MessageForwardingDTO implements Serializable {
 
     /**
@@ -20,101 +24,121 @@ public class MessageForwardingDTO implements Serializable {
     /**
      * 主键ID，修改时不可为空
      */
+    @ApiModelProperty(value = "主键ID，修改时不可为空")
     private Long id;
 
     /**
      * 消息流水号，固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复
      */
+    @ApiModelProperty(value = "消息流水号，固定32位，组成规则：8为日期+4位来源系统ID+6位消息ID+14位序列号（每日从1开始），不可重复")
     private String messageNo;
 
     /**
      * 消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位
      */
+    @ApiModelProperty(value = "消息关键字，方便将来追溯流水(非唯一)，比如客户号、手机号等，最长32位")
     private String messageKeyword;
 
     /**
      * 消息ID，即消息配置信息里的消息ID，固定6位
      */
+    @ApiModelProperty(value = "消息ID，即消息配置信息里的消息ID，固定6位")
     private Integer messageId;
 
     /**
      * 消息转发配置主键
      */
+    @ApiModelProperty(value = "消息转发配置主键")
     private Long forwardingId;
 
     /**
      * 转发到目标系统的方式，固定2位长度：01-Http，02-Kafka，03-RocketMQ，新增时不能为空
      */
+    @ApiModelProperty(value = "转发到目标系统的方式，固定2位长度：01-Http，02-Kafka，03-RocketMQ，新增时不能为空")
     private String forwardingWay;
 
     /**
      * 目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔），新增时不可为空
      */
+    @ApiModelProperty(value = "目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔），新增时不可为空")
     private String targetAddress;
 
     /**
      * 最大重试次数，同时适用于转发重试及回调重试，默认值为3，最大值为10次
      */
+    @ApiModelProperty(value = "最大重试次数，同时适用于转发重试及回调重试，默认值为3，最大值为10次")
     private Integer maxRetryTimes;
 
     /**
      * 是否需要回调，0-否，1-是
      */
+    @ApiModelProperty(value = "是否需要回调，0-否，1-是")
     private Integer callbackRequired;
 
     /**
      * 消息发送结果回调地址，最长200位
      */
+    @ApiModelProperty(value = "消息发送结果回调地址，最长200位")
     private String callbackUrl;
 
     /**
      * 转发处理状态：0-处理中，1-重试中，2-已完成
      */
+    @ApiModelProperty(value = "转发处理状态：0-处理中，1-重试中，2-已完成")
     private Integer forwardingStatus;
 
     /**
      * 转发结果：0-失败，1-成功
      */
+    @ApiModelProperty(value = "转发结果：0-失败，1-成功")
     private Integer forwardingResult;
 
     /**
      * 转发成功时间
      */
+    @ApiModelProperty(value = "转发成功时间")
     private LocalDateTime forwardingSucessTime;
 
     /**
      * 转发重试次数
      */
+    @ApiModelProperty(value = "转发重试次数")
     private Integer forwardingRetryTimes;
 
     /**
      * 回调处理状态：0-处理中，1-重试中，2-已完成
      */
+    @ApiModelProperty(value = "回调处理状态：0-处理中，1-重试中，2-已完成")
     private Integer callbackStatus;
 
     /**
      * 回调结果：0-失败，1-成功
      */
+    @ApiModelProperty(value = "回调结果：0-失败，1-成功")
     private Integer callbackResult;
 
     /**
      * 回调成功时间
      */
+    @ApiModelProperty(value = "回调成功时间")
     private LocalDateTime callbackSucessTime;
 
     /**
      * 回调重试次数
      */
+    @ApiModelProperty(value = "回调重试次数")
     private Integer callbackRetryTimes;
 
     /**
      * 创建时间，默认值为系统当前时间，不可修改
      */
+    @ApiModelProperty(value = "创建时间，默认值为系统当前时间，不可修改")
     private LocalDateTime createTime;
 
     /**
      * 最后修改时间，默认值为系统当前时间，数据修改时自动更新
      */
+    @ApiModelProperty(value = "最后修改时间，默认值为系统当前时间，数据修改时自动更新")
     private LocalDateTime updateTime;
 
     public Long getId() {

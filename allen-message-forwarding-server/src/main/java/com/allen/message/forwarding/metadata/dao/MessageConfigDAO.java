@@ -1,6 +1,8 @@
 package com.allen.message.forwarding.metadata.dao;
 
 import com.allen.message.forwarding.metadata.model.AmfMessageConfigDO;
+import com.allen.message.forwarding.metadata.model.MessageConfigQueryParamDTO;
+import com.allen.tool.param.PagingQueryParam;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -38,8 +40,7 @@ public interface MessageConfigDAO {
      * @param updatedBy        修改人
      * @return 更新的数量
      */
-    int updateBusinessLineName(@Param("businessLineId") String businessLineId,
-                               @Param("businessLineName") String businessLineName, @Param("updatedBy") String updatedBy);
+    int updateBusinessLineName(@Param("businessLineId") String businessLineId, @Param("businessLineName") String businessLineName, @Param("updatedBy") String updatedBy);
 
     /**
      * 根据来源系统ID更新来源系统名称
@@ -49,8 +50,7 @@ public interface MessageConfigDAO {
      * @param updatedBy        修改人
      * @return 更新的数量
      */
-    int updateSourceSystemName(@Param("sourceSystemId") Integer sourceSystemId,
-                               @Param("sourceSystemName") String sourceSystemName, @Param("updatedBy") String updatedBy);
+    int updateSourceSystemName(@Param("sourceSystemId") Integer sourceSystemId, @Param("sourceSystemName") String sourceSystemName, @Param("updatedBy") String updatedBy);
 
     /**
      * 根据主键ID获取消息配置信息
@@ -69,40 +69,20 @@ public interface MessageConfigDAO {
     AmfMessageConfigDO getByMessageId(Integer messageId);
 
     /**
-     * 统计给定的业务线下的未删除的消息配置数量
+     * 统计给定查询条件下消息配置信息的数量
      *
-     * @param businessLineId 业务线Id
-     * @return 消息配置数量
+     * @param queryParam 查询参数
+     * @return 统计数量
      */
-    int countByBusinessLineId(String businessLineId);
+    Integer count(MessageConfigQueryParamDTO queryParam);
+
 
     /**
      * 分页查询给定的业务线下的未删除的消息配置信息
      *
-     * @param businessLineId 业务线Id
-     * @param startNo        起始行号
-     * @param pageSize       每页行数
+     * @param pagingQueryParam 查询条件
      * @return 分页查询结果
      */
-    List<AmfMessageConfigDO> listByBusinessLineId4Paging(@Param("businessLineId") String businessLineId,
-                                                         @Param("startNo") int startNo, @Param("pageSize") int pageSize);
+    List<AmfMessageConfigDO> list4Paging(PagingQueryParam<MessageConfigQueryParamDTO> pagingQueryParam);
 
-    /**
-     * 统计给定的来源系统下的未删除的消息配置数量
-     *
-     * @param sourceSystemId 来源系统Id
-     * @return 消息配置数量
-     */
-    int countBySourceSystemId(Integer sourceSystemId);
-
-    /**
-     * 分页查询给定的来源系统下的未删除的消息配置信息
-     *
-     * @param sourceSystemId 来源系统Id
-     * @param startNo        起始行号
-     * @param pageSize       每页行数
-     * @return 分页查询结果
-     */
-    List<AmfMessageConfigDO> listBySourceSystemId4Paging(@Param("sourceSystemId") Integer sourceSystemId,
-                                                         @Param("startNo") int startNo, @Param("pageSize") int pageSize);
 }

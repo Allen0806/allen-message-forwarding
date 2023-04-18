@@ -1,6 +1,6 @@
 package com.allen.message.forwarding.process.service.impl;
 
-import com.allen.message.forwarding.process.model.ForwardingMessage4Callback;
+import com.allen.message.forwarding.process.model.ForwardingMessage4CallbackDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.service.MessageCallback;
 import com.allen.message.forwarding.process.service.MessageProcessService;
@@ -48,16 +48,16 @@ public class MessageCallbackByHttp implements MessageCallback {
             messageProcessService.updateCallbackResult(messageForwardingDTO, false, false);
             return;
         }
-        ForwardingMessage4Callback forwardingMessage4Callback = new ForwardingMessage4Callback();
-        forwardingMessage4Callback.setMessageNo(messageForwardingDTO.getMessageNo());
-        forwardingMessage4Callback.setMessageKeyword(messageForwardingDTO.getMessageKeyword());
-        forwardingMessage4Callback.setMessageId(messageForwardingDTO.getMessageId());
-        forwardingMessage4Callback.setForwardingId(messageForwardingDTO.getForwardingId());
-        forwardingMessage4Callback.setForwardingResult(messageForwardingDTO.getForwardingResult());
+        ForwardingMessage4CallbackDTO forwardingMessage4CallbackDTO = new ForwardingMessage4CallbackDTO();
+        forwardingMessage4CallbackDTO.setMessageNo(messageForwardingDTO.getMessageNo());
+        forwardingMessage4CallbackDTO.setMessageKeyword(messageForwardingDTO.getMessageKeyword());
+        forwardingMessage4CallbackDTO.setMessageId(messageForwardingDTO.getMessageId());
+        forwardingMessage4CallbackDTO.setForwardingId(messageForwardingDTO.getForwardingId());
+        forwardingMessage4CallbackDTO.setForwardingResult(messageForwardingDTO.getForwardingResult());
         boolean callbackResult = false;
         try {
             BaseResult<?> baseResult = restTemplate.postForObject(callbackUrl,
-                    JsonUtil.object2Json(forwardingMessage4Callback), BaseResult.class);
+                    JsonUtil.object2Json(forwardingMessage4CallbackDTO), BaseResult.class);
             callbackResult = baseResult.isSuccessful();
         } catch (Exception e) {
             LOGGER.error("消息回调出错，转发明细信息：" + messageForwardingDTO, e);

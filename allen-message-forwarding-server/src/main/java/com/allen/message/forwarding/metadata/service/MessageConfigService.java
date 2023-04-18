@@ -1,14 +1,16 @@
 package com.allen.message.forwarding.metadata.service;
 
 import com.allen.message.forwarding.metadata.model.MessageConfigDTO;
+import com.allen.message.forwarding.metadata.model.MessageConfigQueryParamDTO;
 import com.allen.message.forwarding.metadata.model.MessageConfigVO;
+import com.allen.tool.param.PagingQueryParam;
+import com.allen.tool.result.PagingQueryResult;
 import com.allen.tool.validation.ValidationGroup;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
-import java.util.List;
 
 /**
  * 消息配置管理服务层接口
@@ -71,29 +73,26 @@ public interface MessageConfigService {
     MessageConfigVO get(@NotNull(message = "消息配置信息主键ID不能为空") Long id);
 
     /**
-     * 统计给定的来源系统下的未删除的消息配置数量
-     *
-     * @param sourceSystemId 来源系统ID
-     * @return 消息配置数量
-     */
-    int countBySourceSystemId(@NotNull(message = "来源系统ID不能为空") Integer sourceSystemId);
-
-    /**
-     * 分页查询未标记为删除的消息配置信息
-     *
-     * @param sourceSystemId 消息来源系统ID
-     * @param startNo        起始行号
-     * @param pageSize       每页行数
-     * @return 分页查询结果
-     */
-    List<MessageConfigVO> listBySourceSystemId4Paging(@NotNull(message = "来源系统ID不能为空") Integer sourceSystemId,
-                                                      @NotNull(message = "当前页数不能为空") int pageNo, @NotNull(message = "每页行数不能为空") int pageSize);
-
-    /**
      * 根据消息ID获取未删除的消息配置信息，包含消息转发信息
      *
      * @param messageId 消息ID
      * @return 消息配置信息，包含消息转发信息
      */
     MessageConfigDTO getByMessageId(@NotNull(message = "消息ID不能为空") Integer messageId);
+
+    /**
+     * 统计给定查询条件下消息配置信息的数量
+     *
+     * @param queryParam 查询参数
+     * @return 统计数量
+     */
+    Integer count(MessageConfigQueryParamDTO queryParam);
+
+    /**
+     * 分页查询未标记为删除的消息配置信息
+     *
+     * @param pagingQueryParam 分页查询参数
+     * @return 分页查询结果
+     */
+    PagingQueryResult<MessageConfigVO> list4Paging(@NotNull(message = "消息配置信息分页查询参数不能为空") PagingQueryParam<MessageConfigQueryParamDTO> pagingQueryParam);
 }

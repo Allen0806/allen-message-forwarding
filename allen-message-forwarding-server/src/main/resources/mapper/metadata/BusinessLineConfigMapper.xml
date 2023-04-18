@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.allen.message.forwarding.metadata.dao.BusinessLineConfigDAO">
 	<!-- 插入 -->
 	<insert id="save"
@@ -81,7 +80,6 @@
             </if>
         </trim>
         where `id` = #{id}
-        <!-- 更新时间作为乐观锁 -->>
         and   `update_time` = #{updateTime}
     </update>
     
@@ -130,11 +128,11 @@
         <include refid="businessLineConfigColumns"></include>
         from  `amf_business_line_config`
         <where>
-			<if test="businessLineId != null">
-				`business_line_id` like #{businessLineId}
+			<if test="businessLineId != null and businessLineId != ''">
+				`business_line_id` like CONCAT('%', #{businessLineId}, '%')
 			</if>
-			<if test="authorityId != null">
-				and `business_line_name` like #{businessLineName}
+			<if test="businessLineName != null and businessLineName != ''">
+				and `business_line_name` like CONCAT('%', #{businessLineName}, '%')
 			</if>
 			    and `is_deleted` = 0
 		</where>
@@ -143,7 +141,15 @@
 	<select id="count" resultType="int">
 		select count(*)
 		from  `amf_business_line_config`
-		where `is_deleted` = 0
+		<where>
+			<if test="businessLineId != null and businessLineId != ''">
+				`business_line_id` like CONCAT('%', #{businessLineId}, '%')
+			</if>
+			<if test="businessLineName != null and businessLineName != ''">
+				and `business_line_name` like CONCAT('%', #{businessLineName}, '%')
+			</if>
+			and `is_deleted` = 0
+		</where>
 	</select>
 	
 	<!-- 分页查询 -->
@@ -151,7 +157,16 @@
         select
         <include refid="businessLineConfigColumns"></include>
         from  `amf_business_line_config`
-        where `is_deleted` = 0
+		<where>
+			<if test="param.businessLineId != null and param.businessLineId != ''">
+				`business_line_id` like CONCAT('%', #{param.businessLineId}, '%')
+			</if>
+			<if test="param.businessLineName != null and param.businessLineName != ''">
+				and `business_line_name` like CONCAT('%', #{param.businessLineName}, '%')
+			</if>
+			and `is_deleted` = 0
+		</where>
+		order by `id` desc
         limit #{startNo}, #{pageSize}
 	</select>
 </mapper>

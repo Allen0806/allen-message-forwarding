@@ -1,18 +1,23 @@
 package com.allen.message.forwarding.metadata.controller;
 
+import com.allen.message.forwarding.metadata.model.SourceSystemConfigQureyParamDTO;
 import com.allen.message.forwarding.metadata.model.SourceSystemConfigVO;
 import com.allen.message.forwarding.metadata.service.SourceSystemConfigService;
+import com.allen.tool.param.PagingQueryParam;
 import com.allen.tool.result.BaseResult;
+import com.allen.tool.result.PagingQueryResult;
 import com.allen.tool.validation.ValidationGroup;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.groups.Default;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 /**
  * 消息来源系统管理Controller层
@@ -21,6 +26,8 @@ import java.util.List;
  * @date Aug 3, 2020
  * @since 1.0.0
  */
+@Api(tags = {"消息来源系统管理接口"})
+@RefreshScope
 @RestController
 @RequestMapping(path = "/mf/meta/ssc")
 public class SourceSystemConfigController {
@@ -40,9 +47,10 @@ public class SourceSystemConfigController {
     /**
      * 新增消息来源系统配置信息
      *
-     * @param sourceSystemConfigDO 消息来源系统配置信息
+     * @param sourceSystemConfigVO 消息来源系统配置信息
      * @return 保存结果
      */
+    @ApiOperation("新增消息来源系统配置信息")
     @PostMapping("/save")
     public BaseResult<Object> save(@NotNull(message = "消息来源系统配置信息不能为空") @Validated({ValidationGroup.Insert.class,
             Default.class}) @RequestBody SourceSystemConfigVO sourceSystemConfigVO) {
@@ -53,9 +61,10 @@ public class SourceSystemConfigController {
     /**
      * 修改消息来源系统配置信息
      *
-     * @param sourceSystemConfigDO
+     * @param sourceSystemConfigVO
      * @return 修改结果
      */
+    @ApiOperation("修改消息来源系统配置信息")
     @PostMapping("/update")
     public BaseResult<Object> update(@NotNull(message = "消息来源系统配置信息不能为空") @Validated({ValidationGroup.Update.class,
             Default.class}) @RequestBody SourceSystemConfigVO sourceSystemConfigVO) {
@@ -70,9 +79,9 @@ public class SourceSystemConfigController {
      * @param updatedBy 修改人ID
      * @return 删除结果
      */
+    @ApiOperation("根据主键ID删除消息来源系统配置信息，逻辑删除。如果有对应的消息配置，则不允许删除")
     @PostMapping("/remove/{id}/{updatedBy}")
-    public BaseResult<Object> remove(@NotNull(message = "主键ID不能为空") @PathVariable("id") Long id,
-                                     @NotNull(message = "修改人ID不能为空") @PathVariable("updatedBy") String updatedBy) {
+    public BaseResult<Object> remove(@PathVariable("id") Long id, @PathVariable("updatedBy") String updatedBy) {
         sourceSystemConfigService.remove(id, updatedBy);
         return BaseResult.success();
     }
@@ -83,40 +92,22 @@ public class SourceSystemConfigController {
      * @param id 主键ID
      * @return 消息来源系统配置信息
      */
+    @ApiOperation("根据主键ID获取消息来源系统配置信息")
     @PostMapping("/get/{id}")
-    public BaseResult<SourceSystemConfigVO> get(@NotNull(message = "主键ID不能为空") @PathVariable("id") Long id) {
+    public BaseResult<SourceSystemConfigVO> get(@PathVariable("id") Long id) {
         SourceSystemConfigVO sourceSystemConfig = sourceSystemConfigService.get(id);
         return BaseResult.success(sourceSystemConfig);
     }
 
     /**
-     * 根据业务线ID统计消息来源系统配置信息数量
+     * 分页查询消息来源系统配置信息
      *
-     * @param businessLineId 业务线ID
-     * @return 消息来源系统配置信息数量
-     */
-    @PostMapping("/count/{businessLineConfigId}")
-    public BaseResult<Integer> count(
-            @NotNull(message = "业务线主键不能为空") @PathVariable("businessLineConfigId") Long businessLineConfigId) {
-        Integer count = sourceSystemConfigService.count(businessLineConfigId);
-        return BaseResult.success(count);
-    }
-
-    /**
-     * 根据业务线ID分页查询消息来源系统配置信息
-     *
-     * @param businessLineId 业务线ID
-     * @param pageNo         当前页数
-     * @param pageSize       每页行数
+     * @param pagingQueryParam 查询参数
      * @return 分页查询结果
      */
-    @PostMapping("/list_for_paging/{businessLineConfigId}/{pageNo}/{pageSize}")
-    public BaseResult<List<SourceSystemConfigVO>> listByBusinessLineId4Paging(
-            @NotNull(message = "业务线主键不能为空") @PathVariable("businessLineConfigId") Long businessLineConfigId,
-            @NotNull(message = "当前页数不能为空") @PathVariable("pageNo") Integer pageNo,
-            @NotNull(message = "每页行数不能为空") @PathVariable("pageSize") Integer pageSize) {
-        List<SourceSystemConfigVO> sourceSystemConfigs = sourceSystemConfigService.list4Paging(businessLineConfigId,
-                pageNo, pageSize);
-        return BaseResult.success(sourceSystemConfigs);
+    @ApiOperation("分页查询消息来源系统配置信息")
+    @PostMapping("/list_for_paging")
+    public BaseResult<PagingQueryResult<SourceSystemConfigVO>> list4Paging(@Validated @RequestBody PagingQueryParam<SourceSystemConfigQureyParamDTO> pagingQueryParam) {
+        return BaseResult.success(sourceSystemConfigService.list4Paging(pagingQueryParam));
     }
 }

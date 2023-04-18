@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 /**
- * 消息接收 Feign Client，供外部系统集成使用
+ * 消息查询 Feign Client，供外部系统集成使用
  *
  * @author Allen
  * @date 2020年4月20日

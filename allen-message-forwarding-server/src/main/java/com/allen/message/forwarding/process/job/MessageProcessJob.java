@@ -3,7 +3,7 @@ package com.allen.message.forwarding.process.job;
 import com.allen.message.forwarding.process.service.MessageProcessService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
-import com.xxl.job.core.log.XxlJobLogger;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,8 @@ import org.springframework.stereotype.Component;
  * @since 1.0.0
  */
 @Component
+@Slf4j
 public class MessageProcessJob {
-
-    @SuppressWarnings("unused")
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageProcessJob.class);
 
     /**
      * 消息处理服务
@@ -37,7 +35,7 @@ public class MessageProcessJob {
      */
     @XxlJob("forwardingRetryJobHandler")
     public ReturnT<String> forwardingRetryJobHandler(String param) throws Exception {
-        XxlJobLogger.log("消息转发重试任务开始执行");
+        log.info("消息转发重试任务开始执行");
         messageProcessService.retryForward();
         return ReturnT.SUCCESS;
     }
@@ -51,7 +49,7 @@ public class MessageProcessJob {
      */
     @XxlJob("callbackRetryJobHandler")
     public ReturnT<String> callbackRetryJobHandler(String param) throws Exception {
-        XxlJobLogger.log("消息回调重试任务开始执行");
+        log.info("消息回调重试任务开始执行");
         messageProcessService.retryCallback();
         return ReturnT.SUCCESS;
     }
@@ -65,7 +63,7 @@ public class MessageProcessJob {
      */
     @XxlJob("migrationJobHandler")
     public ReturnT<String> migrationJobHandler(String param) throws Exception {
-        XxlJobLogger.log("历史消息迁移任务开始执行");
+        log.info("历史消息迁移任务开始执行");
         messageProcessService.migrate();
         return ReturnT.SUCCESS;
     }

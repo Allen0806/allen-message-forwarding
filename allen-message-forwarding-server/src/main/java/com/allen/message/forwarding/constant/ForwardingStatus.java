@@ -42,17 +42,10 @@ public enum ForwardingStatus {
      * @return 枚举对象
      */
     public static ForwardingStatus instanceOf(Integer value) {
-        if (Objects.isNull(value)) {
-            return null;
-        }
-        if (value == 0) {
-            return PROCESSING;
-        }
-        if (value == 1) {
-            return RETRYING;
-        }
-        if (value == 2) {
-            return FINISH;
+        for (ForwardingStatus item : ForwardingStatus.values()) {
+            if (item.value().equals(value)) {
+                return item;
+            }
         }
         return null;
     }

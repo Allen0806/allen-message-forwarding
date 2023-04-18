@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @date 2020年11月3日
  * @since 1.0.0
  */
-public class ForwardingMessage4Callback implements Serializable {
+public class ForwardingMessage4CallbackDTO implements Serializable {
 
     /**
      * 序列化版本号

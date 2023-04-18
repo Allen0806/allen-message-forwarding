@@ -191,37 +191,59 @@
         and   `is_deleted` = 0
     </select>
     
-    <select id="countByBusinessLineId" parameterType="int" resultType="int">
+    <select id="count" parameterType="int" resultType="int">
 		select count(*)
 		from  `amf_message_config`
-		where `business_line_id` = #{businessLineId}
-		and `is_deleted` = 0
+		<where>
+			<if test="messageId != null">
+				`message_id` = #{messageId}
+			</if>
+			<if test="messageName != null and messageName != ''">
+				and `message_name` like CONCAT('%', #{messageName}, '%')
+			</if>
+			<if test="businessLineId != null and businessLineId != ''">
+				and `business_line_id` = #{businessLineId}
+			</if>
+			<if test="businessLineName != null and businessLineName != ''">
+				and `business_line_name` like CONCAT('%', #{businessLineName}, '%')
+			</if>
+			<if test="sourceSystemId != null and sourceSystemId != ''">
+				and `souce_system_id` = #{sourceSystemId}
+			</if>
+			<if test="sourceSystemName != null and sourceSystemName != ''">
+				and `source_system_name` like CONCAT('%', #{sourceSystemName}, '%')
+			</if>
+			and `is_deleted` = 0
+		</where>
 	</select>
-	
-	<!-- 分页查询 -->
-	<select id="listByBusinessLineId4Paging" resultMap="messageConfigResultMap">
-        select
-        <include refid="messageConfigColumns"></include>
-        from  `amf_message_config`
-        where `business_line_id` = #{businessLineId}
-        and `is_deleted` = 0
-        limit #{startNo}, #{pageSize}
-	</select>
-    
-	<select id="countBySourceSystemId" parameterType="int" resultType="int">
-		select count(*)
+
+	<select id="list4Paging" resultMap="messageConfigResultMap">
+		select
+		<include refid="messageConfigColumns"></include>
 		from  `amf_message_config`
-		where `souce_system_id` = #{sourceSystemId}
-		and `is_deleted` = 0
+		<where>
+			<if test="param.messageId != null">
+				`message_id` = #{param.messageId}
+			</if>
+			<if test="param.messageName != null and param.messageName != ''">
+				and `message_name` like CONCAT('%', #{param.messageName}, '%')
+			</if>
+			<if test="param.businessLineId != null and param.businessLineId != ''">
+				and `business_line_id` = #{param.businessLineId}
+			</if>
+			<if test="param.businessLineName != null and param.businessLineName != ''">
+				and `business_line_name` like CONCAT('%', #{param.businessLineName}, '%')
+			</if>
+			<if test="param.sourceSystemId != null and param.sourceSystemId != ''">
+				and `souce_system_id` = #{param.sourceSystemId}
+			</if>
+			<if test="param.sourceSystemName != null and param.sourceSystemName != ''">
+				and `source_system_name` like CONCAT('%', #{param.sourceSystemName}, '%')
+			</if>
+			and `is_deleted` = 0
+		</where>
+		order by `id` desc
+		limit #{startNo}, #{pageSize}
 	</select>
 	
-	<!-- 分页查询 -->
-	<select id="listBySourceSystemId4Paging" resultMap="messageConfigResultMap">
-        select
-        <include refid="messageConfigColumns"></include>
-        from  `amf_message_config`
-        where `souce_system_id` = #{sourceSystemId}
-        and `is_deleted` = 0
-        limit #{startNo}, #{pageSize}
-	</select>
 </mapper>

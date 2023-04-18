@@ -3,8 +3,9 @@ package com.allen.message.forwarding.process.model;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.Range;
+
+import javax.validation.constraints.Size;
 
 /**
  * 消息查询参数封装类

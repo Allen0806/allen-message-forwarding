@@ -1,11 +1,12 @@
 package com.allen.message.forwarding.process.service;
 
-import com.allen.message.forwarding.process.model.ForwardingMessage4MQ;
+import com.allen.message.forwarding.process.model.ForwardingMessage4MQDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.model.MessageSendingDTO;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * 消息转发处理服务层接口
@@ -29,7 +30,7 @@ public interface MessageProcessService {
      *
      * @param messageForwarding 消息转发明细
      */
-    void forward(@NotNull(message = "消息转发明细不能为空") @Valid ForwardingMessage4MQ messageForwarding);
+    void forward(@NotNull(message = "消息转发明细不能为空") @Valid ForwardingMessage4MQDTO messageForwarding);
 
     /**
      * 更新转发结果，各种转发方式完成转发后需要调用此方法更新转发结果
@@ -47,7 +48,7 @@ public interface MessageProcessService {
      *
      * @param messageForwarding 消息转发明细
      */
-    void callback(@NotNull(message = "消息转发明细不能为空") @Valid ForwardingMessage4MQ messageForwarding);
+    void callback(@NotNull(message = "消息转发明细不能为空") @Valid ForwardingMessage4MQDTO messageForwarding);
 
     /**
      * 更新回调结果，各种回调方式完成回调后需要调用此方法更新回调结果

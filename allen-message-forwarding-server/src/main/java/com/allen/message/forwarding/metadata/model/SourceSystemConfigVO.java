@@ -1,6 +1,11 @@
 package com.allen.message.forwarding.metadata.model;
 
 import com.allen.tool.validation.ValidationGroup;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Range;
@@ -28,40 +33,40 @@ public class SourceSystemConfigVO implements Serializable {
     /**
      * 主键ID，修改时不可为空
      */
-    @ApiModelProperty(value = "主键ID，修改时不可为空", dataType = "Long", required = true)
+    @ApiModelProperty(value = "主键ID，修改时不可为空", required = true)
     @NotNull(message = "主键ID不能为空", groups = {ValidationGroup.Update.class})
     private Long id;
 
     /**
      * 业务线主键ID，新增时不可为空
      */
-    @ApiModelProperty(value = "业务线主键ID，新增时不可为空", dataType = "Long", required = true)
+    @ApiModelProperty(value = "业务线主键ID，新增时不可为空", required = true)
     @NotNull(message = "业务线主键ID不能为空", groups = {ValidationGroup.Insert.class})
     private Long businessLineConfigId;
 
     /**
      * 业务线ID
      */
-    @ApiModelProperty(value = "业务线ID", dataType = "String", required = false)
+    @ApiModelProperty(value = "业务线ID")
     private String businessLineId;
 
     /**
      * 业务线名称
      */
-    @ApiModelProperty(value = "业务线名称", dataType = "String", required = false)
+    @ApiModelProperty(value = "业务线名称")
     private String businessLineName;
 
     /**
      * 来源系统ID，固定4位，由系统分配，默认值为数据库中的最大值加1，不可修改
      */
-    @ApiModelProperty(value = "来源系统ID，固定4位", dataType = "Integer", required = false)
+    @ApiModelProperty(value = "来源系统ID，固定4位")
     @Range(min = 1000, max = 9999, message = "来源系统ID取值范围为1000~9999")
     private Integer sourceSystemId;
 
     /**
      * 来源系统名称，最长30位，不可为空
      */
-    @ApiModelProperty(value = "来源系统名称，最长30位，不可为空", dataType = "String", required = true)
+    @ApiModelProperty(value = "来源系统名称，最长30位，不可为空", required = true)
     @NotNull(message = "来源系统名称不能为空")
     @Size(max = 30, message = "来源系统名称最长30位")
     private String sourceSystemName;
@@ -69,7 +74,7 @@ public class SourceSystemConfigVO implements Serializable {
     /**
      * 创建人ID，最长20位，新增时不可为空，不可修改
      */
-    @ApiModelProperty(value = "创建人ID，最长20位，新增时不可为空，不可修改", dataType = "String", required = true)
+    @ApiModelProperty(value = "创建人ID，最长20位，新增时不可为空，不可修改", required = true)
     @NotNull(message = "创建人ID不能为空", groups = {ValidationGroup.Insert.class})
     @Size(max = 20, message = "创建人ID最长20位")
     private String createdBy;
@@ -77,13 +82,16 @@ public class SourceSystemConfigVO implements Serializable {
     /**
      * 创建时间，默认值为系统当前时间
      */
-    @ApiModelProperty(value = "创建时间，默认值为系统当前时间", dataType = "LocalDateTime", required = false)
+    @ApiModelProperty(value = "创建时间，默认值为系统当前时间，格式：yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     /**
      * 最后修改人ID，最长20位，修改时不可为空
      */
-    @ApiModelProperty(value = "最后修改人ID，最长20位，修改时不可为空", dataType = "String", required = true)
+    @ApiModelProperty(value = "最后修改人ID，最长20位，修改时不可为空", required = true)
     @NotNull(message = "最后修改人ID不能为空", groups = {ValidationGroup.Update.class})
     @Size(max = 20, message = "最后修改人ID最长20位")
     private String updatedBy;
@@ -91,7 +99,10 @@ public class SourceSystemConfigVO implements Serializable {
     /**
      * 最后修改时间，默认值为系统当前时间，数据修改时自动更新
      */
-    @ApiModelProperty(value = "最后修改时间，默认值为系统当前时间，数据修改时自动更新", dataType = "LocalDateTime", required = false)
+    @ApiModelProperty(value = "最后修改时间，默认值为系统当前时间，数据修改时自动更新，格式：yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
     public Long getId() {

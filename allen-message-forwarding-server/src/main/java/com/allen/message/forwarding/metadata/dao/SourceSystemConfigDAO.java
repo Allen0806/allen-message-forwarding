@@ -1,8 +1,9 @@
 package com.allen.message.forwarding.metadata.dao;
 
 import com.allen.message.forwarding.metadata.model.AmfSourceSystemConfigDO;
+import com.allen.message.forwarding.metadata.model.SourceSystemConfigQureyParamDTO;
+import com.allen.tool.param.PagingQueryParam;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -41,21 +42,18 @@ public interface SourceSystemConfigDAO {
     AmfSourceSystemConfigDO get(Long id);
 
     /**
-     * 根据业务线主键统计未删除的消息来源系统配置信息数量
+     * 统计未删除的消息来源系统配置信息数量
      *
-     * @param businessLineConfigId 业务线主键
+     * @param queryParam 查询参数
      * @return 消息来源系统配置信息数量
      */
-    int count(Long businessLineConfigId);
+    int count(SourceSystemConfigQureyParamDTO queryParam);
 
     /**
-     * 根据业务线主键分页查询未删除的消息来源系统配置信息
+     * 分页查询未删除的消息来源系统配置信息
      *
-     * @param businessLineConfigId 业务线主键
-     * @param startNo              起始行号
-     * @param pageSize             每页行数
+     * @param pagingQueryParam 分页查询参数
      * @return 分页查询结果
      */
-    List<AmfSourceSystemConfigDO> list4Paging(@Param("businessLineConfigId") Long businessLineConfigId,
-                                              @Param("startNo") int startNo, @Param("pageSize") int pageSize);
+    List<AmfSourceSystemConfigDO> list4Paging(PagingQueryParam<SourceSystemConfigQureyParamDTO> pagingQueryParam);
 }

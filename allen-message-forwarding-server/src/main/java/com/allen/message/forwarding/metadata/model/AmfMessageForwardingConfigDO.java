@@ -38,7 +38,7 @@ public class AmfMessageForwardingConfigDO implements Serializable {
     private String forwardingWay;
 
     /**
-     * 目标地址：http接口地址/Kafka Topic/RocketMQ Topic:Tag（英文冒号分隔），新增时不可为空
+     * 目标地址：http接口地址/Kafka Topic/RocketMQ Topic（英文冒号分隔），新增时不可为空
      */
     private String targetAddress;
 

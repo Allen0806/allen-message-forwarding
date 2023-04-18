@@ -24,49 +24,49 @@ public class MessageConfigDTO implements Serializable {
     /**
      * 消息ID，由6位数字组成，步长为1，初始值为100000，全局唯一，默认系统自动生成
      */
-    @ApiModelProperty(value = "消息ID，由6位数字组成，步长为1，初始值为100000，全局唯一，默认系统自动生成", dataType = "Integer")
+    @ApiModelProperty(value = "消息ID，由6位数字组成，步长为1，初始值为100000，全局唯一，默认系统自动生成")
     private Integer messageId;
 
     /**
      * 消息名称，最长30位
      */
-    @ApiModelProperty(value = "消息名称，最长30位", dataType = "String")
+    @ApiModelProperty(value = "消息名称，最长30位")
     private String messageName;
 
     /**
      * 业务线ID，最长20位
      */
-    @ApiModelProperty(value = "业务线ID，最长20位", dataType = "String")
+    @ApiModelProperty(value = "业务线ID，最长20位")
     private String businessLineId;
 
     /**
      * 业务线名称，最长30位
      */
-    @ApiModelProperty(value = "业务线名称，最长30位", dataType = "String")
+    @ApiModelProperty(value = "业务线名称，最长30位")
     private String businessLineName;
 
     /**
      * 来源系统ID，固定4位
      */
-    @ApiModelProperty(value = "来源系统ID，固定4位", dataType = "Integer")
+    @ApiModelProperty(value = "来源系统ID，固定4位")
     private Integer sourceSystemId;
 
     /**
      * 来源系统名称，最长30位
      */
-    @ApiModelProperty(value = "来源系统名称，最长30位", dataType = "String")
+    @ApiModelProperty(value = "来源系统名称，最长30位")
     private String sourceSystemName;
 
     /**
      * 消息发送结果回调地址，最长200位
      */
-    @ApiModelProperty(value = "消息发送结果回调地址，最长200位", dataType = "String")
+    @ApiModelProperty(value = "消息发送结果回调地址，最长200位")
     private String callbackUrl;
 
     /**
      * 消息转发配置信息列表
      */
-    @ApiModelProperty(value = "消息转发配置信息列表", dataType = "List")
+    @ApiModelProperty(value = "消息转发配置信息列表")
     private List<MessageForwardingConfigDTO> forwardingConfigs;
 
     public Integer getMessageId() {

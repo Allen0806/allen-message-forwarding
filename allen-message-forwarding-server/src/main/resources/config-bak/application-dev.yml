@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8090
   servlet:
     # 配置项目名称（默认为 /），如果配置了项目名称，那么在访问路径中要加上配置的路径
     context-path: /
@@ -174,38 +174,38 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
-  cloud:
-    stream:
-      function:
-        definition: demoSave;demoUpdate
-      bindings:
-        demoSave-out-0:
-          destination: demo-save-topic
-          content-type: application/json
-        demoSave-in-0:
-          destination: demo-save-topic
-          content-type: application/json
-          group: demo-save-consumer-group
-        demoUpdate-out-0:
-          destination: demo-update-topic
-          content-type: application/json
-        demoUpdate-in-0:
-          destination: demo-update-topic
-          content-type: application/json
-          group: demo-update-consumer-group
-      rocketmq:
-        binder:
-          name-server: localhost:9876
-          group: allen-demo-group
-        bindings:
-          demoSave-in-0:
-            consumer:
-              enabled: true
-              broadcasting: false
-          demoUpdate-in-0:
-            consumer:
-              enabled: true
-              broadcasting: false
+#  cloud:
+#    stream:
+#      function:
+#        definition: demoSave;demoUpdate
+#      bindings:
+#        demoSave-out-0:
+#          destination: demo-save-topic
+#          content-type: application/json
+#        demoSave-in-0:
+#          destination: demo-save-topic
+#          content-type: application/json
+#          group: demo-save-consumer-group
+#        demoUpdate-out-0:
+#          destination: demo-update-topic
+#          content-type: application/json
+#        demoUpdate-in-0:
+#          destination: demo-update-topic
+#          content-type: application/json
+#          group: demo-update-consumer-group
+#      rocketmq:
+#        binder:
+#          name-server: localhost:9876
+#          group: allen-demo-group
+#        bindings:
+#          demoSave-in-0:
+#            consumer:
+#              enabled: true
+#              broadcasting: false
+#          demoUpdate-in-0:
+#            consumer:
+#              enabled: true
+#              broadcasting: false
 
 # 配置Mybatis Plus
 mybatis-plus:
@@ -220,7 +220,7 @@ mybatis-plus:
     # 是否开启缓存
     cache-enabled: false
     # 打印sql
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   # 全局配置
   global-config:
     # 数据库字段驼峰下划线转换
@@ -263,35 +263,28 @@ feign:
     response:
       enabled: true
 
-# 配置定时任务-示例
-xxl:
-  job:
-    admin:
-      addresses: http://localhost:8081/xxl-job-admin
-    executor:
-      appname: allen-message-forwarding-job-executor
-      address:
-      ip:
-      # 此端口不同项目不能相同
-      port: 9090
-      logpath: ./logs
-      logretentiondays: 30
-    accessToken:
+## 配置定时任务-示例
+#xxl:
+#  job:
+#    admin:
+#      addresses: http://localhost:8081/xxl-job-admin
+#    executor:
+#      appname: allen-message-forwarding-job-executor
+#      address:
+#      ip:
+#      # 此端口不同项目不能相同
+#      port: 9090
+#      logpath: ./logs
+#      logretentiondays: 30
+#    accessToken:
 
 # 是否启动swagger
 swagger:
   enable: true
 
-# 配置神域-示例
-# shenyu:
-#  client:
-#    registerType: http
-#    serverLists: http://localhost:9095
-#    props:
-#      contextPath: /demo
-#      isFull: true
-#      nacosNameSpace: allen-dev
-
-message:
-  # 历史消息保留天数
-  retention-days: 30
+allen:
+  message:
+    forwarding:
+      message:
+        # 历史消息保留天数
+        retention-days: 30

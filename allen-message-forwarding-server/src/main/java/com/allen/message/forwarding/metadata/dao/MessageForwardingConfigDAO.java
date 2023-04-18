@@ -16,7 +16,7 @@ public interface MessageForwardingConfigDAO {
     /**
      * 新增消息转发配置信息
      *
-     * @param messageConfigDO 消息转发配置信息
+     * @param messageForwardingConfigDO 消息转发配置信息
      * @return 新增成功的数量
      */
     int save(AmfMessageForwardingConfigDO messageForwardingConfigDO);
@@ -24,7 +24,7 @@ public interface MessageForwardingConfigDAO {
     /**
      * 修改消息转发配置信息
      *
-     * @param messageConfigDO 消息转发配置信息
+     * @param messageForwardingConfigDO 消息转发配置信息
      * @return 修改成功的数量
      */
     int update(AmfMessageForwardingConfigDO messageForwardingConfigDO);
