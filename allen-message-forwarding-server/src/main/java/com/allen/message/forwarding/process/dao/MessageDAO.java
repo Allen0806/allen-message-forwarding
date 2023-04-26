@@ -2,6 +2,7 @@ package com.allen.message.forwarding.process.dao;
 
 import com.allen.message.forwarding.process.model.AmfMessageDO;
 import com.allen.message.forwarding.process.model.MessageQueryParamDTO;
+import com.allen.tool.param.PagingQueryParam;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,8 +67,8 @@ public interface MessageDAO {
     /**
      * 根据给定参数查询消息信息
      *
-     * @param queryParam 查询参数
+     * @param pagingQueryParam 查询参数
      * @return 消息信息
      */
-    List<AmfMessageDO> list(MessageQueryParamDTO queryParam);
+    List<AmfMessageDO> list4Paging(PagingQueryParam<MessageQueryParamDTO> pagingQueryParam);
 }

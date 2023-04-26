@@ -10,11 +10,14 @@ import com.allen.message.forwarding.process.model.*;
 import com.allen.message.forwarding.process.service.MessageManagementService;
 import com.allen.tool.exception.CustomBusinessException;
 import com.allen.tool.json.JsonUtil;
+import com.allen.tool.param.PagingQueryParam;
+import com.allen.tool.result.PagingQueryResult;
 import com.allen.tool.string.StringUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 @Service
+@RefreshScope
 public class MessageManagementServiceImpl implements MessageManagementService {
 
     /**
@@ -138,9 +142,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
                 } else if (oldMessageForwardingDO.getForwardingResult() == ForwardingStatus.FINISH.value()) {
                     Integer oldRetryTimes = oldMessageForwardingDO.getForwardingRetryTimes() + 1;
                     Integer newRetryTimes = messageForwardingDTO.getForwardingRetryTimes();
-                    Integer forwardingRetryTimes = !Objects.isNull(newRetryTimes) && (newRetryTimes > oldRetryTimes)
-                            ? newRetryTimes
-                            : oldRetryTimes;
+                    Integer forwardingRetryTimes = !Objects.isNull(newRetryTimes) && (newRetryTimes > oldRetryTimes) ? newRetryTimes : oldRetryTimes;
                     newMessageForwardingDO.setForwardingRetryTimes(forwardingRetryTimes);
                     if (messageForwardingDTO.getForwardingResult() == MessageConstant.YES && oldMessageForwardingDO
                             .getForwardingResult() != messageForwardingDTO.getForwardingResult()) {
@@ -286,77 +288,51 @@ public class MessageManagementServiceImpl implements MessageManagementService {
     }
 
     @Override
-    public Integer countMessage(MessageQueryParamDTO messageQueryParam) {
-        if (messageQueryParam == null) {
-            LOGGER.error("查询条件为空");
-            throw new CustomBusinessException(ResultStatuses.MF_1013);
+    public PagingQueryResult<MessageDTO> listMessage4Paging(PagingQueryParam<MessageQueryParamDTO> pagingQueryParam) {
+        Integer pageNo = pagingQueryParam.getPageNo();
+        if (pageNo == null) {
+            pageNo = 1;
+            pagingQueryParam.setPageNo(pageNo);
         }
-        return messageDAO.count(messageQueryParam);
+        Integer pageSize = pagingQueryParam.getPageSize();
+        if (pageSize == null) {
+            pageSize = 10;
+            pagingQueryParam.setPageSize(pageSize);
+        }
+        Integer startNo = (pageNo - 1) * pageSize;
+        pagingQueryParam.setStartNo(startNo);
+        MessageQueryParamDTO queryParam = pagingQueryParam.getParam();
+        if (queryParam == null) {
+            queryParam = new MessageQueryParamDTO();
+            pagingQueryParam.setParam(queryParam);
+        }
+        Integer quantity = messageDAO.count(queryParam);
+        List<AmfMessageDO> messageDOList = messageDAO.list4Paging(pagingQueryParam);
+        return new PagingQueryResult<>(toMessageDTO(messageDOList), quantity, pageNo, pageSize);
     }
 
     @Override
-    public List<MessageDTO> listMessage(MessageQueryParamDTO messageQueryParam) {
-        if (messageQueryParam == null) {
-            LOGGER.error("查询条件为空");
-            throw new CustomBusinessException(ResultStatuses.MF_1013);
+    public PagingQueryResult<MessageForwardingDTO> listMessageForwarding4Paging(PagingQueryParam<MessageForwardingQueryParamDTO> pagingQueryParam) {
+        Integer pageNo = pagingQueryParam.getPageNo();
+        if (pageNo == null) {
+            pageNo = 1;
+            pagingQueryParam.setPageNo(pageNo);
         }
-        String messageNo = messageQueryParam.getMessageNo();
-        Integer pageNo = messageQueryParam.getPageNo();
-        Integer startNo = messageQueryParam.getStartNo();
-        Integer pageSize = messageQueryParam.getPageSize();
-        if (StringUtil.isBlank(messageNo)) {
-            if ((pageNo == null && startNo == null) || (startNo != null && startNo < 0)
-                    || (pageNo != null && pageNo < 1)) {
-                LOGGER.error("当前页数或起始行号不能同时为空或起始行号小于0或者当前页数小于1，查询条件：{}", messageQueryParam);
-                throw new CustomBusinessException(ResultStatuses.MF_1014);
-            }
-            if (pageSize == null || pageSize < 1) {
-                LOGGER.error("每页行数不能为空或者小于1，查询条件：{}", messageQueryParam);
-                throw new CustomBusinessException(ResultStatuses.MF_1015);
-            }
+        Integer pageSize = pagingQueryParam.getPageSize();
+        if (pageSize == null) {
+            pageSize = 10;
+            pagingQueryParam.setPageSize(pageSize);
         }
-        if (startNo == null) {
-            messageQueryParam.setStartNo((pageNo - 1) * pageSize);
+        Integer startNo = (pageNo - 1) * pageSize;
+        pagingQueryParam.setStartNo(startNo);
+        MessageForwardingQueryParamDTO queryParam = pagingQueryParam.getParam();
+        if (queryParam == null) {
+            queryParam = new MessageForwardingQueryParamDTO();
+            pagingQueryParam.setParam(queryParam);
         }
-        List<AmfMessageDO> messageDOList = messageDAO.list(messageQueryParam);
-        return toMessageDTO(messageDOList);
-    }
-
-    @Override
-    public Integer countMessageForwarding(MessageForwardingQueryParamDTO forwardingQueryParam) {
-        if (forwardingQueryParam == null) {
-            LOGGER.error("查询条件为空");
-            throw new CustomBusinessException(ResultStatuses.MF_1013);
-        }
-        return messageForwardingDAO.count(forwardingQueryParam);
-    }
-
-    @Override
-    public List<MessageForwardingDTO> listMessageForwarding(MessageForwardingQueryParamDTO forwardingQueryParam) {
-        if (forwardingQueryParam == null) {
-            LOGGER.error("查询条件为空");
-            throw new CustomBusinessException(ResultStatuses.MF_1013);
-        }
-        String messageNo = forwardingQueryParam.getMessageNo();
-        Integer pageNo = forwardingQueryParam.getPageNo();
-        Integer startNo = forwardingQueryParam.getStartNo();
-        Integer pageSize = forwardingQueryParam.getPageSize();
-        if (StringUtil.isBlank(messageNo)) {
-            if ((pageNo == null && startNo == null) || (startNo != null && startNo < 0)
-                    || (pageNo != null && pageNo < 1)) {
-                LOGGER.error("当前页数或起始行号不能同时为空或起始行号小于0或者当前页数小于1，查询条件：{}", forwardingQueryParam);
-                throw new CustomBusinessException(ResultStatuses.MF_1014);
-            }
-            if (pageSize == null || pageSize < 1) {
-                LOGGER.error("每页行数不能为空或者小于1，查询条件：{}", forwardingQueryParam);
-                throw new CustomBusinessException(ResultStatuses.MF_1015);
-            }
-        }
-        if (startNo == null) {
-            forwardingQueryParam.setStartNo((pageNo - 1) * pageSize);
-        }
-        List<AmfMessageForwardingDO> forwardingDOList = messageForwardingDAO.list(forwardingQueryParam);
-        return toMessageForwardingDTO(forwardingDOList);
+        Integer quantity = messageForwardingDAO.count(queryParam);
+        List<AmfMessageForwardingDO> forwardingDOList = messageForwardingDAO.list4Paging(pagingQueryParam);
+        return new PagingQueryResult<>(toMessageForwardingDTO(forwardingDOList), quantity, pageNo, pageSize);
     }
 
     /**
@@ -497,7 +473,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
     /**
      * 转发明细DO转换为DTO
      *
-     * @param messageForwardingDTO
+     * @param messageForwardingDO
      * @return
      */
     private MessageForwardingDTO toMessageForwardingDTO(AmfMessageForwardingDO messageForwardingDO) {

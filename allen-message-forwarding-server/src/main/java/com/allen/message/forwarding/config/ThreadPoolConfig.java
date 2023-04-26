@@ -33,7 +33,7 @@ public class ThreadPoolConfig {
         taskExecutor.setMaxPoolSize(20);
         taskExecutor.setQueueCapacity(200);
         taskExecutor.setKeepAliveSeconds(10);
-        taskExecutor.setThreadNamePrefix("amf-common-");
+        taskExecutor.setThreadNamePrefix("amf-message-forwarding-");
         taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         taskExecutor.setAwaitTerminationSeconds(60);
         // 修改拒绝策略为使用当前线程执行

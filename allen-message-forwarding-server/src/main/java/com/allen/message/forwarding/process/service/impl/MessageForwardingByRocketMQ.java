@@ -10,6 +10,7 @@ import com.allen.tool.exception.CustomBusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
  * @since 1.0.0
  */
 @Service("messageForwardingByRocketMQ")
+@RefreshScope
 public class MessageForwardingByRocketMQ implements MessageForwarding {
 
     /**
@@ -56,7 +58,6 @@ public class MessageForwardingByRocketMQ implements MessageForwarding {
             forwardingResult = true;
         } catch (CustomBusinessException e) {
             LOGGER.error("通过RocketMQ转发消息失败，转发明细信息：" + messageForwardingDTO, e);
-            forwardingResult = false;
         }
         messageProcessService.updateForwardingResult(messageForwardingDTO, forwardingResult, Boolean.TRUE);
     }

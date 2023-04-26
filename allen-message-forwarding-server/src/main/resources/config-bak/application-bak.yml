@@ -194,7 +194,7 @@ message:
         group: amf-message-callback-consumer
   kafka:
     consumer:
-        group: amf-message-forwarding-consumer
+      group: amf-message-forwarding-consumer
     send:
       topic: amf-message-sending
       

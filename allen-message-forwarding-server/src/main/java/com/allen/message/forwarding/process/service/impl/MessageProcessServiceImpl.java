@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,7 @@ import java.util.concurrent.TimeUnit;
  * @since 1.0.0
  */
 @Service
+@RefreshScope
 public class MessageProcessServiceImpl implements MessageProcessService {
 
     /**
@@ -53,8 +55,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
      * 回调处理线程池
      */
     @Autowired
-//	@Qualifier("callbackExecutor")
-    private ThreadPoolTaskExecutor callbackExecutor;
+    private ThreadPoolTaskExecutor commonExecutor;
 
     /**
      * RocketMQ生产者实例
@@ -84,14 +85,11 @@ public class MessageProcessServiceImpl implements MessageProcessService {
     public void send(MessageSendingDTO messageReceiveDTO) {
         Integer messageId = messageReceiveDTO.getMessageId();
         MessageConfigDTO messageConfig = messageConfigService.getByMessageId(messageReceiveDTO.getMessageId());
-        if (messageConfig == null || messageConfig.getForwardingConfigs() == null
-                || messageConfig.getForwardingConfigs().isEmpty()) {
-            LOGGER.error("根据给定的消息ID未获取到对应的消息配置信息或消息配置信息有误，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(),
-                    messageId);
+        if (messageConfig == null || messageConfig.getForwardingConfigs() == null || messageConfig.getForwardingConfigs().isEmpty()) {
+            LOGGER.error("根据给定的消息ID未获取到对应的消息配置信息或消息配置信息有误，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(), messageId);
             throw new CustomBusinessException(ResultStatuses.MF_1001);
         }
-        if (!messageConfig.getBusinessLineId().equals(messageReceiveDTO.getBusinessLineId())
-                || messageConfig.getSourceSystemId() != messageReceiveDTO.getMessageId()) {
+        if (!messageConfig.getBusinessLineId().equals(messageReceiveDTO.getBusinessLineId()) || !Objects.equals(messageConfig.getSourceSystemId(), messageReceiveDTO.getMessageId())) {
             LOGGER.error("传入的业务线ID及来源系统ID与消息配置信息中的不匹配，消息流水号：{}，消息ID：{}", messageReceiveDTO.getMessageNo(), messageId);
             throw new CustomBusinessException(ResultStatuses.MF_1002);
         }
@@ -99,8 +97,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
         messageManagementService.save(messageDTO);
 
         // 异步发送消息到MQ
-        ThreadPoolExecutor executor = ThreadPoolExecutorUtil
-                .getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
+        ThreadPoolExecutor executor = ThreadPoolExecutorUtil.getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
         executor.execute(() -> send2ForwardingMQ(messageReceiveDTO, messageConfig));
     }
 
@@ -118,10 +115,10 @@ public class MessageProcessServiceImpl implements MessageProcessService {
         // 5.更新转发结果
         String messageNo = messageForwarding.getMessageNo();
         Long forwardingId = messageForwarding.getForwardingId();
-        String lockKey = MessageConstant.MESSAGE_FORWARDING_LOCK_NAME + "::" + messageNo + "::" + forwardingId;
+        String lockKey = MessageConstant.MESSAGE_FORWARDING_LOCK_NAME + ":" + messageNo + ":" + forwardingId;
         RLock lock = redissonClient.getLock(lockKey);
         try {
-            if (lock.tryLock(3, 3, TimeUnit.SECONDS)) {
+            if (lock.tryLock(30, 30, TimeUnit.SECONDS)) {
                 try {
                     MessageForwardingDTO messageForwardingDTO = messageManagementService.getMessageForwarding(messageNo,
                             forwardingId);
@@ -129,7 +126,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
                         LOGGER.error("数据库中不存在对应的转发明细信息，MQ中的转发明细信息：{}", messageForwarding);
                         return;
                     }
-                    if (messageForwardingDTO.getForwardingStatus() == ForwardingStatus.FINISH.value()) {
+                    if (Objects.equals(messageForwardingDTO.getForwardingStatus(), ForwardingStatus.FINISH.value())) {
                         LOGGER.info("该消息转发已处理为终态，不再进行转发，数据库中的转发明细信息：{}", messageForwardingDTO);
                         return;
                     }
@@ -216,7 +213,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
         // 发送到回调MQ
         if (messageForwardingDTO.getCallbackRequired() == MessageConstant.YES) {
             // 使用 ThreadPoolTaskExecutor 异步执行，也可以调用异步方法
-            callbackExecutor.submit(() -> send2CallbackMQ(messageForwardingDTO));
+            commonExecutor.submit(() -> send2CallbackMQ(messageForwardingDTO));
         }
     }
 
@@ -319,45 +316,45 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 
     @Override
     public void retryForward() {
-        MessageForwardingQueryParamDTO queryParam = new MessageForwardingQueryParamDTO();
-        queryParam.setForwardingStatus(ForwardingStatus.RETRYING.value());
-        Integer count = messageManagementService.countMessageForwarding(queryParam);
-        if (count == null || count == 0) {
-            return;
-        }
-        Integer pageSize = 1000;
-        queryParam.setPageSize(pageSize);
-        int pageAmount = count / 1000 + 1;
-        for (int i = 0; i < pageAmount; i++) {
-            Integer startNo = i * pageSize;
-            queryParam.setStartNo(startNo);
-            List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding(queryParam);
-            // 异步发送消息到MQ，采用批量发送消息
-            ThreadPoolExecutor executor = ThreadPoolExecutorUtil
-                    .getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
-            executor.execute(() -> send2ForwardingMQ(messageForwardings));
-        }
+//        MessageForwardingQueryParamDTO queryParam = new MessageForwardingQueryParamDTO();
+//        queryParam.setForwardingStatus(ForwardingStatus.RETRYING.value());
+//        Integer count = messageManagementService.countMessageForwarding(queryParam);
+//        if (count == null || count == 0) {
+//            return;
+//        }
+//        Integer pageSize = 1000;
+//        queryParam.setPageSize(pageSize);
+//        int pageAmount = count / 1000 + 1;
+//        for (int i = 0; i < pageAmount; i++) {
+//            Integer startNo = i * pageSize;
+//            queryParam.setStartNo(startNo);
+//            List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding(queryParam);
+//            // 异步发送消息到MQ，采用批量发送消息
+//            ThreadPoolExecutor executor = ThreadPoolExecutorUtil
+//                    .getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);
+//            executor.execute(() -> send2ForwardingMQ(messageForwardings));
+//        }
     }
 
     @Override
     public void retryCallback() {
-        MessageForwardingQueryParamDTO queryParam = new MessageForwardingQueryParamDTO();
-        queryParam.setForwardingStatus(ForwardingStatus.FINISH.value());
-        queryParam.setCallbackStatus(CallbackStatus.RETRYING.value());
-        Integer count = messageManagementService.countMessageForwarding(queryParam);
-        if (count == null || count == 0) {
-            return;
-        }
-        Integer pageSize = 1000;
-        queryParam.setPageSize(pageSize);
-        int pageAmount = count / 1000 + 1;
-        for (int i = 0; i < pageAmount; i++) {
-            Integer startNo = i * pageSize;
-            queryParam.setStartNo(startNo);
-            List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding(queryParam);
-            // 异步发送消息到MQ，采用批量发送消息
-            callbackExecutor.submit(() -> send2CallbackMQ(messageForwardings));
-        }
+//        MessageForwardingQueryParamDTO queryParam = new MessageForwardingQueryParamDTO();
+//        queryParam.setForwardingStatus(ForwardingStatus.FINISH.value());
+//        queryParam.setCallbackStatus(CallbackStatus.RETRYING.value());
+//        Integer count = messageManagementService.countMessageForwarding(queryParam);
+//        if (count == null || count == 0) {
+//            return;
+//        }
+//        Integer pageSize = 1000;
+//        queryParam.setPageSize(pageSize);
+//        int pageAmount = count / 1000 + 1;
+//        for (int i = 0; i < pageAmount; i++) {
+//            Integer startNo = i * pageSize;
+//            queryParam.setStartNo(startNo);
+//            List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding(queryParam);
+//            // 异步发送消息到MQ，采用批量发送消息
+//            commonExecutor.submit(() -> send2CallbackMQ(messageForwardings));
+//        }
 
     }
 
@@ -506,7 +503,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
     /**
      * 将转发明细发送到回调MQ
      *
-     * @param messageForwarding
+     * @param messageForwardingDTO
      */
     // @Async("callbackExecutor") //异步方法，括号里的是线程池对象名称，可以不给定，用默认的
     private void send2CallbackMQ(MessageForwardingDTO messageForwardingDTO) {

@@ -4,9 +4,10 @@ import com.allen.message.forwarding.process.model.MessageDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO;
 import com.allen.message.forwarding.process.model.MessageQueryParamDTO;
+import com.allen.tool.param.PagingQueryParam;
+import com.allen.tool.result.PagingQueryResult;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 消息管理服务，封装对数据库层的操作
@@ -63,34 +64,18 @@ public interface MessageManagementService {
     MessageForwardingDTO getMessageForwarding(String messageNo, Long forwardingId);
 
     /**
-     * 查询符合条件的消息数量
+     * 根据查询条件分页查询消息信息
      *
-     * @param messageQueryParam 查询条件
-     * @return 消息数量
-     */
-    Integer countMessage(MessageQueryParamDTO messageQueryParam);
-
-    /**
-     * 根据查询条件查询消息信息
-     *
-     * @param messageQueryParam 查询条件
+     * @param pagingQueryParam 查询条件
      * @return 消息列表
      */
-    List<MessageDTO> listMessage(MessageQueryParamDTO messageQueryParam);
+    PagingQueryResult<MessageDTO> listMessage4Paging(PagingQueryParam<MessageQueryParamDTO> pagingQueryParam);
 
     /**
-     * 查询符合条件的消息转发明细数量
+     * 根据查询条件分页查询消息转发信息
      *
-     * @param forwardingQueryParam 查询条件
-     * @return 数量
-     */
-    Integer countMessageForwarding(MessageForwardingQueryParamDTO forwardingQueryParam);
-
-    /**
-     * 根据查询条件查询消息转发信息
-     *
-     * @param forwardingQueryParam 查询条件
+     * @param pagingQueryParam 查询条件
      * @return 消息转发信息列表
      */
-    List<MessageForwardingDTO> listMessageForwarding(MessageForwardingQueryParamDTO forwardingQueryParam);
+    PagingQueryResult<MessageForwardingDTO> listMessageForwarding4Paging(PagingQueryParam<MessageForwardingQueryParamDTO> pagingQueryParam);
 }

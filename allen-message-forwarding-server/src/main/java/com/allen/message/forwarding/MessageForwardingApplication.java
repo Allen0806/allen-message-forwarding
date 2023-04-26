@@ -19,7 +19,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = {"com.allen"})
-@EnableScheduling // 开启Spring定时任务支持
 @ComponentScan(basePackages = "com.allen")
 @MapperScan(basePackages = "com.allen.**.dao")
 @RefreshScope

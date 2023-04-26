@@ -203,45 +203,43 @@
 	</select>
 	
 	<!-- 分页查询 -->
-	<select id="list" parameterType="com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO" resultMap="forwardingResultMap">
+	<select id="list4Paging" resultMap="forwardingResultMap">
         select
         <include refid="forwardingColumns"></include>
         from  amf_message_forwarding
 		<where>
-			<if test="messageNo != null">
-				message_no = #{messageNo}
+			<if test="param.messageNo != null">
+				message_no = #{param.messageNo}
 			</if>
-			<if test="messageKeyword != null">
-				and message_keyword = #{messageKeyword}
+			<if test="param.messageKeyword != null">
+				and message_keyword = #{param.messageKeyword}
 			</if>
-			<if test="messageId != null">
-				and message_id = #{messageId}
+			<if test="param.messageId != null">
+				and message_id = #{param.messageId}
 			</if>
-			<if test="forwardingId != null">
-				and forwarding_id = #{forwardingId}
+			<if test="param.forwardingId != null">
+				and forwarding_id = #{param.forwardingId}
 			</if>
-			<if test="forwardingStatus != null">
-				and forwarding_status = #{forwardingStatus}
+			<if test="param.forwardingStatus != null">
+				and forwarding_status = #{param.forwardingStatus}
 			</if>
-			<if test="forwardingResult != null">
-				and forwarding_result = #{forwardingResult}
+			<if test="param.forwardingResult != null">
+				and forwarding_result = #{param.forwardingResult}
 			</if>
-			<if test="callbackStatus != null">
-				and callback_status = #{callbackStatus}
+			<if test="param.callbackStatus != null">
+				and callback_status = #{param.callbackStatus}
 			</if>
-			<if test="callbackResult != null">
-				and callback_result = #{callbackResult}
+			<if test="param.callbackResult != null">
+				and callback_result = #{param.callbackResult}
 			</if>
-			<if test="beginDate != null">
-				and create_time &gt;= unix_timestamp(#{beginDate})
+			<if test="param.beginDate != null">
+				and create_time &gt;= unix_timestamp(#{param.beginDate})
 			</if>
-			<if test="endDate != null">
-				and create_time &lt;= unix_timestamp(#{endDate})
+			<if test="param.endDate != null">
+				and create_time &lt;= unix_timestamp(#{param.endDate})
 			</if>
-				order by create_time desc
-			<if test="startNo != null and pageSize != null">
-				limit #{startNo}, #{pageSize}
-			</if>
+			order by id desc
+			limit #{startNo}, #{pageSize}
 		</where>
 	</select>
 </mapper>

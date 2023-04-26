@@ -5,16 +5,16 @@ import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.service.MessageForwarding;
 import com.allen.message.forwarding.process.service.MessageManagementService;
 import com.allen.message.forwarding.process.service.MessageProcessService;
-import com.allen.tool.http.HttpClientUtil;
-import com.allen.tool.json.JsonUtil;
 import com.allen.tool.result.BaseResult;
-import com.allen.tool.string.StringUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,6 +24,7 @@ import java.util.Map;
  * @date 2020年12月1日
  * @since 1.0.0
  */
+@RefreshScope
 @Service("messageForwardingByHttp")
 public class MessageForwardingByHttp implements MessageForwarding {
 
@@ -35,33 +36,45 @@ public class MessageForwardingByHttp implements MessageForwarding {
     /**
      * 消息管理服务
      */
-    @Autowired
+    @Resource
     private MessageManagementService messageManagementService;
 
     /**
      * 消息处理服务
      */
-    @Autowired
+    @Resource
     private MessageProcessService messageProcessService;
+
+    @Resource
+    private RestTemplate restTemplate;
 
     @Override
     public void forward(MessageForwardingDTO messageForwardingDTO) {
-        MessageDTO messageDTO = messageManagementService.getMessage(messageForwardingDTO.getMessageNo());
-        String messageContent = messageDTO.getMessageContent();
-        Map<String, String> httpHeaders = messageDTO.getHttpHeaders();
-        String targetAddress = messageForwardingDTO.getTargetAddress();
         boolean forwardingResult = false;
+        MessageDTO messageDTO = messageManagementService.getMessage(messageForwardingDTO.getMessageNo());
         try {
-            String resultStr = HttpClientUtil.doPost4Json(targetAddress, httpHeaders, messageContent, 3);
-            if (StringUtil.isNotBlank(resultStr)) {
-                BaseResult<Object> baseResult = JsonUtil.json2Object(resultStr,
-                        new TypeReference<BaseResult<Object>>() {
-                        });
+            String messageContent = messageDTO.getMessageContent();
+            Map<String, String> httpHeaderMap = messageDTO.getHttpHeaders();
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.parseMediaType("application/json;charset=UTF-8"));
+            if (httpHeaderMap != null && !httpHeaderMap.isEmpty()) {
+                for (Map.Entry<String, String> entry : httpHeaderMap.entrySet()) {
+                    httpHeaders.add(entry.getKey(), entry.getValue());
+                }
+            }
+            Map<String, String> httpParam = new HashMap<>();
+            httpParam.put("message", messageContent);
+            HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(httpParam, httpHeaders);
+            ResponseEntity<BaseResult> responseEntity = restTemplate.postForEntity(messageForwardingDTO.getTargetAddress(), httpEntity, BaseResult.class);
+
+            if (responseEntity.getStatusCode() != HttpStatus.OK || responseEntity.getBody() == null) {
+                LOGGER.error("通过http接口转发消息异常，消息流水号：" + messageDTO.getMessageNo());
+            } else {
+                BaseResult<?> baseResult = responseEntity.getBody();
                 forwardingResult = baseResult.isSuccessful();
             }
         } catch (Exception e) {
             LOGGER.error("通过http接口转发消息异常，消息流水号：" + messageDTO.getMessageNo(), e);
-            forwardingResult = false;
         }
         messageProcessService.updateForwardingResult(messageForwardingDTO, forwardingResult, Boolean.TRUE);
     }

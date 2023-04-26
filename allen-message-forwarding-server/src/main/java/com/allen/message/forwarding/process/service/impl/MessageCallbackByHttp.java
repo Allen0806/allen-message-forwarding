@@ -10,6 +10,7 @@ import com.allen.tool.string.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
  * @since 1.0.0
  */
 @Service("messageCallbackByHttp")
+@RefreshScope
 public class MessageCallbackByHttp implements MessageCallback {
 
     /**

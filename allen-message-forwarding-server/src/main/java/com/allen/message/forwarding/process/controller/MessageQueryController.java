@@ -5,13 +5,16 @@ import com.allen.message.forwarding.process.model.MessageForwardingDTO;
 import com.allen.message.forwarding.process.model.MessageForwardingQueryParamDTO;
 import com.allen.message.forwarding.process.model.MessageQueryParamDTO;
 import com.allen.message.forwarding.process.service.MessageManagementService;
+import com.allen.tool.param.PagingQueryParam;
 import com.allen.tool.result.BaseResult;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import com.allen.tool.result.PagingQueryResult;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.Valid;
 
 /**
  * 消息处理Controller层
@@ -20,6 +23,8 @@ import java.util.List;
  * @date 2020年5月12日
  * @since 1.0.0
  */
+@Api(tags = {"消息查询接口"})
+@RefreshScope
 @RestController
 @RequestMapping(path = "/mf/process")
 public class MessageQueryController {
@@ -36,43 +41,30 @@ public class MessageQueryController {
      * @param messageNo 消息流水号
      * @return 消息信息
      */
+    @ApiOperation("获取消息信息，同时返回消息转发明细")
     @PostMapping(value = "/get/message/{messageNo}")
-    BaseResult<MessageDTO> getMessage(@NotNull(message = "消息流水号不能为空") @PathVariable("messageNo") String messageNo) {
+    public BaseResult<MessageDTO> getMessage(@PathVariable("messageNo") String messageNo) {
         MessageDTO messageDTO = messageManagementService.getMessage(messageNo);
         if (messageDTO != null) {
             MessageForwardingQueryParamDTO forwardingQueryParam = new MessageForwardingQueryParamDTO();
             forwardingQueryParam.setMessageNo(messageNo);
-            List<MessageForwardingDTO> messageForwardings = messageManagementService
-                    .listMessageForwarding(forwardingQueryParam);
-            messageDTO.setMessageForwardings(messageForwardings);
+            PagingQueryParam<MessageForwardingQueryParamDTO> pagingQueryParam = new PagingQueryParam<>(forwardingQueryParam, 1, 1000);
+            PagingQueryResult<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding4Paging(pagingQueryParam);
+            messageDTO.setMessageForwardings(messageForwardings.getItems());
         }
         return BaseResult.success(messageDTO);
     }
 
     /**
-     * 查询符合条件的消息数量
+     * 根据查询条件分页查询消息信息，不包含转发明细信息
      *
-     * @param messageQueryParam 查询条件
-     * @return 消息数量
-     */
-    @PostMapping(value = "/count/message")
-    BaseResult<Integer> countMessage(
-            @NotNull(message = "消息查询条件不能为空") @Valid @RequestBody MessageQueryParamDTO messageQueryParam) {
-        Integer count = messageManagementService.countMessage(messageQueryParam);
-        return BaseResult.success(count);
-    }
-
-    /**
-     * 根据查询条件查询消息信息，不包含转发明细信息
-     *
-     * @param messageQueryParam 查询条件
+     * @param pagingQueryParam 查询条件
      * @return 消息列表
      */
+    @ApiOperation("根据查询条件分页查询消息信息，不包含转发明细信息")
     @PostMapping(value = "/list/message")
-    BaseResult<List<MessageDTO>> listMessage(
-            @NotNull(message = "消息查询条件不能为空") @Valid @RequestBody MessageQueryParamDTO messageQueryParam) {
-        List<MessageDTO> messages = messageManagementService.listMessage(messageQueryParam);
-        return BaseResult.success(messages);
+    public BaseResult<PagingQueryResult<MessageDTO>> listMessage(@Valid @RequestBody PagingQueryParam<MessageQueryParamDTO> pagingQueryParam) {
+        return BaseResult.success(messageManagementService.listMessage4Paging(pagingQueryParam));
     }
 
     /**
@@ -82,37 +74,23 @@ public class MessageQueryController {
      * @param forwardingId 转发配置主键
      * @return 息转发明细信息
      */
+    @ApiOperation("获取消息转发明细")
     @PostMapping(value = "/get/forwarding/{messageNo}/{forwardingId}")
-    BaseResult<MessageForwardingDTO> getMessageForwarding(
-            @NotNull(message = "消息流水号不能为空") @PathVariable("messageNo") String messageNo,
-            @NotNull(message = "转发配置ID不能为空") @PathVariable("forwardingId") Long forwardingId) {
+    public BaseResult<MessageForwardingDTO> getMessageForwarding(@PathVariable("messageNo") String messageNo, @PathVariable("forwardingId") Long forwardingId) {
         MessageForwardingDTO forwarding = messageManagementService.getMessageForwarding(messageNo, forwardingId);
         return BaseResult.success(forwarding);
     }
 
     /**
-     * 查询符合条件的消息转发明细数量
+     * 根据查询条件分页查询消息转发信息
      *
-     * @param forwardingQueryParam 查询条件
-     * @return 数量
-     */
-    @PostMapping(value = "/count/forwarding")
-    BaseResult<Integer> countMessageForwarding(
-            @NotNull(message = "消息转发明细查询条件不能为空") @Valid @RequestBody MessageForwardingQueryParamDTO forwardingQueryParam) {
-        Integer count = messageManagementService.countMessageForwarding(forwardingQueryParam);
-        return BaseResult.success(count);
-    }
-
-    /**
-     * 根据查询条件查询消息转发信息
-     *
-     * @param forwardingQueryParam 查询条件
+     * @param pagingQueryParam 查询条件
      * @return 消息转发信息列表
      */
+    @ApiOperation("根据查询条件分页查询消息转发信息")
     @PostMapping(value = "/list/forwarding")
-    BaseResult<List<MessageForwardingDTO>> listMessageForwarding(
-            @NotNull(message = "消息转发明细查询条件不能为空") @Valid @RequestBody MessageForwardingQueryParamDTO forwardingQueryParam) {
-        List<MessageForwardingDTO> forwardings = messageManagementService.listMessageForwarding(forwardingQueryParam);
+    public BaseResult<PagingQueryResult<MessageForwardingDTO>> listMessageForwarding(@Valid @RequestBody PagingQueryParam<MessageForwardingQueryParamDTO> pagingQueryParam) {
+        PagingQueryResult<MessageForwardingDTO> forwardings = messageManagementService.listMessageForwarding4Paging(pagingQueryParam);
         return BaseResult.success(forwardings);
     }
 }

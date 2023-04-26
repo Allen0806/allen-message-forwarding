@@ -206,6 +206,11 @@ spring:
 #            consumer:
 #              enabled: true
 #              broadcasting: false
+# rocketmq 配置
+rocketmq:
+  name-server: localhost:9876
+  producer:
+    group: amf-message-forwarding-producer
 
 # 配置Mybatis Plus
 mybatis-plus:
@@ -263,20 +268,20 @@ feign:
     response:
       enabled: true
 
-## 配置定时任务-示例
-#xxl:
-#  job:
-#    admin:
-#      addresses: http://localhost:8081/xxl-job-admin
-#    executor:
-#      appname: allen-message-forwarding-job-executor
-#      address:
-#      ip:
-#      # 此端口不同项目不能相同
-#      port: 9090
-#      logpath: ./logs
-#      logretentiondays: 30
-#    accessToken:
+# 配置定时任务-示例
+xxl:
+  job:
+    admin:
+      addresses: http://localhost:8081/xxl-job-admin
+    executor:
+      appname: allen-message-forwarding-job-executor
+      address:
+      ip:
+      # 此端口不同项目不能相同
+      port: 9090
+      logpath: ./logs
+      logretentiondays: 30
+    accessToken:
 
 # 是否启动swagger
 swagger:
@@ -288,3 +293,16 @@ allen:
       message:
         # 历史消息保留天数
         retention-days: 30
+      rocketmq:
+        send:
+          topic: amf-message-sending
+          consumer:
+            group: amf-message-sending-consumer
+        forward:
+          topic: amf-message-forwarding
+          consumer:
+            group: amf-message-forwarding-consumer
+        callback:
+          topic: amf-message-callback
+          consumer:
+            group: amf-message-callback-consumer
