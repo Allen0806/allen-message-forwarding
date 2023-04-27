@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
  * @date 2020年12月1日
  * @since 1.0.0
  */
-@Service("messageForwardingByRocketMQ")
 @RefreshScope
+@Service("messageForwardingByRocketMQ")
 public class MessageForwardingByRocketMQ implements MessageForwarding {
 
     /**

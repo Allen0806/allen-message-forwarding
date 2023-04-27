@@ -21,8 +21,8 @@ import org.springframework.web.client.RestTemplate;
  * @date 2020年12月2日
  * @since 1.0.0
  */
-@Service("messageCallbackByHttp")
 @RefreshScope
+@Service("messageCallbackByHttp")
 public class MessageCallbackByHttp implements MessageCallback {
 
     /**

@@ -21,8 +21,8 @@ import org.springframework.util.concurrent.ListenableFuture;
  * @date 2020年12月1日
  * @since 1.0.0
  */
-@Service("messageForwardingByKafka")
 @RefreshScope
+@Service("messageForwardingByKafka")
 public class MessageForwardingByKafka implements MessageForwarding {
 
     /**

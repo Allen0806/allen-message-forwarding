@@ -11,6 +11,7 @@ import com.allen.message.forwarding.process.service.MessageManagementService;
 import com.allen.message.forwarding.process.service.MessageProcessService;
 import com.allen.message.forwarding.rocketmq.RocketMQProducer;
 import com.allen.tool.exception.CustomBusinessException;
+import com.allen.tool.param.PagingQueryParam;
 import com.allen.tool.thread.ThreadPoolExecutorUtil;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -316,8 +317,14 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 
     @Override
     public void retryForward() {
-//        MessageForwardingQueryParamDTO queryParam = new MessageForwardingQueryParamDTO();
-//        queryParam.setForwardingStatus(ForwardingStatus.RETRYING.value());
+        MessageForwardingQueryParamDTO queryParam = new MessageForwardingQueryParamDTO();
+        queryParam.setForwardingStatus(ForwardingStatus.RETRYING.value());
+        PagingQueryParam<MessageForwardingQueryParamDTO> pagingQueryParam = new PagingQueryParam<>(queryParam, 0, 100);
+        while (true){
+
+        }
+
+
 //        Integer count = messageManagementService.countMessageForwarding(queryParam);
 //        if (count == null || count == 0) {
 //            return;
@@ -328,7 +335,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
 //        for (int i = 0; i < pageAmount; i++) {
 //            Integer startNo = i * pageSize;
 //            queryParam.setStartNo(startNo);
-//            List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding(queryParam);
+//            List<MessageForwardingDTO> messageForwardings = messageManagementService.listMessageForwarding4Paging(queryParam);
 //            // 异步发送消息到MQ，采用批量发送消息
 //            ThreadPoolExecutor executor = ThreadPoolExecutorUtil
 //                    .getExecutor(MessageConstant.MESSAGE_FORWARDING_THREAD_POOL_NAME);

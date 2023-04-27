@@ -31,7 +31,7 @@ public class KafkaConsumer {
     @Autowired
     private MessageProcessService messageProcessService;
 
-    @KafkaListener(topics = "${message.kafka.send.topic}", groupId = "${message.kafka.consumer.group}")
+    @KafkaListener(topics = "${allen.message.forwarding.kafka.send.topic}", groupId = "${allen.message.forwarding.kafka.consumer.group}")
     public void consume(String message) {
         if (StringUtil.isBlank(message)) {
             return;
